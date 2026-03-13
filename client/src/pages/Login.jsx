@@ -1,31 +1,32 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { loginUser } from '../services/api'
-import toast from 'react-hot-toast'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { loginUser } from "../services/api";
+import toast from "react-hot-toast";
 
 const Login = () => {
-  const { login } = useAuth()
-  const navigate  = useNavigate()
-  const [form, setForm]       = useState({ email: '', password: '' })
-  const [loading, setLoading] = useState(false)
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     try {
-      const res = await loginUser(form)
-      login(res.data.user, res.data.token)
-      toast.success(`Welcome back, ${res.data.user.name}!`)
-      navigate('/dashboard')
+      const res = await loginUser(form);
+      login(res.data.user, res.data.token);
+      toast.success(`Welcome back, ${res.data.user.name}!`);
+      navigate("/dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed.')
+      toast.error(err.response?.data?.message || "Login failed.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
@@ -39,26 +40,46 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
               <label className="label">Email address</label>
-              <input name="email" type="email" required placeholder="you@example.com"
-                className="input" value={form.email} onChange={handleChange} />
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="your@gmail.com"
+                className="input"
+                value={form.email}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <label className="label">Password</label>
-              <input name="password" type="password" required placeholder="••••••••"
-                className="input" value={form.password} onChange={handleChange} />
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="••••••••"
+                className="input"
+                value={form.password}
+                onChange={handleChange}
+              />
             </div>
-            <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+            <button
+              type="submit"
+              className="btn-primary w-full mt-2"
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
           <p className="text-center text-sm text-slate-400 mt-6">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-indigo-400 hover:underline">Create one</Link>
+            Don't have an account?{" "}
+            <Link to="/register" className="text-indigo-400 hover:underline">
+              Create one
+            </Link>
           </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

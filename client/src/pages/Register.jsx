@@ -1,34 +1,35 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { registerUser } from '../services/api'
-import toast from 'react-hot-toast'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { registerUser } from "../services/api";
+import toast from "react-hot-toast";
 
 const Register = () => {
-  const { login } = useAuth()
-  const navigate  = useNavigate()
-  const [form, setForm]       = useState({ name: '', email: '', password: '' })
-  const [loading, setLoading] = useState(false)
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (form.password.length < 6) {
-      return toast.error('Password must be at least 6 characters.')
+      return toast.error("Password must be at least 6 characters.");
     }
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await registerUser(form)
-      login(res.data.user, res.data.token)
-      toast.success('Account created successfully!')
-      navigate('/dashboard')
+      const res = await registerUser(form);
+      login(res.data.user, res.data.token);
+      toast.success("Account created successfully!");
+      navigate("/dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed.')
+      toast.error(err.response?.data?.message || "Registration failed.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
@@ -36,37 +37,71 @@ const Register = () => {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">📍</div>
           <h1 className="text-2xl font-bold text-white">Create an account</h1>
-          <p className="text-slate-400 mt-1 text-sm">Start tracking in seconds</p>
+          <p className="text-slate-400 mt-1 text-sm">
+            Start tracking in seconds
+          </p>
         </div>
         <div className="card">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
               <label className="label">Full name</label>
-              <input name="name" type="text" required placeholder="John Doe"
-                className="input" value={form.name} onChange={handleChange} />
+              <input
+                name="name"
+                type="text"
+                required
+                placeholder="vasu"
+                className="input"
+                value={form.name}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <label className="label">Email address</label>
-              <input name="email" type="email" required placeholder="you@example.com"
-                className="input" value={form.email} onChange={handleChange} />
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="vasu@gmail.com"
+                className="input"
+                value={form.email}
+                onChange={handleChange}
+              />
             </div>
             <div>
-              <label className="label">Password <span className="text-slate-500 font-normal">(min. 6 chars)</span></label>
-              <input name="password" type="password" required placeholder="••••••••"
-                className="input" value={form.password} onChange={handleChange} />
+              <label className="label">
+                Password{" "}
+                <span className="text-slate-500 font-normal">
+                  (min. 6 chars)
+                </span>
+              </label>
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="••••••••"
+                className="input"
+                value={form.password}
+                onChange={handleChange}
+              />
             </div>
-            <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create Account'}
+            <button
+              type="submit"
+              className="btn-primary w-full mt-2"
+              disabled={loading}
+            >
+              {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
           <p className="text-center text-sm text-slate-400 mt-6">
-            Already have an account?{' '}
-            <Link to="/login" className="text-indigo-400 hover:underline">Sign in</Link>
+            Already have an account?{" "}
+            <Link to="/login" className="text-indigo-400 hover:underline">
+              Sign in
+            </Link>
           </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;
