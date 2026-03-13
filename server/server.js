@@ -20,14 +20,24 @@ const server = http.createServer(app);
 const allowedOrigin = (origin, callback) => {
   // No origin (curl, Postman, same-origin): allow
   if (!origin) return callback(null, true);
+
+  // Clean up the env var (remove trailing slash if user added it)
+  const clientUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.trim().replace(/\/$/, '') : null;
+  const normalizedOrigin = origin.trim().replace(/\/$/, '');
+
   // Exact match with CLIENT_URL env var
-  if (origin === process.env.CLIENT_URL) return callback(null, true);
-  // Allow any Vercel deployment (for production before CLIENT_URL is pinned)
-  if (/^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin)) return callback(null, true);
+  if (clientUrl && normalizedOrigin === clientUrl) return callback(null, true);
+
+  // More robust Vercel check: allow anything ending in .vercel.app
+  if (normalizedOrigin.endsWith('.vercel.app')) return callback(null, true);
+
   // Always allow localhost (any port)
-  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return callback(null, true);
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin)) return callback(null, true);
+
   // Allow local network IPs: 192.168.x.x, 10.x.x.x, 172.16-31.x.x
-  if (/^http:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.)/.test(origin)) return callback(null, true);
+  if (/^http:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.)/.test(normalizedOrigin)) return callback(null, true);
+
+  console.error(`❌ CORS REJECTED: ${origin}`);
   callback(new Error('CORS: origin not allowed — ' + origin));
 };
 
