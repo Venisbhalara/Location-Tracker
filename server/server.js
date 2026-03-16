@@ -21,6 +21,9 @@ const allowedOrigin = (origin, callback) => {
   // No origin (curl, Postman, same-origin): allow
   if (!origin) return callback(null, true);
 
+  // If explicitly allowed to bypass CORS for testing
+  if (process.env.ALLOW_ALL_ORIGINS === "true") return callback(null, true);
+
   // Clean up the env var (remove trailing slash if user added it)
   const clientUrl = process.env.CLIENT_URL
     ? process.env.CLIENT_URL.trim().replace(/\/$/, "")
@@ -32,6 +35,16 @@ const allowedOrigin = (origin, callback) => {
 
   // More robust Vercel check: allow anything ending in .vercel.app
   if (normalizedOrigin.endsWith(".vercel.app")) return callback(null, true);
+
+  // Tunnel support: allow common tunnel providers like ngrok, cloudflare, etc.
+  if (
+    normalizedOrigin.endsWith(".ngrok-free.app") ||
+    normalizedOrigin.endsWith(".ngrok.io") ||
+    normalizedOrigin.endsWith(".trycloudflare.com") ||
+    normalizedOrigin.endsWith(".loca.lt")
+  ) {
+    return callback(null, true);
+  }
 
   // Always allow localhost (any port)
   if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin))

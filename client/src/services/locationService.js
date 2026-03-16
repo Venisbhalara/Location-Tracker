@@ -1,9 +1,10 @@
 import { updateLocation } from './api';
 import io from 'socket.io-client';
 
-// In production (Vercel), VITE_SOCKET_URL points to the Render backend.
-// In local dev, falls back to window.location.origin so Vite's /socket.io proxy works.
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ||
+// In development with Vite, we want the socket to go through the same host + port as the UI
+// so that Vite's proxy (defined in vite.config.js) can route it to the backend.
+// This works perfectly with tunnels like ngrok.
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 
   (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
 
 // Auto-refresh interval: 10 minutes (in milliseconds)

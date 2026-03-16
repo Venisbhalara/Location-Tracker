@@ -35,7 +35,17 @@ const createTracking = async (req, res) => {
     });
 
     // Build the shareable tracking URL
-    const trackingLink = `${process.env.CLIENT_URL}/track/${token}`;
+    // Use Origin/Host header if CLIENT_URL is not set or looks like a local IP, 
+    // to make it work seamlessly with tunnels.
+    let baseUrl = process.env.CLIENT_URL || '';
+    
+    // If we're hitting this from a tunnel or different IP, adjust baseUrl
+    const requestOrigin = req.get('origin') || (req.get('host') ? `${req.protocol}://${req.get('host')}` : null);
+    if (requestOrigin && (!baseUrl || baseUrl.includes('localhost') || baseUrl.match(/\d+\.\d+\.\d+\.\d+/))) {
+      baseUrl = requestOrigin;
+    }
+
+    const trackingLink = `${baseUrl.replace(/\/$/, '')}/track/${token}`;
 
     res.status(201).json({
       message:      'Tracking link created successfully!',
@@ -85,6 +95,7 @@ const updateLocation = async (req, res) => {
     // Emit real-time location update via Socket.IO
     const io = req.app.get('io');
     if (io) {
+      console.log(`📡 Emitting location update for token: ${token}`);
       io.to(token).emit('location-update', {
         latitude,
         longitude,
@@ -95,8 +106,8 @@ const updateLocation = async (req, res) => {
 
     res.status(200).json({ message: 'Location updated successfully!', latitude, longitude });
   } catch (error) {
-    console.error('Update location error:', error);
-    res.status(500).json({ message: 'Server error while updating location.', error: error.message });
+    console.error('Update location error for token:', token, error);
+    res.status(500).json({ message: 'Server error while updating location. Please try again.', error: error.message });
   }
 };
 
