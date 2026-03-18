@@ -333,7 +333,7 @@ const LiveMap = () => {
               ? `${activePos.latitude?.toFixed(8)}, ${activePos.longitude?.toFixed(8)}`
               : "—"}
           </p>{" "}
-          <br /> <br />
+          <br />
           <a
             href={`https://www.google.com/maps?q=${activePos.latitude?.toFixed(8)},${activePos.longitude?.toFixed(8)}&z=18`}
             target="_blank"
