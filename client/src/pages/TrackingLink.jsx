@@ -288,13 +288,19 @@ const TrackingLink = () => {
             {/* Auto-refresh countdown */}
             <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-3 mb-4">
               <p className="text-xs text-indigo-300 mb-1">
-                🔄 Next auto-refresh
+                Live update frequency
               </p>
-              <p className="text-2xl font-mono font-bold text-indigo-400">
-                {formatCountdown(countdown)}
-              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <p className="text-sm font-mono font-bold text-indigo-400">
+                  Every 1 second
+                </p>
+              </div>
               <p className="text-xs text-slate-500 mt-1">
-                Location is refreshed every 10 minutes automatically
+                Last update:{" "}
+                {position?.timestamp
+                  ? new Date(position.timestamp).toLocaleTimeString()
+                  : "—"}
               </p>
             </div>
 

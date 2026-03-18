@@ -83,3 +83,6 @@ Feature Requirement:
 
 Goal:
 Build a complete production-ready admin-controlled access system where only approved users can use the location tracking feature, ensuring security and controlled usage.
+
+
+in the location when a user allow the location it will only show me the area name and city name so i want the all details like if there are building so give the building name and if there are any company so give me he company name like i want all the details ike street name landmark name area name and city name perfectly are you understand this so pls do this 
