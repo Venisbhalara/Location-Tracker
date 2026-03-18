@@ -45,11 +45,6 @@ const TrackingRequest = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
-    expiresAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
     accuracy: {
       type: DataTypes.FLOAT,
       allowNull: true,
