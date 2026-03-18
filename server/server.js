@@ -71,6 +71,9 @@ const io = socketio(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
+  transports: ["websocket", "polling"],
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
 // Middleware

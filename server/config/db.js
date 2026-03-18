@@ -1,5 +1,5 @@
-const { Sequelize } = require('sequelize');
-const dotenv = require('dotenv');
+const { Sequelize } = require("sequelize");
+const dotenv = require("dotenv");
 dotenv.config();
 
 const sequelize = new Sequelize(
@@ -7,9 +7,9 @@ const sequelize = new Sequelize(
   process.env.DB_USER,
   process.env.DB_PASSWORD,
   {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT) || 3306,
-    dialect: 'mysql',
+    dialect: "mysql",
     logging: false,
     pool: {
       max: 10,
@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
       acquire: 30000,
       idle: 10000,
     },
-  }
+  },
 );
 
 // Just exports the sequelize instance — sync is done in server.js
