@@ -32,29 +32,25 @@ export default defineConfig({
         // ── Split heavy vendor libraries into their own cached chunks ──────
         // These rarely change, so browsers cache them across deployments.
         manualChunks(id) {
-          // React core — tiny but critical, give it its own chunk
-          if (id.includes('node_modules/react') ||
-              id.includes('node_modules/react-dom') ||
-              id.includes('node_modules/react-router-dom') ||
-              id.includes('node_modules/react-hot-toast') ||
-              id.includes('node_modules/scheduler')) {
-            return 'vendor-react'
-          }
-          // Leaflet + react-leaflet (the map library) — ~150 kB
-          if (id.includes('node_modules/leaflet') ||
-              id.includes('node_modules/react-leaflet')) {
+          // 1. Separate native Leaflet (heavy, no React dependency)
+          if (id.includes('node_modules/leaflet/')) {
             return 'vendor-leaflet'
           }
-          // Socket.io client — ~80 kB
-          if (id.includes('node_modules/socket.io-client') ||
-              id.includes('node_modules/engine.io-client')) {
+          // 2. Put EVERYTHING strictly React-related into one combined chunk.
+          // This safely catches react, react-dom, react-router-dom, react-hot-toast,
+          // react-leaflet, and @react-leaflet/core so they never lose context.
+          if (id.includes('node_modules/react') || id.includes('node_modules/@react-') || id.includes('node_modules/scheduler')) {
+            return 'vendor-react'
+          }
+          // 3. Socket.io client
+          if (id.includes('node_modules/socket.io-client') || id.includes('node_modules/engine.io-client')) {
             return 'vendor-socket'
           }
-          // Lenis smooth scroll
+          // 4. Lenis smooth scroll
           if (id.includes('node_modules/lenis')) {
             return 'vendor-lenis'
           }
-          // Everything else in node_modules
+          // 5. Everything else
           if (id.includes('node_modules')) {
             return 'vendor-misc'
           }
