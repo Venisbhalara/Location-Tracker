@@ -37,7 +37,6 @@ const register = async (req, res) => {
 
     // Generate token
     const token = generateToken(user.id);
-
     res.status(201).json({
       message: "Registration successful!",
       token,
@@ -45,6 +44,8 @@ const register = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
+        trackingAccess: user.trackingAccess,
         createdAt: user.createdAt,
       },
     });
@@ -100,6 +101,8 @@ const login = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
+        trackingAccess: user.trackingAccess,
         createdAt: user.createdAt,
       },
     });
@@ -121,6 +124,8 @@ const getMe = async (req, res) => {
         id: req.user.id,
         name: req.user.name,
         email: req.user.email,
+        role: req.user.role,
+        trackingAccess: req.user.trackingAccess,
         createdAt: req.user.createdAt,
       },
     });
