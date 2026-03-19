@@ -31,6 +31,26 @@ const User = sequelize.define('User', {
       len: { args: [6, 255], msg: 'Password must be at least 6 characters' },
     },
   },
+  role: {
+    type: DataTypes.STRING(20),
+    allowNull: true,
+    defaultValue: 'user',
+  },
+  accessStatus: {
+    type: DataTypes.STRING(20),
+    allowNull: true,
+    defaultValue: 'approved',
+  },
+  trackingAccess: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+    defaultValue: false,
+  },
+  lastLoginAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null,
+  },
 }, {
   tableName: 'users',
   timestamps: true,

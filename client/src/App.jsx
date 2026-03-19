@@ -3,8 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useLenis } from './hooks/useLenis'
 
 // ── Lazy-loaded pages (each becomes its own JS chunk) ────────────────────────
-// This drastically reduces the initial bundle size. Each page's code is only
-// downloaded the first time the user navigates to it.
 const Home           = lazy(() => import('./pages/Home'))
 const Login          = lazy(() => import('./pages/Login'))
 const Register       = lazy(() => import('./pages/Register'))
@@ -13,6 +11,12 @@ const Contacts       = lazy(() => import('./pages/Contacts'))
 const CreateTracking = lazy(() => import('./pages/CreateTracking'))
 const TrackingLink   = lazy(() => import('./pages/TrackingLink'))
 const LiveMap        = lazy(() => import('./pages/LiveMap'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminUsers     = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminAccess    = lazy(() => import('./pages/admin/AdminAccess'))
+const AdminTracking  = lazy(() => import('./pages/admin/AdminTracking'))
+const AdminLiveMap   = lazy(() => import('./pages/admin/AdminLiveMap'))
+const AdminSecurity  = lazy(() => import('./pages/admin/AdminSecurity'))
 const PrivacyPolicy  = lazy(() => import('./pages/PrivacyPolicy'))
 const Terms          = lazy(() => import('./pages/Terms'))
 const About          = lazy(() => import('./pages/About'))
@@ -22,9 +26,9 @@ const Contact        = lazy(() => import('./pages/Contact'))
 import Navbar         from './components/Navbar'
 import Footer         from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminProtectedRoute from './components/AdminProtectedRoute'
 
 // ── Lightweight inline fallback ───────────────────────────────────────────────
-// Shown while a lazy page chunk is downloading (usually < 200ms on fast connections)
 const PageLoader = () => (
   <div className="flex items-center justify-center py-24">
     <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
@@ -33,9 +37,6 @@ const PageLoader = () => (
 
 function App() {
   useLenis()
-
-  // No global loading gate here — public pages render instantly.
-  // ProtectedRoute handles the auth wait internally before gating protected routes.
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -63,6 +64,16 @@ function App() {
               <Route path="/contacts"            element={<Contacts />} />
               <Route path="/tracking/create"     element={<CreateTracking />} />
               <Route path="/tracking/map/:token" element={<LiveMap />} />
+            </Route>
+
+            {/* Admin Protected */}
+            <Route element={<AdminProtectedRoute />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/access" element={<AdminAccess />} />
+              <Route path="/admin/tracking" element={<AdminTracking />} />
+              <Route path="/admin/live-map" element={<AdminLiveMap />} />
+              <Route path="/admin/security" element={<AdminSecurity />} />
             </Route>
 
             {/* Catch-all */}

@@ -34,4 +34,19 @@ export const updateLocation       = (data)   => API.post('/tracking/update-locat
 export const getUserTrackings     = (params) => API.get('/tracking', { params });
 export const deleteTracking       = (id)     => API.delete(`/tracking/${id}`);
 
+// Admin
+export const getAdminDashboard   = () => API.get('/admin/dashboard');
+export const getAdminUsers       = () => API.get('/admin/users');
+export const updateAdminUserRole = (id, data) => API.put(`/admin/users/${id}/role`, data);
+export const updateAdminUserAccess = (id, data) => API.put(`/admin/users/${id}/access`, data);
+export const deleteAdminUser     = (id) => API.delete(`/admin/users/${id}`);
+export const getAdminAccessRequests = () => API.get('/admin/access-requests');
+export const updateAdminAccessRequest = (id, data) => API.put(`/admin/access-requests/${id}`, data);
+export const getAdminTrackingSessions = () => API.get('/admin/tracking-sessions');
+export const deleteAdminTrackingSession = (id) => API.delete(`/admin/tracking-sessions/${id}`);
+
+// Access
+export const requestAccess = (data) => API.post('/access/request', data);
+export const getAccessStatus = () => API.get('/access/status');
+
 export default API;

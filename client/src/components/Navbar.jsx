@@ -1,11 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getAdminAccessRequests } from '../services/api'
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    if (user?.email === 'vasu@gmail.com') {
+      getAdminAccessRequests()
+        .then(res => {
+          const count = res.data.filter(r => r.status === 'pending').length;
+          setPendingCount(count);
+        })
+        .catch(err => console.error("Could not fetch badge count", err));
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout()
@@ -36,6 +49,18 @@ const Navbar = () => {
                 <NavLink to="/dashboard"       className={navClass}>Dashboard</NavLink>
                 <NavLink to="/contacts"        className={navClass}>Contacts</NavLink>
                 <NavLink to="/tracking/create" className={navClass}>New Tracking</NavLink>
+                {user?.email === 'vasu@gmail.com' && (
+                  <NavLink to="/admin" className={navClass}>
+                    <span className="flex items-center gap-1.5">
+                      Admin
+                      {pendingCount > 0 && (
+                        <span className="bg-red-500 text-white min-w-[20px] text-center text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow-sm shadow-red-500/30">
+                          {pendingCount}
+                        </span>
+                      )}
+                    </span>
+                  </NavLink>
+                )}
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l border-slate-700">
                   <span className="text-sm text-slate-400">Hi, {user?.name?.split(' ')[0]}</span>
                   <button onClick={handleLogout} className="btn-danger text-sm px-4 py-2">Logout</button>
@@ -76,6 +101,18 @@ const Navbar = () => {
               <NavLink to="/dashboard"       className={navClass} onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
               <NavLink to="/contacts"        className={navClass} onClick={() => setMenuOpen(false)}>Contacts</NavLink>
               <NavLink to="/tracking/create" className={navClass} onClick={() => setMenuOpen(false)}>New Tracking</NavLink>
+              {user?.email === 'vasu@gmail.com' && (
+                <NavLink to="/admin" className={navClass} onClick={() => setMenuOpen(false)}>
+                  <span className="flex items-center gap-1.5">
+                    Admin Panel
+                    {pendingCount > 0 && (
+                      <span className="bg-red-500 text-white min-w-[20px] text-center text-[10px] px-1.5 py-0.5 rounded-full font-bold">
+                        {pendingCount}
+                      </span>
+                    )}
+                  </span>
+                </NavLink>
+              )}
               <div className="pt-3 border-t border-slate-800">
                 <p className="text-sm text-slate-400 mb-3">Logged in as {user?.name}</p>
                 <button onClick={handleLogout} className="btn-danger w-full text-sm py-2">Logout</button>

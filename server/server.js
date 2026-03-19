@@ -12,6 +12,10 @@ dotenv.config();
 // Import sequelize instance
 const sequelize = require("./config/db");
 
+// Track location updates for the admin dashboard
+global.locationUpdatesToday = 0;
+
+
 // Import models to register them with Sequelize (must happen before sync)
 const { User, Contact, TrackingRequest } = require("./models/index");
 
@@ -93,6 +97,8 @@ app.set("io", io);
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/contacts", require("./routes/contacts"));
 app.use("/api/tracking", require("./routes/tracking"));
+app.use("/api/access", require("./routes/access"));
+app.use("/api/admin", require("./routes/admin"));
 
 // Health check
 app.get("/", (req, res) => {
@@ -113,6 +119,11 @@ io.on("connection", (socket) => {
     console.log(` ${socket.id} joined room: ${token}`);
   });
 
+  socket.on("join-admin-global", () => {
+    socket.join("admin_global");
+    console.log(` Admin ${socket.id} joined admin_global room`);
+  });
+
   // Sharer registers themselves so we know who is actively sharing
   socket.on("register-sharer", (token) => {
     socket.join(token);
@@ -121,11 +132,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-location", ({ token, latitude, longitude, accuracy }) => {
-    io.to(token).emit("location-update", {
+    // Admin dashboard tracking
+    global.locationUpdatesToday = (global.locationUpdatesToday || 0) + 1;
+
+    const payload = {
       latitude,
       longitude,
       accuracy,
       timestamp: new Date(),
+    };
+
+    io.to(token).emit("location-update", payload);
+    
+    // Broadcast directly to God-mode room
+    io.to("admin_global").emit("admin-location-update", {
+      token,
+      ...payload
     });
   });
 
@@ -153,7 +175,7 @@ const start = async () => {
     await sequelize.authenticate();
     console.log(" MySQL Connected.");
 
-    // Create/update all tables automatically
+    // Create/update all tables automatically without destructive alter rules
     await sequelize.sync();
     console.log(" Tables synced: users, contacts, tracking_requests");
 
@@ -186,7 +208,7 @@ const start = async () => {
       }
     });
   } catch (err) {
-    console.error(" Failed to start server:", err.message);
+    console.error(" Failed to start server:", err);
     console.error(
       "\n Check your .env database credentials and make sure MySQL is running.\n",
     );

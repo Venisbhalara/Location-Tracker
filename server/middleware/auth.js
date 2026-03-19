@@ -26,6 +26,10 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized. User not found.' });
     }
 
+    if (user.accessStatus === 'revoked') {
+      return res.status(403).json({ message: 'Your access has been revoked by an administrator.' });
+    }
+
     req.user = user;
     next();
   } catch (error) {
