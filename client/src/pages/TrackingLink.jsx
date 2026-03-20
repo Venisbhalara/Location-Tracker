@@ -209,9 +209,33 @@ const TrackingLink = () => {
                     {address.formatted}
                   </p>
                   <div className="grid grid-cols-2 gap-2 mt-2">
+                    {address.company && (
+                      <div className="bg-slate-700/50 rounded-lg p-2">
+                        <p className="text-xs text-slate-500">Company</p>
+                        <p className="text-xs text-white font-medium truncate">
+                          {address.company}
+                        </p>
+                      </div>
+                    )}
+                    {address.building && (
+                      <div className="bg-slate-700/50 rounded-lg p-2">
+                        <p className="text-xs text-slate-500">Building</p>
+                        <p className="text-xs text-white font-medium truncate">
+                          {address.building}
+                        </p>
+                      </div>
+                    )}
+                    {address.landmark && (
+                      <div className="bg-slate-700/50 rounded-lg p-2">
+                        <p className="text-xs text-slate-500">Landmark</p>
+                        <p className="text-xs text-white font-medium truncate">
+                          {address.landmark}
+                        </p>
+                      </div>
+                    )}
                     {address.road && (
                       <div className="bg-slate-700/50 rounded-lg p-2">
-                        <p className="text-xs text-slate-500">Road</p>
+                        <p className="text-xs text-slate-500">Street</p>
                         <p className="text-xs text-white font-medium truncate">
                           {address.road}
                         </p>

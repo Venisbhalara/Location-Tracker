@@ -210,6 +210,21 @@ const LiveMap = () => {
                       <p className="text-gray-700 text-xs leading-snug font-medium">
                         {address.formatted}
                       </p>
+                      {address.company && (
+                        <p className="text-gray-500 text-xs">
+                          🏢 {address.company}
+                        </p>
+                      )}
+                      {address.building && (
+                        <p className="text-gray-500 text-xs">
+                          🏬 {address.building}
+                        </p>
+                      )}
+                      {address.landmark && (
+                        <p className="text-gray-500 text-xs">
+                          🏛️ {address.landmark}
+                        </p>
+                      )}
                       {address.road && (
                         <p className="text-gray-500 text-xs">
                           🛣️ {address.road}
@@ -303,6 +318,24 @@ const LiveMap = () => {
           )}
         </div>
         <div className="card">
+          <p className="text-xs text-slate-500 mb-1">🏢 Company</p>
+          <p className="font-semibold text-white truncate">
+            {address?.company || "—"}
+          </p>
+        </div>
+        <div className="card">
+          <p className="text-xs text-slate-500 mb-1">🏬 Building</p>
+          <p className="font-semibold text-white truncate">
+            {address?.building || "—"}
+          </p>
+        </div>
+        <div className="card">
+          <p className="text-xs text-slate-500 mb-1">🏛️ Landmark</p>
+          <p className="font-semibold text-white truncate">
+            {address?.landmark || "—"}
+          </p>
+        </div>
+        <div className="card">
           <p className="text-xs text-slate-500 mb-1">🏙️ City</p>
           <p className="font-semibold text-white truncate">
             {address?.city || "—"}
@@ -351,8 +384,12 @@ const LiveMap = () => {
         </div>
 
         <div className="card">
-          <p className="text-xs text-slate-500 mb-1">🛣️ Road</p>
+          <p className="text-xs text-slate-500 mb-1">🛣️ Street</p>
           <p className="text-sm text-white truncate">{address?.road || "—"}</p>
+        </div>
+        <div className="card">
+          <p className="text-xs text-slate-500 mb-1">🏘️ Area</p>
+          <p className="text-sm text-white truncate">{address?.area || "—"}</p>
         </div>
         <div className="card">
           <p className="text-xs text-slate-500 mb-1">Updates</p>

@@ -174,26 +174,6 @@ const start = async () => {
     await sequelize.authenticate();
     console.log(" MySQL Connected.");
 
-    const ensureColumns = async () => {
-      try {
-        await sequelize.query(`
-      ALTER TABLE users 
-        ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user',
-        ADD COLUMN IF NOT EXISTS access_status VARCHAR(20) NOT NULL DEFAULT 'approved',
-        ADD COLUMN IF NOT EXISTS tracking_access TINYINT(1) NOT NULL DEFAULT 0,
-        ADD COLUMN IF NOT EXISTS last_login_at DATETIME NULL DEFAULT NULL
-    `);
-        console.log(" User columns verified");
-      } catch (err) {
-        // Columns already exist — that is fine
-        if (!err.message.includes("Duplicate column")) {
-          console.warn(" ensureColumns warning:", err.message);
-        }
-      }
-    };
-
-    await ensureColumns();
-
     // Sync models with database
     try {
       await sequelize.sync({ alter: true });

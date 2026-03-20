@@ -22,7 +22,7 @@ const createTracking = async (req, res) => {
 
     // Calculate expiry time
     const expiresAt = new Date(
-      Date.now() + parseInt(expiryHours) * 60 * 60 * 1000
+      Date.now() + parseInt(expiryHours) * 60 * 60 * 1000,
     );
 
     const tracking = await TrackingRequest.create({
@@ -39,15 +39,22 @@ const createTracking = async (req, res) => {
     // to make it work seamlessly with tunnels.
     let baseUrl = process.env.CLIENT_URL || "";
 
-    // If we're hitting this from a tunnel or different IP, adjust baseUrl
+    // If we're hitting this from a tunnel or different IP, or running locally, adjust baseUrl
     const requestOrigin =
       req.get("origin") ||
       (req.get("host") ? `${req.protocol}://${req.get("host")}` : null);
+
+    const isLocalRequest =
+      requestOrigin &&
+      (requestOrigin.includes("localhost") ||
+        requestOrigin.match(/\d+\.\d+\.\d+\.\d+/));
+
     if (
       requestOrigin &&
       (!baseUrl ||
         baseUrl.includes("localhost") ||
-        baseUrl.match(/\d+\.\d+\.\d+\.\d+/))
+        baseUrl.match(/\d+\.\d+\.\d+\.\d+/) ||
+        isLocalRequest)
     ) {
       baseUrl = requestOrigin;
     }
@@ -65,7 +72,8 @@ const createTracking = async (req, res) => {
     console.error("Stack:", error.stack);
     res.status(500).json({
       message: "Server error while creating tracking link.",
-      error: process.env.NODE_ENV === "production" ? error.message : error.stack,
+      error:
+        process.env.NODE_ENV === "production" ? error.message : error.stack,
     });
   }
 };

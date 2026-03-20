@@ -25,8 +25,14 @@ const parseAddress = (data) => {
   const area =
     a.neighbourhood || a.suburb || a.quarter || a.residential || a.village || a.town || '';
 
-  // Building / amenity / shop
-  const building = a.building || a.amenity || a.shop || a.office || a.tourism || '';
+  // Building
+  const building = a.building || '';
+
+  // Company
+  const company = a.office || a.shop || a.commercial || a.corporation || '';
+
+  // Landmark
+  const landmark = a.amenity || a.historic || a.tourism || a.landmark || '';
 
   // City
   const city = a.city || a.town || a.village || a.municipality || a.county || '';
@@ -39,10 +45,10 @@ const parseAddress = (data) => {
   const country  = a.country || '';
 
   // Build a human-readable one-line address (most specific → least specific)
-  const parts = [building, road, area, city, state, postcode].filter(Boolean);
+  const parts = [company, building, landmark, road, area, city, state, postcode].filter(Boolean);
   const formatted = parts.join(', ') || data.display_name || 'Unknown location';
 
-  return { road, area, building, city, state, postcode, country, formatted };
+  return { road, area, building, company, landmark, city, state, postcode, country, formatted };
 };
 
 /**
@@ -80,7 +86,7 @@ const reverseGeocode = async (latitude, longitude) => {
   } catch (err) {
     console.warn('Reverse geocoding failed:', err.message);
     return {
-      road: '', area: '', building: '', city: '', state: '',
+      road: '', area: '', building: '', company: '', landmark: '', city: '', state: '',
       postcode: '', country: '',
       formatted: `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`,
     };
