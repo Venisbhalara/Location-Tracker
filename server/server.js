@@ -176,7 +176,7 @@ const start = async () => {
 
     // Sync models with database
     try {
-      await sequelize.sync({ alter: true });
+      await sequelize.sync({ alter: false });
       console.log(" Tables synced successfully");
     } catch (syncErr) {
       console.error(" SYNC FAILED:", syncErr.message);

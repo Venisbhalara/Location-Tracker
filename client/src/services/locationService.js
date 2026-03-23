@@ -137,13 +137,16 @@ class LocationTrackingService {
   // ── Handle geolocation error ──────────────────────────────────
   _handleError(err, onPermissionDenied) {
     if (err.code === err.PERMISSION_DENIED) {
+      this.stop();
       onPermissionDenied?.();
       this.onError?.("Location permission was denied.");
     } else if (err.code === err.POSITION_UNAVAILABLE) {
+      this.stop();
       this.onError?.("Location information is unavailable.");
     } else if (err.code === err.TIMEOUT) {
       this.onError?.("Location request timed out.");
     } else {
+      this.stop();
       this.onError?.("Unknown error while getting location.");
     }
   }
