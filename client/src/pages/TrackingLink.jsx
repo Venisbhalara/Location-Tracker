@@ -120,14 +120,14 @@ const TrackingLink = () => {
   // ── Loading ─────────────────────────────────────────────────
   if (loading)
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
   if (error && !tracking)
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="card text-center max-w-md w-full">
           <div className="text-5xl mb-4">🔗</div>
           <h1 className="text-xl font-bold text-white mb-2">
@@ -139,7 +139,7 @@ const TrackingLink = () => {
     );
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* ── Idle — ask for consent ──────────────────────── */}
         {consent === "idle" && (

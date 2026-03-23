@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
-const { TrackingRequest } = require("../models");
+const { TrackingRequest, User } = require("../models");
 const { Op } = require("sequelize");
 
 // ─── @route   POST /api/tracking/create ──────────────────────
@@ -17,6 +17,12 @@ const createTracking = async (req, res) => {
   const { phoneNumber, trackingType, expiryHours = 24 } = req.body;
 
   try {
+    // Check if user has approved tracking access
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
     // Generate a unique UUID token
     const token = uuidv4();
 
@@ -25,12 +31,15 @@ const createTracking = async (req, res) => {
       Date.now() + parseInt(expiryHours) * 60 * 60 * 1000,
     );
 
+    // Set status based on user's access approval
+    const initialStatus = user.trackingAccess ? "active" : "pending";
+
     const tracking = await TrackingRequest.create({
       userId: req.user.id,
       phoneNumber,
       trackingType: trackingType || "location",
       token,
-      status: "pending",
+      status: initialStatus,
       expiresAt,
     });
 
@@ -62,10 +71,13 @@ const createTracking = async (req, res) => {
     const trackingLink = `${baseUrl.replace(/\/$/, "")}/track/${token}`;
 
     res.status(201).json({
-      message: "Tracking link created successfully!",
+      message: user.trackingAccess 
+        ? "Tracking link created successfully!" 
+        : "Tracking link created! Awaiting admin approval.",
       trackingLink,
       token,
       tracking,
+      requiresApproval: !user.trackingAccess,
     });
   } catch (error) {
     console.error("Create tracking error:", error.message);

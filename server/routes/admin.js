@@ -148,7 +148,25 @@ router.put("/users/:id/access", async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     if (user.email === "vasu@gmail.com") return res.status(400).json({ message: "Cannot modify master admin access" });
     
-    user.accessStatus = req.body.accessStatus || 'approved';
+    const newAccessStatus = req.body.accessStatus || 'approved';
+    user.accessStatus = newAccessStatus;
+    
+    // If approving access, also set trackingAccess to true and activate pending requests
+    if (newAccessStatus === 'approved') {
+      user.trackingAccess = true;
+      
+      // Auto-activate any pending tracking requests for this user
+      await TrackingRequest.update(
+        { status: "active" },
+        { 
+          where: { 
+            userId: user.id, 
+            status: "pending" 
+          } 
+        }
+      );
+    }
+    
     await user.save();
     res.json({ message: "Access status updated successfully", user: user.toSafeJSON() });
   } catch (error) {
@@ -207,6 +225,17 @@ router.put("/access-requests/:id", async (req, res) => {
       const user = request.user;
       user.trackingAccess = true;
       await user.save();
+
+      // Auto-activate any pending tracking requests for this user
+      await TrackingRequest.update(
+        { status: "active" },
+        { 
+          where: { 
+            userId: user.id, 
+            status: "pending" 
+          } 
+        }
+      );
 
       await sendEmail({
         to: user.email,
