@@ -88,3 +88,54 @@ self.addEventListener('sync', (event) => {
 
 // Background fetch listener (if enabled in modern browsers)
 self.addEventListener('backgroundfetchsuccess', (event) => {});
+
+// ─── Web Push Notification Listeners ─────────────────────────────
+
+self.addEventListener('push', (event) => {
+  let payload = {};
+  if (event.data) {
+    try {
+      payload = event.data.json();
+    } catch (e) {
+      payload = { body: event.data.text() };
+    }
+  }
+
+  const title = payload.title || 'Location Update Required 📍';
+  const options = {
+    body: payload.body || 'Admin is requesting your current location. Tap to update.',
+    icon: payload.icon || '/vite.svg',
+    badge: '/vite.svg',
+    vibrate: [200, 100, 200, 100, 200, 100, 200],
+    data: payload.data || {},
+    requireInteraction: true // Keeps the notification open until the user clicks it!
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  // The URL configured directly by the server ping data
+  const urlToOpen = event.notification.data?.url || '/';
+  
+  // Look to see if the tracking window is already open
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Find the window matching the URL
+      for (let i = 0; i < windowClients.length; i++) {
+        const client = windowClients[i];
+        // If they already have the tracker tab open anywhere, focus it
+        if (client.url.includes(urlToOpen) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+
+      // Otherwise, open a new window to that url
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
+});

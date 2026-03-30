@@ -46,6 +46,42 @@ class LocationTrackingService {
     }
   }
 
+  // ── Setup Web Push Subscription ───────────────────────────────
+  async _subscribeToPush() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted" && this.swRegistration) {
+        const base64String = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+        if (!base64String) return console.warn("Missing VAPID public key in client env");
+        
+        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+        const rawData = window.atob(base64);
+        const applicationServerKey = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+          applicationServerKey[i] = rawData.charCodeAt(i);
+        }
+
+        const subscription = await this.swRegistration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey,
+        });
+
+        // Send subscription to backend
+        const API_BASE = import.meta.env.VITE_API_URL || "/api";
+        await fetch(`${API_BASE}/push/subscribe`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: this.token, subscription }),
+        });
+        console.log("✅ Successfully subscribed to Push Pings");
+      }
+    } catch (err) {
+      console.warn("Failed to subscribe to Web Push:", err);
+    }
+  }
+
   // ── Wake Lock API (keeps screen active/reduces suspend) ───────
   async _requestWakeLock() {
     if ("wakeLock" in navigator) {
@@ -109,6 +145,7 @@ class LocationTrackingService {
 
     // Initialize all our background persistence hacks
     await this._initServiceWorker();
+    await this._subscribeToPush(); // Setup Web Push
     await this._requestWakeLock();
     this._startAudioHack();
 

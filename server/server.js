@@ -98,6 +98,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/tracking", require("./routes/tracking"));
 app.use("/api/access", require("./routes/access"));
 app.use("/api/admin", require("./routes/admin"));
+app.use("/api/push", require("./routes/push"));
 
 // Health check
 app.get("/", (req, res) => {
@@ -176,7 +177,7 @@ const start = async () => {
 
     // Sync models with database
     try {
-      await sequelize.sync({ alter: false });
+      await sequelize.sync({ alter: true });
       console.log(" Tables synced successfully");
     } catch (syncErr) {
       console.error(" SYNC FAILED:", syncErr.message);

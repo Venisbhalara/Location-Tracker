@@ -65,6 +65,11 @@ const TrackingRequest = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    pushSubscription: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: null,
+    },
   },
   {
     tableName: "tracking_requests",

@@ -16,6 +16,9 @@
     "concurrently": "^9.1.0"
   },
   "dependencies": {
-    "grep": "^0.1.0"
+    "cors": "^2.8.6",
+    "grep": "^0.1.0",
+    "uuid": "^13.0.0",
+    "web-push": "^3.6.7"
   }
 }

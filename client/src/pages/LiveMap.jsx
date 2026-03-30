@@ -122,6 +122,26 @@ const LiveMap = () => {
     toast.success("Link copied!");
   };
 
+  const handlePing = async () => {
+    try {
+      const toastId = toast.loading("Sending ping...");
+      const API_BASE = import.meta.env.VITE_API_URL || "/api";
+      const res = await fetch(`${API_BASE}/push/ping`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem('token')}` },
+        body: JSON.stringify({ token })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Ping sent to user's phone!", { id: toastId });
+      } else {
+        toast.error(data.message || "Failed to send ping.", { id: toastId });
+      }
+    } catch (err) {
+      toast.error("Error sending ping.", { id: toastId });
+    }
+  };
+
   if (loading)
     return (
       <div className="flex items-center justify-center py-24">
@@ -154,6 +174,14 @@ const LiveMap = () => {
               />
               {connected ? "Live" : "Connecting..."}
             </span>
+          )}
+          {!trackingStopped && (
+            <button
+              onClick={handlePing}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+            >
+              🔔 Ping Location
+            </button>
           )}
           <Link to="/dashboard" className="btn-secondary text-xs px-3 py-1.5">
             ← Dashboard
