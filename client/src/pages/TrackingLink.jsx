@@ -213,7 +213,7 @@ const TrackingLink = () => {
                 <h1 className="text-2xl font-bold text-white mb-2">
                   Thank You!
                 </h1>
-                <p className="text-emerald-400 text-sm font-medium">.</p>
+                {/* <p className="text-emerald-400 text-sm font-medium">.</p> */}
               </>
             )}
           </div>
