@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { loginUser } from "../services/api";
+import { loginUser, googleLogin } from "../services/api";
+import { GoogleLogin } from '@react-oauth/google';
 import toast from "react-hot-toast";
 
 const Login = () => {
@@ -26,6 +27,24 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    try {
+      const res = await googleLogin({ credential: credentialResponse.credential });
+      login(res.data.user, res.data.token);
+      toast.success(`Welcome back, ${res.data.user.name}!`);
+      navigate("/dashboard");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Google login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google Sign-In failed.");
   };
 
   return (
@@ -69,6 +88,22 @@ const Login = () => {
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-slate-700"></div>
+              <span className="flex-shrink-0 mx-4 text-slate-500 text-sm">or</span>
+              <div className="flex-grow border-t border-slate-700"></div>
+            </div>
+            <div className="flex justify-center w-full">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="filled_black"
+                shape="rectangular"
+                width="384"
+                text="continue_with"
+              />
+            </div>
           </form>
           <p className="text-center text-sm text-slate-400 mt-6">
             Don't have an account?{" "}

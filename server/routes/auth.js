@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
-const { register, login, getMe } = require("../controllers/authController");
+const { register, login, getMe, googleAuth } = require("../controllers/authController");
 const { protect } = require("../middleware/auth");
 
 // ─── Validation Rules ─────────────────────────────────────────
@@ -42,6 +42,9 @@ const loginValidation = [
 
 // POST /api/auth/register
 router.post("/register", registerValidation, register);
+
+// POST /api/auth/google
+router.post("/google", googleAuth);
 
 // POST /api/auth/login
 const { validationResult } = require("express-validator");

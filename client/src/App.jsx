@@ -37,13 +37,13 @@ const PageLoader = () => (
 )
 
 // ── Main layout with navbar and footer ────────────────────────────────────────
-const MainLayout = ({ children }) => (
+const MainLayout = ({ children, hideFooter }) => (
   <div className="min-h-screen flex flex-col">
     <Navbar />
     <main className="flex-1">
       {children}
     </main>
-    <Footer />
+    {!hideFooter && <Footer />}
   </div>
 )
 
@@ -58,6 +58,7 @@ function App() {
   useLenis()
   const location = useLocation()
   const isTrackingRoute = location.pathname.startsWith('/track/')
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/register'
 
   // If it's a tracking route, use minimal layout
   if (isTrackingRoute) {
@@ -75,7 +76,7 @@ function App() {
 
   // Otherwise, use the main layout with navbar and footer
   return (
-    <MainLayout>
+    <MainLayout hideFooter={isAuthRoute}>
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>

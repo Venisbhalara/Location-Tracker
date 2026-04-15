@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import App from './App.jsx'
 import './index.css'
 import 'leaflet/dist/leaflet.css'
@@ -10,8 +11,9 @@ import 'leaflet/dist/leaflet.css'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <App />
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <AuthProvider>
+          <App />
         <Toaster
           position="top-right"
           toastOptions={{
@@ -25,7 +27,8 @@ createRoot(document.getElementById('root')).render(
             error:   { iconTheme: { primary: '#ef4444', secondary: '#f1f5f9' } },
           }}
         />
-      </AuthProvider>
+        </AuthProvider>
+      </GoogleOAuthProvider>
     </BrowserRouter>
   </StrictMode>,
 )

@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const { User } = require("../models");
+const { OAuth2Client } = require("google-auth-library");
+const crypto = require("crypto");
+
+const oauthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // ─── Helper: Generate JWT ─────────────────────────────────────
 const generateToken = (userId) => {
@@ -134,4 +138,57 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe };
+// ─── @route   POST /api/auth/google ───────────────────────────
+// ─── @desc    Google OAuth login/register
+// ─── @access  Public
+const googleAuth = async (req, res) => {
+  const { credential } = req.body;
+  
+  if (!credential) {
+    return res.status(400).json({ message: "No Google credential provided." });
+  }
+
+  try {
+    const ticket = await oauthClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    const { email, name } = payload;
+
+    // Check if user exists
+    let user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      // Create user with a random unguessable password
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      user = await User.create({ name, email, password: randomPassword });
+    }
+
+    // Register active login timestamp
+    user.lastLoginAt = new Date();
+    await user.save();
+
+    // Generate token
+    const token = generateToken(user.id);
+
+    res.status(200).json({
+      message: "Google login successful!",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        trackingAccess: user.trackingAccess,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error("Google Auth error:", error);
+    res.status(500).json({ message: "Google authentication failed.", error: error.message });
+  }
+};
+
+module.exports = { register, login, getMe, googleAuth };
