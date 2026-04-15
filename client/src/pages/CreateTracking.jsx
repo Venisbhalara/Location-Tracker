@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTracking, getAccessStatus, requestAccess } from "../services/api";
 import toast from "react-hot-toast";
@@ -13,6 +13,8 @@ const CreateTracking = () => {
   });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const closeTimeoutRef = useRef(null);
 
   // Monitor target user's interaction
   const { location, permissionDenied } = useSocket(result?.token);
@@ -30,6 +32,14 @@ const CreateTracking = () => {
       toast.error("Target rejected the location permission.", { id: "denied-toast", duration: 5000 });
     }
   }, [permissionDenied]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Access State
   const [access, setAccess] = useState(null);
@@ -82,6 +92,33 @@ const CreateTracking = () => {
     navigator.clipboard.writeText(result.trackingLink);
     toast.success("Link copied to clipboard!");
   };
+
+  const handleClose = () => {
+    if (isClosing) return;
+
+    setIsClosing(true);
+    closeTimeoutRef.current = setTimeout(() => {
+      const canGoBack = window.history.state?.idx > 0;
+      navigate(canGoBack ? -1 : "/dashboard");
+    }, 220);
+  };
+
+  useEffect(() => {
+    if (isClosing) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key !== "Escape") return;
+
+      setIsClosing(true);
+      closeTimeoutRef.current = setTimeout(() => {
+        const canGoBack = window.history.state?.idx > 0;
+        navigate(canGoBack ? -1 : "/dashboard");
+      }, 220);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isClosing, navigate]);
 
   if (checkingAccess) return <LoadingScreen />;
 
@@ -149,12 +186,26 @@ const CreateTracking = () => {
 
   // ─── MAIN TRACKING GENERATOR ──────────────────────────────────────
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white border-l-4 border-indigo-500 pl-3">Create Tracking Link</h1>
-        <p className="text-slate-400 text-sm mt-2">
-          Generate a secure link that asks for location permission.
-        </p>
+    <div
+      className={`max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-200 ease-out ${isClosing ? "opacity-0 translate-y-3 scale-[0.98] pointer-events-none" : "opacity-100 translate-y-0 scale-100"}`}
+    >
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white border-l-4 border-indigo-500 pl-3">Create Tracking Link</h1>
+          <p className="text-slate-400 text-sm mt-2">
+            Generate a secure link that asks for location permission.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label="Close create tracking link panel"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-700/80 bg-slate-900/80 text-slate-400 transition-all duration-200 hover:border-indigo-500 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
       </div>
 
       {!result ? (
