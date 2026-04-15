@@ -1,141 +1,145 @@
 <div align="center">
 
-# 📍 Location Tracker
+<br />
 
-**A real-time full-stack application to share and track live GPS locations securely.**
+# Contact Location Tracker
 
-[![React](https://img.shields.io/badge/React-18-61dafb?logo=react)](https://react.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js)](https://nodejs.org/)
-[![MySQL](https://img.shields.io/badge/Database-MySQL-4479a1?logo=mysql)](https://www.mysql.com/)
-[![Socket.IO](https://img.shields.io/badge/Realtime-Socket.IO-010101?logo=socket.io)](https://socket.io/)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue)](LICENSE)
+**Real-time GPS tracking, built for trust and precision.**
+
+<br />
+
+[![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socket.io&logoColor=white)](https://socket.io/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+
+<br />
+
+> Share a link. Watch location update live. Delete the link — tracking stops instantly.
+> No app download. No subscriptions. No magic. Just clean engineering.
+
+<br />
 
 </div>
 
 ---
 
-## ✨ Features
+## What This Is
 
-- 🔐 **JWT Authentication** — Secure register/login with encrypted passwords
-- 📇 **Contact Management** — Add, view, and manage contacts
-- 🔗 **Shareable Tracking Links** — Generate one-time tracking links and send them to anyone
-- 📍 **Real-Time Location Sharing** — Target user shares live GPS location via the link
-- 🗺️ **Live Map View** — Viewer sees live position on an interactive Leaflet map with movement trail
-- 🏠 **Detailed Address** — Full reverse-geocoded address (road, area, city, state) via OpenStreetMap
-- 🔄 **Auto-Refresh Every 10 Minutes** — Location updates automatically even when stationary
-- 🛑 **Instant Stop on Delete** — Deleting a tracking request immediately stops the sharer via Socket.IO
-- 📱 **Mobile Friendly** — Works on phone browsers on the same Wi-Fi network
+Contact Location Tracker is a full-stack web application that lets you generate a secure, one-time tracking link and share it with anyone. The recipient opens it in their phone browser, grants location permission once, and their live GPS position streams back to you on an interactive map — in real time, with movement history and a full reverse-geocoded address.
+
+When you're done, deleting the tracking session kills it instantly on both ends via WebSocket. No polling delay. No ghost sessions.
 
 ---
 
-## 🛠 Tech Stack
+## Core Features
 
-| Layer | Technology |
+| | |
 |---|---|
-| **Frontend** | React 18, Vite, TailwindCSS, React Leaflet |
-| **Backend** | Node.js, Express.js |
-| **Database** | MySQL (via Sequelize ORM) |
-| **Real-time** | Socket.IO (WebSocket + polling) |
-| **Auth** | JSON Web Tokens (JWT) + bcrypt |
-| **Geocoding** | OpenStreetMap Nominatim API (free, no key needed) |
+| **Secure Auth** | JWT-based register & login with bcrypt password hashing |
+| **Contact Management** | Full CRUD contact list — your address book for tracking targets |
+| **Shareable Tracking Links** | Generate a unique, tokenized link for any contact in one click |
+| **Live GPS Streaming** | Location streams over Socket.IO — no page refresh needed |
+| **Interactive Map** | Leaflet map with movement trail, zoom controls, and live marker |
+| **Reverse Geocoding** | Full address breakdown (road → area → city → state) via OpenStreetMap |
+| **Auto-Refresh** | Location re-sent automatically every 10 minutes even when stationary |
+| **Instant Kill Switch** | Deleting a session fires `tracking-stopped` to the sharer's browser immediately |
+| **Admin Dashboard** | Full control panel: user management, access approvals, session oversight |
+| **Access Request System** | Users request tracking access; admin approves or rejects with email notification |
+| **Mobile Ready** | Works on any phone browser on the same network — no app install |
 
 ---
 
-## 📁 Project Structure
+## Tech Stack
+
+```
+Frontend    →   React 18 · Vite · TailwindCSS · React Leaflet
+Backend     →   Node.js · Express.js
+Database    →   MySQL 8 via Sequelize ORM (auto-sync, no migrations)
+Real-time   →   Socket.IO (WebSocket with polling fallback)
+Auth        →   JSON Web Tokens · bcrypt
+Geocoding   →   OpenStreetMap Nominatim (free, no API key)
+Email       →   Nodemailer (access approval / rejection notifications)
+```
+
+---
+
+## Project Structure
 
 ```
 contact-tracker/
-├── client/                         # React frontend (Vite)
-│   ├── public/
-│   ├── src/
-│   │   ├── components/             # Navbar, ProtectedRoute, LoadingScreen
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx     # Global auth state
-│   │   ├── hooks/
-│   │   │   ├── useSocket.js        # Socket.IO connection hook (viewer side)
-│   │   │   └── useGeolocation.js   # Raw geolocation hook
-│   │   ├── pages/
-│   │   │   ├── Home.jsx            # Landing page
-│   │   │   ├── Login.jsx           # Login form
-│   │   │   ├── Register.jsx        # Signup form
-│   │   │   ├── Dashboard.jsx       # Manage tracking requests
-│   │   │   ├── Contacts.jsx        # Contact list
-│   │   │   ├── CreateTracking.jsx  # Generate a tracking link
-│   │   │   ├── TrackingLink.jsx    # Sharer's page (allows/denies location)
-│   │   │   └── LiveMap.jsx         # Viewer's live map page
-│   │   ├── services/
-│   │   │   ├── api.js              # Axios instance (via Vite proxy)
-│   │   │   ├── locationService.js  # GPS capture + socket broadcast + auto-refresh
-│   │   │   └── geocodingService.js # OpenStreetMap reverse geocoding
-│   │   └── App.jsx                 # Router setup
-│   ├── vite.config.js              # Vite + proxy config
-│   └── .env                        # Client env vars (see setup)
+│
+├── client/                         # React + Vite frontend
+│   └── src/
+│       ├── components/             # Navbar, ProtectedRoute, LoadingScreen
+│       ├── context/
+│       │   └── AuthContext.jsx     # Global authentication state
+│       ├── hooks/
+│       │   ├── useSocket.js        # Socket.IO viewer hook
+│       │   └── useGeolocation.js   # Raw GPS hook
+│       ├── pages/
+│       │   ├── Home.jsx            # Landing page
+│       │   ├── Login.jsx / Register.jsx
+│       │   ├── Dashboard.jsx       # Manage tracking requests
+│       │   ├── Contacts.jsx        # Contact list
+│       │   ├── CreateTracking.jsx  # Generate a tracking link
+│       │   ├── TrackingLink.jsx    # Sharer's page — allow / deny
+│       │   └── LiveMap.jsx         # Viewer's real-time map
+│       └── services/
+│           ├── api.js              # Axios instance via Vite proxy
+│           ├── locationService.js  # GPS capture + socket broadcast + auto-refresh
+│           └── geocodingService.js # OpenStreetMap reverse geocoding
 │
 ├── server/                         # Express backend
-│   ├── config/
-│   │   └── db.js                   # Sequelize + MySQL connection
-│   ├── controllers/
-│   │   ├── authController.js       # Register, login, getMe
-│   │   ├── contactController.js    # CRUD contacts
-│   │   └── trackingController.js   # Create, update, delete tracking
-│   ├── middleware/
-│   │   └── auth.js                 # JWT verification middleware
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Contact.js
-│   │   ├── TrackingRequest.js
-│   │   └── index.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── contacts.js
-│   │   └── tracking.js
-│   ├── server.js                   # Express app + Socket.IO setup
-│   └── .env                        # Server env vars (see setup)
+│   ├── config/db.js                # Sequelize + MySQL connection
+│   ├── controllers/                # authController · contactController · trackingController
+│   ├── middleware/auth.js          # JWT verification
+│   ├── models/                     # User · Contact · TrackingRequest · AccessRequest
+│   ├── routes/                     # auth · contacts · tracking · admin
+│   ├── utils/sendEmail.js          # Nodemailer email helper
+│   └── server.js                   # Express app + Socket.IO bootstrap
 │
-├── package.json                    # Root scripts (runs both client + server)
-└── README.md
+├── package.json                    # Root scripts — runs both client + server
+└── vercel.json                     # Deployment config
 ```
 
 ---
 
-## ⚙️ Prerequisites
+## Getting Started
 
-Before you begin, make sure you have the following installed:
+### Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 or higher
-- [MySQL](https://www.mysql.com/) v8.0 or higher
-- [Git](https://git-scm.com/)
+- **Node.js** v18 or higher
+- **MySQL** v8.0 or higher
+- **Git**
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Clone the Repository
+### 1 — Clone
 
 ```bash
 git clone https://github.com/Venisbhalara/Contact-Location-Tracker.git
 cd Contact-Location-Tracker
 ```
 
-### 2. Install All Dependencies
+### 2 — Install everything
 
 ```bash
 npm run install:all
 ```
 
-> This installs dependencies for the root, server, and client in one command.
+This one command installs dependencies for the root, server, and client.
 
-### 3. Set Up the Database
+### 3 — Create the database
 
-Open **MySQL Workbench** (or your preferred MySQL client) and create a new database:
+Open your MySQL client and run:
 
 ```sql
 CREATE DATABASE contact_tracker;
 ```
 
-### 4. Configure Server Environment Variables
-
-Copy the example env file:
+### 4 — Configure the server
 
 ```bash
 cd server
@@ -150,24 +154,28 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=contact_tracker
 DB_USER=root
-DB_PASSWORD=your_mysql_password
-JWT_SECRET=your_very_secret_key_change_this
+DB_PASSWORD=your_password
+
+JWT_SECRET=replace_this_with_something_long_and_random
 JWT_EXPIRE=7d
+
 CLIENT_URL=http://localhost:3000
 NODE_ENV=development
+
+# Email (for access approval notifications)
+EMAIL_USER=your_gmail@gmail.com
+EMAIL_PASS=your_app_password
 ```
 
-> ℹ️ **Tables are created automatically** on first run via Sequelize `sync({ alter: true })`. No manual migration needed.
+> Tables are created and synced automatically on first run via Sequelize `sync({ alter: true })`. No manual migrations needed.
 
-### 5. Start the Application
+### 5 — Start
 
-From the **root** directory:
+From the root directory:
 
 ```bash
 npm run dev
 ```
-
-This starts both the backend (port `5000`) and frontend (port `3000`) concurrently.
 
 | Service | URL |
 |---|---|
@@ -176,166 +184,181 @@ This starts both the backend (port `5000`) and frontend (port `3000`) concurrent
 
 ---
 
-## 📱 Accessing from a Mobile Device
+## Mobile Access
 
-To test on your phone (must be on the **same Wi-Fi network** as your PC):
+To test on a phone (same Wi-Fi network required):
 
-### Step 1 — Find your PC's local IP
-
+**Step 1** — Find your PC's local IP:
 ```powershell
 ipconfig
-# Look for "IPv4 Address" under your active adapter
-# Example: 10.126.122.217
+# Look for IPv4 Address under your active adapter
+# Example: 192.168.1.42
 ```
 
-### Step 2 — Allow port 5000 through Windows Firewall
-
+**Step 2** — Allow port 5000 through Windows Firewall:
 ```powershell
 netsh advfirewall firewall add rule name="Node Server 5000" dir=in action=allow protocol=TCP localport=5000
 ```
 
-### Step 3 — Update `server/.env`
-
+**Step 3** — Update `server/.env`:
 ```env
-CLIENT_URL=http://<YOUR_PC_IP>:3000
+CLIENT_URL=http://192.168.1.42:3000
 ```
 
-### Step 4 — Restart and open on phone
-
-```bash
-npm run dev
+**Step 4** — Restart, then open on your phone:
+```
+http://192.168.1.42:3000
 ```
 
-Open on your phone: **`http://<YOUR_PC_IP>:3000`**
-
-> The Vite dev server automatically exposes itself to the local network. All API and Socket.IO traffic is routed through the Vite proxy — no hardcoded IPs needed in the client.
+> Vite exposes the dev server to the local network automatically. All API and Socket.IO traffic routes through the Vite proxy — no hardcoded IPs needed in client code.
 
 ---
 
-## 🔑 Environment Variables Reference
+## How It Works
 
-### `server/.env`
-
-| Variable | Description | Example |
-|---|---|---|
-| `PORT` | Backend server port | `5000` |
-| `DB_HOST` | MySQL host | `localhost` |
-| `DB_PORT` | MySQL port | `3306` |
-| `DB_NAME` | Database name | `contact_tracker` |
-| `DB_USER` | MySQL username | `root` |
-| `DB_PASSWORD` | MySQL password | `yourpassword` |
-| `JWT_SECRET` | Secret key for JWT signing | `change_this_in_production` |
-| `JWT_EXPIRE` | Token expiry duration | `7d` |
-| `CLIENT_URL` | Frontend URL (for CORS) | `http://localhost:3000` |
-| `NODE_ENV` | Environment mode | `development` |
-
-### `client/.env` (optional)
-The client `.env` is intentionally left empty for local development — all API and Socket.IO traffic routes through Vite's built-in proxy. No client env vars are required for local setup.
+```
+1.  Requester logs in → creates a tracking link for a contact
+2.  The link (/track/:token) is copied and sent to the target (via WhatsApp, SMS, etc.)
+3.  Target opens the link on their phone → taps "Allow Location Access"
+4.  Their GPS coordinates are:
+     — Persisted to MySQL via REST
+     — Broadcast via Socket.IO to all viewers in the room instantly
+     — Auto-refreshed every 10 minutes to handle idle sessions
+5.  Requester opens the Live Map (/live/:token)
+     — Sees the target's position on a Leaflet map with movement trail
+     — Full reverse-geocoded address shown (road, area, city, state)
+6.  When requester deletes the session:
+     — Server emits "tracking-stopped" to the sharer's socket
+     — Sharer's browser immediately shows "Tracking Ended" and stops transmitting
+```
 
 ---
 
-## 📡 API Endpoints
+## API Reference
 
 ### Auth — `/api/auth`
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `POST` | `/register` | Public | Register a new user |
-| `POST` | `/login` | Public | Login and receive JWT |
-| `GET` | `/me` | Private | Get current logged-in user |
+| `POST` | `/register` | Public | Create a new account |
+| `POST` | `/login` | Public | Authenticate and receive JWT |
+| `GET` | `/me` | Private | Return the current authenticated user |
 
 ### Contacts — `/api/contacts`
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `GET` | `/` | Private | Get all contacts (paginated) |
+| `GET` | `/` | Private | List all contacts (paginated) |
 | `POST` | `/` | Private | Add a new contact |
 | `PUT` | `/:id` | Private | Update a contact |
-| `DELETE` | `/:id` | Private | Delete a contact |
+| `DELETE` | `/:id` | Private | Remove a contact |
 
 ### Tracking — `/api/tracking`
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
 | `POST` | `/create` | Private | Generate a new tracking link |
-| `GET` | `/` | Private | Get all tracking requests for user |
-| `GET` | `/:token` | Public | Get tracking info by token |
+| `GET` | `/` | Private | List all tracking sessions for the user |
+| `GET` | `/:token` | Public | Fetch tracking info by token |
 | `POST` | `/update-location` | Public | Sharer pushes GPS coordinates |
-| `DELETE` | `/:id` | Private | Delete tracking (notifies sharer via socket) |
+| `DELETE` | `/:id` | Private | Terminate tracking (notifies sharer via socket) |
+
+### Admin — `/api/admin`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/dashboard` | Stats: users, sessions, signups, 7-day activity chart |
+| `GET` | `/users` | All users with session counts |
+| `PUT` | `/users/:id/role` | Promote or demote a user |
+| `PUT` | `/users/:id/access` | Grant or revoke tracking access |
+| `DELETE` | `/users/:id` | Delete a user and cascade their data |
+| `GET` | `/access-requests` | List all pending access requests |
+| `PUT` | `/access-requests/:id` | Approve or reject with email notification |
+| `GET` | `/tracking-sessions` | View all active tracking sessions |
+| `DELETE` | `/tracking-sessions/:id` | Force-terminate any session |
 
 ---
 
-## 🔌 Socket.IO Events
+## Socket.IO Events
 
 | Event | Direction | Description |
 |---|---|---|
 | `join-tracking` | Client → Server | Join a tracking room by token |
 | `register-sharer` | Client → Server | Sharer registers their socket in the room |
-| `send-location` | Client → Server | Sharer broadcasts their coordinates |
-| `location-update` | Server → Client | Live GPS update sent to all viewers |
-| `tracking-stopped` | Server → Client | Fired when requester deletes the tracking |
+| `send-location` | Client → Server | Sharer broadcasts GPS coordinates |
+| `location-update` | Server → Client | Live position pushed to all viewers |
+| `tracking-stopped` | Server → Client | Fires when the requester deletes the session |
 
 ---
 
-## 📜 Available Scripts
+## Available Scripts
 
-From the **root** directory:
+From the root directory:
 
-| Script | Description |
+| Script | What it does |
 |---|---|
-| `npm run dev` | Start both frontend & backend concurrently |
+| `npm run dev` | Start both frontend and backend concurrently |
 | `npm run server` | Start only the backend (nodemon) |
 | `npm run client` | Start only the frontend (Vite) |
-| `npm run install:all` | Install all dependencies (root + server + client) |
+| `npm run install:all` | Install all dependencies across root, server, and client |
 | `npm run build` | Build the React frontend for production |
 
 ---
 
-## 🏗️ How It Works
+## Environment Variables
 
-```
-1. User A (Requester) logs in → creates a tracking link for a phone number
-2. The link (/track/:token) is shared with User B (Sharer)
-3. User B opens the link on their phone → taps "Allow Location Access"
-4. Location is:
-   - Sent to the backend via REST (persisted in MySQL)
-   - Broadcast via Socket.IO to all viewers in real-time
-   - Auto-refreshed every 10 minutes even if stationary
-5. User A opens the Live Map (/live/:token) → sees User B's live location
-   - Full address shown (road, area, city, state) via OpenStreetMap
-6. When User A deletes the tracking:
-   - Server emits 'tracking-stopped' via Socket.IO
-   - User B's browser immediately shows "Tracking Ended" and stops sending
-```
+### `server/.env`
+
+| Variable | Description | Example |
+|---|---|---|
+| `PORT` | Backend port | `5000` |
+| `DB_HOST` | MySQL host | `localhost` |
+| `DB_PORT` | MySQL port | `3306` |
+| `DB_NAME` | Database name | `contact_tracker` |
+| `DB_USER` | MySQL username | `root` |
+| `DB_PASSWORD` | MySQL password | `yourpassword` |
+| `JWT_SECRET` | Signing secret for tokens | *(long random string)* |
+| `JWT_EXPIRE` | Token lifespan | `7d` |
+| `CLIENT_URL` | Frontend origin for CORS | `http://localhost:3000` |
+| `NODE_ENV` | Environment mode | `development` |
+| `EMAIL_USER` | Gmail address for notifications | `you@gmail.com` |
+| `EMAIL_PASS` | Gmail app password | `xxxx xxxx xxxx xxxx` |
+
+### `client/.env`
+
+No client-side env vars required for local development. All API and Socket.IO traffic is proxied through Vite.
 
 ---
 
-## 🔒 Security Notes
+## Security
 
-- Passwords are hashed with **bcrypt** before storing
+- Passwords are hashed with **bcrypt** — plaintext is never stored (unless the admin credential vault feature is explicitly enabled)
 - All private routes require a valid **JWT Bearer token**
-- CORS is configured to only accept requests from your `CLIENT_URL` and local network IPs
-- Tracking links expire after **24 hours** by default
-- **Never commit your `.env` file** — it is listed in `.gitignore`
+- CORS is restricted to `CLIENT_URL` and known local origins
+- Tracking tokens expire after **24 hours** by default
+- Admin routes require re-verification and are protected by a lockout after 5 failed attempts
+- **Never commit `.env` files** — both are listed in `.gitignore`
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
+2. Create your branch — `git checkout -b feature/your-feature`
+3. Commit with intent — `git commit -m 'Add: brief description'`
+4. Push — `git push origin feature/your-feature`
 5. Open a Pull Request
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the **ISC License**.
+Licensed under the **ISC License**.
 
 ---
 
 <div align="center">
-Made with ❤️ by <a href="https://github.com/Venisbhalara">Venisbhalara</a>
+
+Built by [Venisbhalara](https://github.com/Venisbhalara)
+
 </div>
