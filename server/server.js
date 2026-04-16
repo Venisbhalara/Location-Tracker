@@ -21,6 +21,9 @@ const { User, TrackingRequest } = require("./models/index");
 const app = express();
 const server = http.createServer(app);
 
+// Trust proxy for express-rate-limit (useful for Render/Vercel/Heroku)
+app.set("trust proxy", 1);
+
 // Allow requests from localhost AND any local network IP (for mobile testing on same Wi-Fi)
 const allowedOrigin = (origin, callback) => {
   // No origin (curl, Postman, same-origin): allow
@@ -33,10 +36,14 @@ const allowedOrigin = (origin, callback) => {
   const clientUrl = process.env.CLIENT_URL
     ? process.env.CLIENT_URL.trim().replace(/\/$/, "")
     : null;
+  const adminUrl = process.env.ADMIN_URL
+    ? process.env.ADMIN_URL.trim().replace(/\/$/, "")
+    : null;
   const normalizedOrigin = origin.trim().replace(/\/$/, "");
 
-  // Exact match with CLIENT_URL env var
+  // Exact match with CLIENT_URL or ADMIN_URL env var
   if (clientUrl && normalizedOrigin === clientUrl) return callback(null, true);
+  if (adminUrl && normalizedOrigin === adminUrl) return callback(null, true);
 
   // More robust Vercel check: allow anything ending in .vercel.app
   if (normalizedOrigin.endsWith(".vercel.app")) return callback(null, true);

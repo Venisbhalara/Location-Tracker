@@ -12,12 +12,6 @@ const CreateTracking = lazy(() => import('./pages/tracking/CreateTracking'))
 const TrackingLink   = lazy(() => import('./pages/tracking/TrackingLink'))
 const LiveMap        = lazy(() => import('./pages/tracking/LiveMap'))
 const Profile        = lazy(() => import('./pages/user/Profile'))
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
-const AdminUsers     = lazy(() => import('./pages/admin/AdminUsers'))
-const AdminAccess    = lazy(() => import('./pages/admin/AdminAccess'))
-const AdminTracking  = lazy(() => import('./pages/admin/AdminTracking'))
-const AdminLiveMap   = lazy(() => import('./pages/admin/AdminLiveMap'))
-const AdminSecurity  = lazy(() => import('./pages/admin/AdminSecurity'))
 const PrivacyPolicy  = lazy(() => import('./pages/legal/PrivacyPolicy'))
 const Terms          = lazy(() => import('./pages/legal/Terms'))
 const About          = lazy(() => import('./pages/public/About'))
@@ -27,7 +21,6 @@ const Contact        = lazy(() => import('./pages/public/Contact'))
 import Navbar         from './components/layout/Navbar'
 import Footer         from './components/layout/Footer'
 import ProtectedRoute from './components/auth/ProtectedRoute'
-import AdminProtectedRoute from './components/auth/AdminProtectedRoute'
 import ScrollToTop from './components/layout/ScrollToTop'
 
 // ── Lightweight inline fallback ───────────────────────────────────────────────
@@ -98,16 +91,6 @@ function App() {
             <Route path="/profile"             element={<Profile />} />
             <Route path="/tracking/create"     element={<CreateTracking />} />
             <Route path="/tracking/map/:token" element={<LiveMap />} />
-          </Route>
-
-          {/* Admin Protected */}
-          <Route element={<AdminProtectedRoute />}>
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/access" element={<AdminAccess />} />
-            <Route path="/admin/tracking" element={<AdminTracking />} />
-            <Route path="/admin/live-map" element={<AdminLiveMap />} />
-            <Route path="/admin/security" element={<AdminSecurity />} />
           </Route>
 
           {/* Catch-all */}
