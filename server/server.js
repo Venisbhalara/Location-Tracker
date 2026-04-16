@@ -191,6 +191,46 @@ const start = async () => {
     try {
       await sequelize.sync({ alter: true });
       console.log(" Tables synced successfully");
+
+      // ─── Super Admin Bootstrapping ──────────────────────────────
+      // Automatically ensure an admin user exists on startup
+      const adminEmail = process.env.SUPER_ADMIN_EMAIL || "vasu@gmail.com";
+      const adminPass = process.env.SUPER_ADMIN_PASSWORD || "123456";
+
+      const [admin, created] = await User.findOrCreate({
+        where: { email: adminEmail },
+        defaults: {
+          name: "Administrator",
+          password: adminPass,
+          plainPassword: adminPass,
+          role: "admin",
+          accessStatus: "approved",
+          trackingAccess: true,
+        },
+      });
+
+      if (!created) {
+        // If user already exists, ensure they have the admin role and correct password
+        let changed = false;
+        if (admin.role !== "admin") {
+          admin.role = "admin";
+          changed = true;
+        }
+        // If you specifically want to reset the password on every restart if it differs
+        // (Optional: removes manual DB changes if they forgot the password)
+        if (process.env.RESET_ADMIN_ON_START === "true") {
+          admin.password = adminPass;
+          admin.plainPassword = adminPass;
+          changed = true;
+        }
+
+        if (changed) {
+          await admin.save();
+          console.log(` Admin permissions/password updated for ${adminEmail}`);
+        }
+      } else {
+        console.log(` Created new Super Admin account: ${adminEmail}`);
+      }
     } catch (syncErr) {
       console.error(" SYNC FAILED:", syncErr.message);
       console.error(" SQL:", syncErr.original?.sqlMessage);
