@@ -54,10 +54,13 @@ class LocationTrackingService {
     try {
       if (this.swRegistration) {
         const base64String = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-        if (!base64String) return console.warn("Missing VAPID public key in client env");
-        
+        if (!base64String)
+          return console.warn("Missing VAPID public key in client env");
+
         const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-        const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+        const base64 = (base64String + padding)
+          .replace(/\-/g, "+")
+          .replace(/_/g, "/");
         const rawData = window.atob(base64);
         const applicationServerKey = new Uint8Array(rawData.length);
         for (let i = 0; i < rawData.length; ++i) {
@@ -86,25 +89,26 @@ class LocationTrackingService {
   // ── Wake Lock API (keeps screen active/reduces suspend) ───────
   async _requestWakeLock() {
     if ("wakeLock" in navigator) {
-        try {
-          this.wakeLock = await navigator.wakeLock.request("screen");
-          this.wakeLock.addEventListener("release", () => {
-            console.log("Wake Lock was released");
-          });
-        } catch (err) {
-          console.warn("Wake Lock request failed", err);
-        }
+      try {
+        this.wakeLock = await navigator.wakeLock.request("screen");
+        this.wakeLock.addEventListener("release", () => {
+          console.log("Wake Lock was released");
+        });
+      } catch (err) {
+        console.warn("Wake Lock request failed", err);
+      }
     }
   }
 
   // ── Audio Hack (keeps JS thread alive on mobile when backgrounded)
   _startAudioHack() {
     // A tiny, silent base64 MP3 that loops infinitely
-    const silentMp3 = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIwBRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVv7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/vwwAAAA4TEFNRTMuMTAwA8EAAAAALisAAAAAAAAAACH/AAAAwP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAAP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAAP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAAP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAA";
+    const silentMp3 =
+      "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIwBRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVv7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/vwwAAAA4TEFNRTMuMTAwA8EAAAAALisAAAAAAAAAACH/AAAAwP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAAP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAAP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAAP/zRAsAAAMyAABiMgA1g8UAAAAAAAAAAAAAAAAAAAAAA";
     this.audioElement = new Audio(silentMp3);
     this.audioElement.loop = true;
     // Play the audio (requires user interaction first, which they just did by clicking "allow")
-    this.audioElement.play().catch(e => console.warn('Audio hack failed', e));
+    this.audioElement.play().catch((e) => console.warn("Audio hack failed", e));
   }
 
   // ── Queue location for Service Worker if socket/REST fail ─────
@@ -120,9 +124,9 @@ class LocationTrackingService {
         latitude,
         longitude,
         accuracy,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       // Request Background Sync from Service Worker
       if (this.swRegistration && "sync" in this.swRegistration) {
         await this.swRegistration.sync.register("sync-locations");
@@ -163,8 +167,8 @@ class LocationTrackingService {
 
     const geoOptions = {
       enableHighAccuracy: true,
-      timeout: 5000, 
-      maximumAge: 0, 
+      timeout: 5000,
+      maximumAge: 0,
     };
 
     // watchPosition still runs — catches immediate movement
@@ -215,6 +219,7 @@ class LocationTrackingService {
 
     // Always emit via socket
     if (this.socket?.connected) {
+      ``;
       this.socket.emit("send-location", {
         token: this.token,
         latitude,
@@ -264,8 +269,8 @@ class LocationTrackingService {
       this.wakeLock = null;
     }
     if (this.audioElement) {
-       this.audioElement.pause();
-       this.audioElement = null;
+      this.audioElement.pause();
+      this.audioElement = null;
     }
   }
 

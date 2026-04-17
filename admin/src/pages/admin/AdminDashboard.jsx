@@ -297,9 +297,17 @@ const AdminDashboard = () => {
                   setCredentials(null);
                   setCredPassword("");
                 }}
-                className="text-slate-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group px-3 py-1.5 rounded-lg hover:bg-slate-700/50"
               >
-                ✕
+                <svg 
+                  className="w-4 h-4 group-hover:-translate-x-1 transition-transform" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span className="text-sm font-medium">Back to Board</span>
               </button>
             </div>
 

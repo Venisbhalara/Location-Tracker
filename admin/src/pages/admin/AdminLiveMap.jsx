@@ -11,6 +11,7 @@ import L from "leaflet";
 import { io } from "socket.io-client";
 import { getAdminTrackingSessions } from "../../services/api";
 import LoadingScreen from "../../components/common/LoadingScreen";
+import BackButton from "../../components/common/BackButton";
 import toast from "react-hot-toast";
 
 // Ensure correct API fallback
@@ -123,6 +124,7 @@ const AdminLiveMap = () => {
 
   return (
     <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-64px)] flex flex-col">
+      <BackButton />
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-white border-l-4 border-yellow-500 pl-3">
           Global Live Recon

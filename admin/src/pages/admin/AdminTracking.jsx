@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import BackButton from "../../components/common/BackButton";
 import toast from "react-hot-toast";
 import { getAdminTrackingSessions, deleteAdminTrackingSession } from "../../services/api";
 import LoadingScreen from "../../components/common/LoadingScreen";
@@ -69,6 +70,7 @@ const AdminTracking = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <BackButton />
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white border-l-4 border-indigo-500 pl-3">
           Global Tracking Sessions
