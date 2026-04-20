@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { useLenis } from './hooks/useLenis'
 
 // ── Lazy-loaded pages (each becomes its own JS chunk) ────────────────────────
@@ -14,7 +14,6 @@ const AdminSecurity  = lazy(() => import('./pages/admin/AdminSecurity'))
 
 // ── Components (always needed, kept eager) ────────────────────────────────────
 import Navbar         from './components/layout/Navbar'
-import Footer         from './components/layout/Footer'
 import AdminProtectedRoute from './components/auth/AdminProtectedRoute'
 import ScrollToTop from './components/layout/ScrollToTop'
 
@@ -25,18 +24,17 @@ const PageLoader = () => (
   </div>
 )
 
-// ── Main layout with navbar and footer ────────────────────────────────────────
-const MainLayout = ({ children, hideFooter }) => (
+// ── Main layout with navbar ───────────────────────────────────────────────────
+const MainLayout = ({ children }) => (
   <div className="min-h-screen flex flex-col">
     <Navbar />
     <main className="flex-1">
       {children}
     </main>
-    {!hideFooter && <Footer />}
   </div>
 )
 
-// ── Minimal layout for tracking links (no navbar/footer) ───────────────────────
+// ── Minimal layout for tracking links (no navbar) ──────────────────────────────
 const MinimalLayout = ({ children }) => (
   <div className="min-h-screen bg-slate-900">
     {children}
@@ -45,12 +43,10 @@ const MinimalLayout = ({ children }) => (
 
 function App() {
   useLenis()
-  const location = useLocation()
-  const isAuthRoute = location.pathname === '/login'
 
-  // Otherwise, use the main layout with navbar and footer
+  // Otherwise, use the main layout with navbar
   return (
-    <MainLayout hideFooter={isAuthRoute}>
+    <MainLayout>
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>
