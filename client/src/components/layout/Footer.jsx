@@ -4,7 +4,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-slate-800 bg-slate-950 overflow-hidden">
+    <footer className="hidden sm:block relative border-t border-slate-800 bg-slate-950 overflow-hidden">
       {/* Subtle top glow */}
       <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
       <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-[400px] h-40 rounded-full bg-indigo-700/5 blur-3xl" />
