@@ -33,14 +33,14 @@ const allowedOrigin = (origin, callback) => {
   // If explicitly allowed to bypass CORS for testing
   if (process.env.ALLOW_ALL_ORIGINS === "true") return callback(null, true);
 
-  // Clean up the env var (remove trailing slash if user added it)
+  // Clean up the env vars (remove trailing slash if user added it)
   const clientUrl = process.env.CLIENT_URL
-    ? process.env.CLIENT_URL.trim().replace(/\/$/, "")
+    ? process.env.CLIENT_URL.trim().replace(/\/$/, "").toLowerCase()
     : null;
   const adminUrl = process.env.ADMIN_URL
-    ? process.env.ADMIN_URL.trim().replace(/\/$/, "")
+    ? process.env.ADMIN_URL.trim().replace(/\/$/, "").toLowerCase()
     : null;
-  const normalizedOrigin = origin.trim().replace(/\/$/, "");
+  const normalizedOrigin = origin.trim().replace(/\/$/, "").toLowerCase();
 
   // Exact match with CLIENT_URL or ADMIN_URL env var
   if (clientUrl && normalizedOrigin === clientUrl) return callback(null, true);
@@ -71,7 +71,7 @@ const allowedOrigin = (origin, callback) => {
   )
     return callback(null, true);
 
-  console.error(`❌ CORS REJECTED: ${origin}`);
+  console.error(`❌ CORS REJECTED: "${origin}" (Normalized: "${normalizedOrigin}"). Expected Client: "${clientUrl}", Admin: "${adminUrl}"`);
   callback(new Error("CORS: origin not allowed — " + origin));
 };
 
