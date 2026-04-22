@@ -1,17 +1,32 @@
-require("dotenv").config(); // Must be FIRST, before anything else
+// Load env vars FIRST — must be before any other require that reads process.env
+require("dotenv").config();
+
+// ── Startup environment variable validation ────────────────────────────────
+// Fail fast with a clear message instead of a cryptic crash deep in the code.
+const REQUIRED_ENV_VARS = [
+  "DB_HOST",
+  "DB_NAME",
+  "DB_USER",
+  "DB_PASSWORD",
+  "JWT_SECRET",
+];
+const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
+if (missingVars.length > 0) {
+  console.error(
+    `\n❌ STARTUP FAILED: Missing required environment variables:\n   ${missingVars.join(', ')}\n` +
+    `   Please set them in your .env file (local) or Render dashboard (production).\n`
+  );
+  process.exit(1);
+}
 
 const express = require("express");
 const http = require("http");
 const socketio = require("socket.io");
 const cors = require("cors");
-const dotenv = require("dotenv");
-
-// Load env vars FIRST
-dotenv.config();
 
 // Import sequelize instance
 const sequelize = require("./config/db");
-const runMigrations = require("./utils/dbRepair"); // We will create this file
+const runMigrations = require("./utils/dbRepair");
 
 // Track location updates for the admin dashboard
 global.locationUpdatesToday = 0;
@@ -109,14 +124,37 @@ app.use("/api/access", require("./routes/access"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/push", require("./routes/push"));
 
-// Health check
+// Root check
 app.get("/", (req, res) => {
   res.json({
-    message: " Location Tracker API is running!",
+    message: "Location Tracker API is running!",
     status: "OK",
     database: "MySQL",
     timestamp: new Date().toISOString(),
   });
+});
+
+// ── /api/health — ping this on Render to verify server + DB are alive ─────
+app.get("/api/health", async (req, res) => {
+  try {
+    await sequelize.authenticate();
+    res.json({
+      success: true,
+      status: "healthy",
+      database: "connected",
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+    });
+  } catch (dbErr) {
+    console.error("[/api/health] DB connection failed:", dbErr.message);
+    res.status(503).json({
+      success: false,
+      status: "unhealthy",
+      database: "disconnected",
+      error: dbErr.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // ── Periodic Offline Ping Scheduler ─────────────────────────────────────────

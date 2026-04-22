@@ -46,7 +46,7 @@ const User = sequelize.define(
     accessStatus: {
       type: DataTypes.STRING(20),
       allowNull: true,
-      defaultValue: "approved",
+      defaultValue: "pending",  // New users must await admin approval
       field: "access_status",
     },
     trackingAccess: {

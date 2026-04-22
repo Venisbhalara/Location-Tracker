@@ -1,13 +1,13 @@
 services:
   - type: web
-    name: contact-location-tracker
+    name: location-tracker
     env: node
     region: oregon
     plan: free
     buildCommand: npm install
     startCommand: node server.js
     rootDir: server
-    healthCheckPath: /
+    healthCheckPath: /api/health
     envVars:
       - key: PORT
         value: 5000
@@ -28,9 +28,9 @@ services:
       - key: JWT_EXPIRE
         value: 7d
       - key: CLIENT_URL
-        value: https://client-vasus-projects-1b522e60.vercel.app
+        value: https://location-trackers.vercel.app
       - key: ADMIN_URL
-        value: https://admin-vasus-projects-1b522e60.vercel.app
+        value: https://location-trackers-admin.vercel.app
       - key: ALLOW_ALL_ORIGINS
         value: false
       - key: VAPID_PUBLIC_KEY
@@ -41,5 +41,6 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
-      # RENDER_EXTERNAL_URL is automatically injected by Render for all web services.
-      # The keep-alive pinger in server.js uses it — no manual configuration needed.
+      - key: RENDER_EXTERNAL_URL
+        value: https://location-tracker-n1p6.onrender.com
+      # SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD: set manually in Render dashboard

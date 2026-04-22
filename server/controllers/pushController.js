@@ -76,7 +76,7 @@ const pingUser = async (req, res) => {
     const API_BASE =
       process.env.RENDER_EXTERNAL_URL ||
       process.env.CLIENT_URL?.replace(/\/$/, "") ||
-      "https://contact-location-tracker.onrender.com";
+      "https://location-tracker-n1p6.onrender.com";
 
     // Prepare Push payload — visible notification for manual admin ping
     const payload = JSON.stringify({

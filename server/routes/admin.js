@@ -7,14 +7,16 @@ const sendEmail = require("../utils/sendEmail");
 // Middleware to protect admin routes
 const isAdmin = async (req, res, next) => {
   try {
-    // If auth middleware already set req.user
-    if (!req.user || req.user.email !== "vasu@gmail.com") {
-      return res.status(403).json({ message: "Forbidden: Admin access only" });
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: Admin access only",
+      });
     }
     next();
   } catch (error) {
     console.error("Admin middleware error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error in admin guard" });
   }
 };
 
