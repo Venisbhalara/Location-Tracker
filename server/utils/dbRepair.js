@@ -1,70 +1,73 @@
 /**
  * utils/dbRepair.js
  * 
- * Automatically ensures all required columns exist in the database.
- * This runs every time the server starts to prevent "Unknown column" errors.
+ * Ultimate Database Repair Utility
+ * Automatically synchronizes the database schema with Sequelize models
+ * by adding any missing columns without deleting existing data.
  */
+const { User, TrackingRequest, AccessRequest, ActivityLog } = require("../models");
 const sequelize = require("../config/db");
 
-const tablesToRepair = [
-  {
-    tableName: "tracking_requests",
-    columns: [
-      { name: "user_id", sql: "INT NOT NULL AFTER id" },
-      { name: "phone_number", sql: "VARCHAR(20) NOT NULL AFTER user_id" },
-      { name: "tracking_type", sql: "ENUM('location') NOT NULL DEFAULT 'location' AFTER phone_number" },
-      { name: "location_mode", sql: "ENUM('gps','ip','offline') NOT NULL DEFAULT 'offline'" },
-      { name: "sharer_online", sql: "TINYINT(1) NOT NULL DEFAULT 0" },
-      { name: "ip_latitude", sql: "DECIMAL(11,8) NULL DEFAULT NULL" },
-      { name: "ip_longitude", sql: "DECIMAL(12,8) NULL DEFAULT NULL" },
-      { name: "ip_city", sql: "VARCHAR(100) NULL DEFAULT NULL" },
-      { name: "ip_region", sql: "VARCHAR(100) NULL DEFAULT NULL" },
-      { name: "ip_country", sql: "VARCHAR(100) NULL DEFAULT NULL" },
-      { name: "ip_isp", sql: "VARCHAR(255) NULL DEFAULT NULL" },
-      { name: "last_ip_updated_at", sql: "DATETIME NULL DEFAULT NULL" },
-      { name: "push_subscription", sql: "JSON NULL DEFAULT NULL" },
-      { name: "last_known_ip", sql: "VARCHAR(64) NULL DEFAULT NULL" }
-    ]
-  },
-  {
-    tableName: "access_requests",
-    columns: [
-      { name: "user_id", sql: "INT NOT NULL AFTER id" },
-      { name: "rejection_reason", sql: "TEXT NULL AFTER status" }
-    ]
-  },
-  {
-    tableName: "activity_logs",
-    columns: [
-      { name: "user_id", sql: "INT NULL AFTER alert" }
-    ]
-  }
-];
-
 async function runMigrations() {
+  const models = [
+    { model: User, tableName: "users" },
+    { model: TrackingRequest, tableName: "tracking_requests" },
+    { model: AccessRequest, tableName: "access_requests" },
+    { model: ActivityLog, tableName: "activity_logs" }
+  ];
+
+  console.log("🛠️ Starting Ultimate Database Repair...");
+
   try {
-    for (const table of tablesToRepair) {
-      // Check existing columns
+    for (const item of models) {
+      const { model, tableName } = item;
+      
+      // 1. Check if table exists
+      const [tableCheck] = await sequelize.query(
+        `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${tableName}'`
+      );
+
+      if (tableCheck.length === 0) {
+        console.log(`📦 Table '${tableName}' does not exist. It will be created by sequelize.sync().`);
+        continue;
+      }
+
+      // 2. Get existing columns
       const [rows] = await sequelize.query(
         `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${table.tableName}'`
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${tableName}'`
       );
-      
-      if (rows.length === 0) continue; // Table doesn't exist yet
-
       const existingCols = rows.map((r) => r.COLUMN_NAME.toLowerCase());
 
-      for (const col of table.columns) {
-        if (!existingCols.includes(col.name)) {
-          console.log(`[Database Repair] ➕ Adding missing column: ${table.tableName}.${col.name}`);
-          await sequelize.query(
-            `ALTER TABLE ${table.tableName} ADD COLUMN \`${col.name}\` ${col.sql}`
-          );
+      // 3. Compare with Model definition
+      const attributes = model.getAttributes();
+      for (const attrName in attributes) {
+        const attribute = attributes[attrName];
+        const colName = (attribute.field || attrName).toLowerCase();
+
+        if (!existingCols.includes(colName)) {
+          console.log(`[Database Repair] ➕ Adding missing column: ${tableName}.${colName}`);
+          
+          // Generate raw SQL for the column type
+          let colSql = attribute.type.toString();
+          if (attribute.allowNull === false) colSql += " NOT NULL";
+          if (attribute.defaultValue !== undefined) {
+             if (typeof attribute.defaultValue === 'string') colSql += ` DEFAULT '${attribute.defaultValue}'`;
+             else if (typeof attribute.defaultValue === 'number' || typeof attribute.defaultValue === 'boolean') colSql += ` DEFAULT ${attribute.defaultValue}`;
+          }
+
+          try {
+            await sequelize.query(`ALTER TABLE ${tableName} ADD COLUMN \`${colName}\` ${colSql}`);
+          } catch (alterErr) {
+            console.warn(`[Database Repair] ⚠️ Could not add ${tableName}.${colName}: ${alterErr.message}`);
+          }
         }
       }
     }
+    console.log("✅ Ultimate Database Repair complete!");
   } catch (err) {
-    console.warn("[Database Repair] Warning: Could not complete auto-migration:", err.message);
+    console.error("❌ Ultimate Database Repair failed:", err.message);
   }
 }
 
