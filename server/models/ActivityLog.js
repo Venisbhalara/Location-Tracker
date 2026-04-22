@@ -38,6 +38,9 @@ const ActivityLog = sequelize.define("ActivityLog", {
     allowNull: true,
     field: "user_id",
   }
+}, {
+  tableName: "activity_logs",  // CRITICAL: explicit name — Sequelize default would use "ActivityLogs" (wrong on MySQL/Linux)
+  timestamps: true,
 });
 
 module.exports = ActivityLog;
