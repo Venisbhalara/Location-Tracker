@@ -11,6 +11,7 @@ dotenv.config();
 
 // Import sequelize instance
 const sequelize = require("./config/db");
+const runMigrations = require("./utils/dbRepair"); // We will create this file
 
 // Track location updates for the admin dashboard
 global.locationUpdatesToday = 0;
@@ -279,6 +280,9 @@ const start = async () => {
   try {
     await sequelize.authenticate();
     console.log(" MySQL Connected.");
+
+    // Run automatic database repair/migration
+    await runMigrations();
 
     // Sync models with database
     try {

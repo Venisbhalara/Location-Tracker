@@ -195,8 +195,9 @@ const getTrackingByToken = async (req, res) => {
 // ─── @desc    Get all tracking requests for logged-in user
 // ─── @access  Private
 const getUserTrackings = async (req, res) => {
+  const { status, page = 1, limit = 10 } = req.query;
+
   try {
-    const { status, page = 1, limit = 10 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     const where = { userId: req.user.id };

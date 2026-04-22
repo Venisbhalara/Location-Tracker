@@ -10,6 +10,18 @@ const sequelize = require("./config/db");
 
 const columns = [
   {
+    name: "user_id",
+    sql: "INT NOT NULL AFTER id",
+  },
+  {
+    name: "phone_number",
+    sql: "VARCHAR(20) NOT NULL AFTER user_id",
+  },
+  {
+    name: "tracking_type",
+    sql: "ENUM('location') NOT NULL DEFAULT 'location' AFTER phone_number",
+  },
+  {
     name: "location_mode",
     sql: "ENUM('gps','ip','offline') NOT NULL DEFAULT 'offline'",
   },
