@@ -103,6 +103,7 @@ const AdminTracking = () => {
             <thead>
               <tr className="bg-slate-800/50 border-b border-slate-800 text-slate-400 text-sm uppercase tracking-wider">
                 <th className="px-6 py-4 font-semibold">User (Owner)</th>
+                <th className="px-6 py-4 font-semibold">Label / Name</th>
                 <th className="px-6 py-4 font-semibold">Target Contact</th>
                 <th className="px-6 py-4 font-semibold">Status / Metrics</th>
                 <th className="px-6 py-4 font-semibold">Live State</th>
@@ -112,7 +113,7 @@ const AdminTracking = () => {
             <tbody className="divide-y divide-slate-800">
               {filteredSessions.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
                     <div className="text-4xl mb-3">📡</div>
                     No isolated payloads matching current filter schema.
                   </td>
@@ -126,12 +127,19 @@ const AdminTracking = () => {
                       <div className="text-xs text-slate-500 font-mono mt-0.5">{session.user?.email}</div>
                     </td>
                     
+                    {/* Label */}
+                    <td className="px-6 py-4 border-r border-slate-800/50">
+                      <div className="font-semibold text-white">
+                        {session.label || <span className="text-slate-600 font-normal italic">No Label</span>}
+                      </div>
+                    </td>
+
                     {/* Target Contact */}
                     <td className="px-6 py-4 border-r border-slate-800/50">
-                      <div className="font-medium text-white flex items-center gap-2">
-                        <span className="text-slate-400">📱</span> {session.phoneNumber}
+                      <div className="font-medium text-slate-300 flex items-center gap-2 font-mono text-sm">
+                        <span className="text-slate-500">📱</span> {session.phoneNumber}
                       </div>
-                      <div className="text-xs text-indigo-400/70 mt-1 font-mono">{session.trackingType} mode</div>
+                      <div className="text-xs text-indigo-400/50 mt-1 font-mono">{session.trackingType} mode</div>
                     </td>
 
                     {/* Status & Metrics */}

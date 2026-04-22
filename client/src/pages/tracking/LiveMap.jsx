@@ -388,9 +388,12 @@ const LiveMap = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Live Location Map</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            📞 {tracking?.phoneNumber}
+          <h1 className="text-2xl font-bold text-white">
+            {tracking?.label ? tracking.label : "Live Location Map"}
+          </h1>
+          <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
+            <span>📞 {tracking?.phoneNumber}</span>
+            {tracking?.label && <span className="text-slate-600 px-2 py-0.5 rounded bg-slate-800/50 text-[10px] uppercase tracking-wider">Target Link</span>}
           </p>
         </div>
         <div className="flex items-center gap-3">

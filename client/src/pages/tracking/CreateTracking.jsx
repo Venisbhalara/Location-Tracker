@@ -4,12 +4,15 @@ import { createTracking, getAccessStatus, requestAccess } from "../../services/a
 import toast from "react-hot-toast";
 import LoadingScreen from "../../components/common/LoadingScreen";
 import useSocket from "../../hooks/useSocket";
+import PhoneInputSection from "../../components/tracking/PhoneInputSection";
 
 const CreateTracking = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     phoneNumber: "",
     trackingType: "location",
+    label: "",
+    isValid: false,
   });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -243,23 +246,12 @@ const CreateTracking = () => {
 
       {!result ? (
         <div className="bg-slate-900/80 backdrop-blur-md rounded-xl p-6 shadow-sm border border-slate-800">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div>
-              <label className="label">Phone Number *</label>
-              <input
-                type="text"
-                className="input"
-                required
-                placeholder="+91 9876543210"
-                value={form.phoneNumber}
-                onChange={(e) =>
-                  setForm({ ...form, phoneNumber: e.target.value })
-                }
-              />
-              <p className="text-xs text-slate-500 mt-2">
-                The phone number you want to track.
-              </p>
-            </div>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+            <PhoneInputSection 
+              onChange={({ phoneNumber, label, isValid }) => 
+                setForm(prev => ({ ...prev, phoneNumber, label, isValid }))
+              } 
+            />
 
             <div>
               <label className="label font-medium mb-3 block">Tracking Type *</label>
@@ -294,8 +286,17 @@ const CreateTracking = () => {
               </p>
             </div>
 
-            <button type="submit" className="btn-primary py-3 mt-4" disabled={loading}>
-              {loading ? "Generating Link..." : "Generate Tracking Link"}
+            <button 
+              type="submit" 
+              className={`btn-primary py-4 mt-2 transition-all duration-300 ${!form.isValid ? "opacity-50 cursor-not-allowed grayscale" : "hover:scale-[1.02] active:scale-95 shadow-[0_0_20px_rgba(99,102,241,0.3)]"}`} 
+              disabled={loading || !form.isValid}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Generating Link...</span>
+                </div>
+              ) : "Generate Tracking Link"}
             </button>
           </form>
         </div>

@@ -15,7 +15,7 @@ const logActivity = require("../utils/activityLogger");
       .json({ message: errors.array()[0].msg, errors: errors.array() });
   }
 
-  const { phoneNumber, trackingType, expiryHours = 24 } = req.body;
+  const { phoneNumber, trackingType, label, expiryHours = 24 } = req.body;
 
   try {
     // Check if user has approved tracking access
@@ -38,6 +38,7 @@ const logActivity = require("../utils/activityLogger");
     const tracking = await TrackingRequest.create({
       userId: req.user.id,
       phoneNumber,
+      label,
       trackingType: trackingType || "location",
       token,
       status: initialStatus,

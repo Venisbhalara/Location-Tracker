@@ -96,6 +96,7 @@ const Dashboard = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-slate-500 border-b border-slate-800">
+                  <th className="pb-3 pr-4 font-medium">Label</th>
                   <th className="pb-3 pr-4 font-medium">Phone</th>
                   <th className="pb-3 pr-4 font-medium">Type</th>
                   <th className="pb-3 pr-4 font-medium">Status</th>
@@ -106,7 +107,12 @@ const Dashboard = () => {
               <tbody className="divide-y divide-slate-800">
                 {trackings.map((t) => (
                   <tr key={t.id} className="text-slate-300">
-                    <td className="py-3 pr-4 font-mono text-xs">{t.phoneNumber}</td>
+                    <td className="py-3 pr-4">
+                      <span className="text-white font-medium">{t.label || '—'}</span>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <span className="font-mono text-xs text-slate-400">{t.phoneNumber}</span>
+                    </td>
                     <td className="py-3 pr-4"><span className="badge-blue">{t.trackingType}</span></td>
                     <td className="py-3 pr-4">{statusBadge(t.status)}</td>
                     <td className="py-3 pr-4 text-slate-500 hidden sm:table-cell text-xs">

@@ -144,6 +144,11 @@ const TrackingRequest = sequelize.define(
       defaultValue: null,
       field: "last_known_ip",
     },
+    label: {
+      type: DataTypes.STRING(30),
+      allowNull: true,
+      defaultValue: null,
+    },
   },
   {
     tableName: "tracking_requests",
