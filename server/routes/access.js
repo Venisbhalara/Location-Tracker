@@ -42,14 +42,8 @@ router.post('/request', protect, async (req, res) => {
       });
     }
 
-    // ── Sanitize & validate reason ────────────────────────────────────────────
-    const reason = sanitizeText(req.body.reason);
-    if (!reason) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide a reason for your access request.',
-      });
-    }
+    // ── Sanitize reason (optional field — empty string is allowed) ─────────────
+    const reason = sanitizeText(req.body.reason || '');
 
     // ── Create the request ────────────────────────────────────────────────────
     const newRequest = await AccessRequest.create({
@@ -83,11 +77,20 @@ router.post('/request', protect, async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('[access/request] Error:', error);
+    // Log the full error so we can see it in Render logs
+    console.error('[access/request] FULL ERROR:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      original: error.original?.message,
+      sql: error.original?.sql,
+    });
     return res.status(500).json({
       success: false,
       message: 'Server error while submitting your request. Please try again later.',
-      ...(process.env.NODE_ENV !== 'production' && { debug: error.message }),
+      // Always include debug in response for now so you can see it in browser DevTools
+      debug: error.message,
+      detail: error.original?.message || null,
     });
   }
 });
