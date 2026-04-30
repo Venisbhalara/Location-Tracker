@@ -4,44 +4,58 @@
   * {
     box-sizing: border-box;
   }
-  body, html {
-    @apply bg-[#080d1a] text-[#F1F5F9] font-sans antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+  html {
+    scroll-behavior: smooth;
   }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #080d1a; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 9999px; }
+  body {
+    @apply text-slate-100 antialiased;
+    font-family: "Inter", system-ui, sans-serif;
+    background-color: #0d0d17;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d0d17;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
 }
 
 @layer components {
-  .card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-    will-change: transform;
-    @apply shadow-xl text-white;
-  }
-  
+  .card,
   .glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    @apply border border-white/[0.07] rounded-2xl shadow-xl;
+    background: rgba(255, 255, 255, 0.025);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-radius: 12px;
     transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
     will-change: transform;
-    contain: layout paint;
+    color: white;
+  }
+
+  .nextrack-btn-primary {
+    @apply inline-flex items-center justify-center font-semibold rounded-xl
+           transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+  }
+  .nextrack-btn-primary:hover {
+    box-shadow: 0 0 35px rgba(99, 102, 241, 0.55);
+    transform: translateY(-1px);
   }
 
   .btn-primary {
-    @apply bg-[#7C6FFF] hover:bg-[#6859ff] text-white font-semibold px-4 py-2 rounded-[12px]
+    @apply bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl
            transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
-           focus:outline-none focus:ring-2 focus:ring-[#7C6FFF] focus:ring-offset-2 focus:ring-offset-[#080d1a];
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900;
   }
   .btn-secondary {
     @apply bg-white/5 hover:bg-white/10 text-white font-semibold px-4 py-2 rounded-[12px] border border-white/10

@@ -1,43 +1,106 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* ── Base ─────────────────────────────────────────────────────────── */
 @layer base {
   * {
     box-sizing: border-box;
   }
-  body {
-    @apply bg-slate-950 text-slate-100 font-sans antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+
+  html {
+    scroll-behavior: smooth;
   }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { @apply bg-slate-900; }
-  ::-webkit-scrollbar-thumb { @apply bg-slate-600 rounded-full; }
+
+  body {
+    @apply text-slate-100 antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #0d0d17;
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: #0d0d17; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
 }
 
+/* ── Components ───────────────────────────────────────────────────── */
 @layer components {
+
+  /* ── Cards ── */
   .card {
-    @apply bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-6;
+    @apply border border-white/[0.07] rounded-2xl shadow-xl p-6;
+    background: rgba(255,255,255,0.025);
+    backdrop-filter: blur(12px);
   }
+
+  /* ── NexTrack primary button (indigo-purple gradient) ── */
+  .nextrack-btn-primary {
+    @apply inline-flex items-center justify-center font-semibold rounded-xl
+           transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(99,102,241,0.35);
+  }
+  .nextrack-btn-primary:hover {
+    box-shadow: 0 0 35px rgba(99,102,241,0.55);
+    transform: translateY(-1px);
+  }
+
+  /* ── Ghost / outline button ── */
+  .nextrack-btn-ghost {
+    @apply inline-flex items-center justify-center font-semibold rounded-xl border
+           transition-all duration-300 active:scale-95 focus:outline-none
+           focus:ring-2 focus:ring-white/20 text-slate-200;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+  }
+  .nextrack-btn-ghost:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.22);
+  }
+
+  /* ── Legacy btn-primary (kept for other pages) ── */
   .btn-primary {
     @apply bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl
            transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900;
   }
+
   .btn-secondary {
-    @apply bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3 rounded-xl
+    @apply font-semibold px-6 py-3 rounded-xl
            transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-slate-500;
+    background: rgba(255,255,255,0.06);
+    color: #cbd5e1;
+    border: 1px solid rgba(255,255,255,0.1);
   }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
   .btn-danger {
     @apply bg-red-600 hover:bg-red-500 text-white font-semibold px-6 py-3 rounded-xl
            transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500;
   }
+
+  /* ── Inputs ── */
   .input {
-    @apply w-full bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500
-           rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+    @apply w-full border text-slate-100 placeholder-slate-500
+           rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60
            focus:border-transparent transition-all duration-200;
+    background: rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.1);
   }
+  .input:focus {
+    box-shadow: 0 0 0 2px rgba(99,102,241,0.4), 0 0 20px rgba(99,102,241,0.1);
+  }
+
   .label {
     @apply block text-sm font-medium text-slate-300 mb-1.5;
   }
+
+  /* ── Badges ── */
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
@@ -54,17 +117,30 @@
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400;
   }
 
-  .nice-scrollbar::-webkit-scrollbar {
-    width: 5px;
-  }
-  .nice-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
+  /* ── Scrollbars ── */
+  .nice-scrollbar::-webkit-scrollbar { width: 5px; }
+  .nice-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .nice-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-slate-700/50 rounded-full hover:bg-slate-600/50 transition-colors;
+    background: rgba(255,255,255,0.1);
+    border-radius: 9999px;
   }
-  
+  .nice-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.18);
+  }
+
+  /* ── Glass panel ── */
   .glass-panel {
-    @apply bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 shadow-2xl;
+    @apply border rounded-2xl shadow-2xl;
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+  }
+
+  /* ── Admin glass card ── */
+  .glass-card {
+    @apply border rounded-2xl;
+    background: rgba(255,255,255,0.025);
+    border-color: rgba(255,255,255,0.07);
+    backdrop-filter: blur(16px);
   }
 }

@@ -60,7 +60,12 @@ const MapUpdater = ({ position }) => {
 };
 
 // ── NEURAL PING STATUS BAR ─────────────────────────────────────────────────────
-const NeuralPingStatusBar = ({ locationMode, sharerOnline, offlineEvent, ipLocation }) => {
+const NeuralPingStatusBar = ({
+  locationMode,
+  sharerOnline,
+  offlineEvent,
+  ipLocation,
+}) => {
   const [dot, setDot] = useState(true);
 
   // Blinking dot for alive indicators
@@ -73,7 +78,8 @@ const NeuralPingStatusBar = ({ locationMode, sharerOnline, offlineEvent, ipLocat
     return (
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.1) 100%)",
+          background:
+            "linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.1) 100%)",
           border: "1px solid rgba(16,185,129,0.4)",
           borderRadius: "12px",
           padding: "12px 16px",
@@ -85,23 +91,45 @@ const NeuralPingStatusBar = ({ locationMode, sharerOnline, offlineEvent, ipLocat
       >
         <div
           style={{
-            width: 10, height: 10, borderRadius: "50%",
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
             background: "#10b981",
-            boxShadow: dot ? "0 0 0 4px rgba(16,185,129,0.3)" : "0 0 0 0px rgba(16,185,129,0)",
+            boxShadow: dot
+              ? "0 0 0 4px rgba(16,185,129,0.3)"
+              : "0 0 0 0px rgba(16,185,129,0)",
             transition: "box-shadow 0.8s",
             flexShrink: 0,
           }}
         />
         <div>
-          <p style={{ color: "#10b981", fontWeight: 700, fontSize: 13, margin: 0 }}>
+          <p
+            style={{
+              color: "#10b981",
+              fontWeight: 700,
+              fontSize: 13,
+              margin: 0,
+            }}
+          >
             ✅ Precision GPS Mode — Live
           </p>
-          <p style={{ color: "rgba(156,220,170,0.7)", fontSize: 11, margin: 0 }}>
+          <p
+            style={{ color: "rgba(156,220,170,0.7)", fontSize: 11, margin: 0 }}
+          >
             Real-time GPS coordinates are streaming. Accuracy: ±5m
           </p>
         </div>
-        <div style={{ marginLeft: "auto", background: "rgba(16,185,129,0.2)", borderRadius: 6, padding: "2px 8px" }}>
-          <span style={{ color: "#10b981", fontSize: 11, fontWeight: 600 }}>LIVE</span>
+        <div
+          style={{
+            marginLeft: "auto",
+            background: "rgba(16,185,129,0.2)",
+            borderRadius: 6,
+            padding: "2px 8px",
+          }}
+        >
+          <span style={{ color: "#10b981", fontSize: 11, fontWeight: 600 }}>
+            LIVE
+          </span>
         </div>
       </div>
     );
@@ -111,64 +139,141 @@ const NeuralPingStatusBar = ({ locationMode, sharerOnline, offlineEvent, ipLocat
     return (
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.1) 100%)",
+          background:
+            "linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.1) 100%)",
           border: "1px solid rgba(249,115,22,0.4)",
           borderRadius: "12px",
           padding: "12px 16px",
           marginBottom: "16px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: 8 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            marginBottom: 8,
+          }}
+        >
           <div
             style={{
-              width: 10, height: 10, borderRadius: "50%",
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
               background: "#f97316",
-              boxShadow: dot ? "0 0 0 4px rgba(249,115,22,0.3)" : "0 0 0 0px rgba(249,115,22,0)",
+              boxShadow: dot
+                ? "0 0 0 4px rgba(249,115,22,0.3)"
+                : "0 0 0 0px rgba(249,115,22,0)",
               transition: "box-shadow 0.8s",
               flexShrink: 0,
             }}
           />
           <div>
-            <p style={{ color: "#f97316", fontWeight: 700, fontSize: 13, margin: 0 }}>
+            <p
+              style={{
+                color: "#f97316",
+                fontWeight: 700,
+                fontSize: 13,
+                margin: 0,
+              }}
+            >
               ⚠️ Internet Mode — GPS is Off
             </p>
-            <p style={{ color: "rgba(251,191,36,0.7)", fontSize: 11, margin: 0 }}>
-              Location fetched via mobile internet (IP address). Showing approximate area.
+            <p
+              style={{ color: "rgba(251,191,36,0.7)", fontSize: 11, margin: 0 }}
+            >
+              Location fetched via mobile internet (IP address). Showing
+              approximate area.
             </p>
           </div>
-          <div style={{ marginLeft: "auto", background: "rgba(249,115,22,0.2)", borderRadius: 6, padding: "2px 8px" }}>
-            <span style={{ color: "#f97316", fontSize: 11, fontWeight: 600 }}>~IP</span>
+          <div
+            style={{
+              marginLeft: "auto",
+              background: "rgba(249,115,22,0.2)",
+              borderRadius: 6,
+              padding: "2px 8px",
+            }}
+          >
+            <span style={{ color: "#f97316", fontSize: 11, fontWeight: 600 }}>
+              ~IP
+            </span>
           </div>
         </div>
         <div
           style={{
-            display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 8, marginTop: 8,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gap: 8,
+            marginTop: 8,
             background: "rgba(249,115,22,0.07)",
-            borderRadius: 8, padding: "8px 10px",
+            borderRadius: 8,
+            padding: "8px 10px",
           }}
         >
           <div>
-            <p style={{ color: "rgba(249,115,22,0.6)", fontSize: 10, margin: 0 }}>City</p>
-            <p style={{ color: "#fdba74", fontSize: 12, fontWeight: 600, margin: 0 }}>
+            <p
+              style={{ color: "rgba(249,115,22,0.6)", fontSize: 10, margin: 0 }}
+            >
+              City
+            </p>
+            <p
+              style={{
+                color: "#fdba74",
+                fontSize: 12,
+                fontWeight: 600,
+                margin: 0,
+              }}
+            >
               {ipLocation.city || "—"}
             </p>
           </div>
           <div>
-            <p style={{ color: "rgba(249,115,22,0.6)", fontSize: 10, margin: 0 }}>Country</p>
-            <p style={{ color: "#fdba74", fontSize: 12, fontWeight: 600, margin: 0 }}>
+            <p
+              style={{ color: "rgba(249,115,22,0.6)", fontSize: 10, margin: 0 }}
+            >
+              Country
+            </p>
+            <p
+              style={{
+                color: "#fdba74",
+                fontSize: 12,
+                fontWeight: 600,
+                margin: 0,
+              }}
+            >
               {ipLocation.country || "—"}
             </p>
           </div>
           <div>
-            <p style={{ color: "rgba(249,115,22,0.6)", fontSize: 10, margin: 0 }}>ISP</p>
-            <p style={{ color: "#fdba74", fontSize: 12, fontWeight: 600, margin: "0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <p
+              style={{ color: "rgba(249,115,22,0.6)", fontSize: 10, margin: 0 }}
+            >
+              ISP
+            </p>
+            <p
+              style={{
+                color: "#fdba74",
+                fontSize: 12,
+                fontWeight: 600,
+                margin: "0",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               {ipLocation.isp || "—"}
             </p>
           </div>
         </div>
-        <p style={{ color: "rgba(249,115,22,0.5)", fontSize: 10, margin: "6px 0 0" }}>
-          📡 Accuracy: {ipLocation.accuracyNote || "±1–5km"} — Circle on map shows uncertainty radius
+        <p
+          style={{
+            color: "rgba(249,115,22,0.5)",
+            fontSize: 10,
+            margin: "6px 0 0",
+          }}
+        >
+          📡 Accuracy: {ipLocation.accuracyNote || "±1–5km"} — Circle on map
+          shows uncertainty radius
         </p>
       </div>
     );
@@ -178,7 +283,8 @@ const NeuralPingStatusBar = ({ locationMode, sharerOnline, offlineEvent, ipLocat
     return (
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(185,28,28,0.1) 100%)",
+          background:
+            "linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(185,28,28,0.1) 100%)",
           border: "1px solid rgba(239,68,68,0.35)",
           borderRadius: "12px",
           padding: "12px 16px",
@@ -190,14 +296,34 @@ const NeuralPingStatusBar = ({ locationMode, sharerOnline, offlineEvent, ipLocat
       >
         <span style={{ fontSize: 20, flexShrink: 0 }}>📴</span>
         <div>
-          <p style={{ color: "#f87171", fontWeight: 700, fontSize: 13, margin: 0 }}>
+          <p
+            style={{
+              color: "#f87171",
+              fontWeight: 700,
+              fontSize: 13,
+              margin: 0,
+            }}
+          >
             Target is Offline — Last Known Location Shown
           </p>
-          <p style={{ color: "rgba(248,113,113,0.6)", fontSize: 11, margin: "3px 0 0" }}>
-            {offlineEvent?.message || "GPS and browser tab are closed. Attempting background Internet tracking..."}
+          <p
+            style={{
+              color: "rgba(248,113,113,0.6)",
+              fontSize: 11,
+              margin: "3px 0 0",
+            }}
+          >
+            {offlineEvent?.message ||
+              "GPS and browser tab are closed. Attempting background Internet tracking..."}
           </p>
           {offlineEvent?.timestamp && (
-            <p style={{ color: "rgba(248,113,113,0.4)", fontSize: 10, margin: "3px 0 0" }}>
+            <p
+              style={{
+                color: "rgba(248,113,113,0.4)",
+                fontSize: 10,
+                margin: "3px 0 0",
+              }}
+            >
               Went offline at {offlineEvent.timestamp.toLocaleTimeString()}
             </p>
           )}
@@ -369,7 +495,6 @@ const LiveMap = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
       {/* Inline keyframes for pulse animations */}
       <style>{`
         @keyframes gps-pulse {
@@ -393,13 +518,18 @@ const LiveMap = () => {
           </h1>
           <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
             <span>📞 {tracking?.phoneNumber}</span>
-            {tracking?.label && <span className="text-slate-600 px-2 py-0.5 rounded bg-slate-800/50 text-[10px] uppercase tracking-wider">Target Link</span>}
+            {tracking?.label && (
+              <span className="text-slate-600 px-2 py-0.5 rounded bg-slate-800/50 text-[10px] uppercase tracking-wider">
+                Target Link
+              </span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-3">
           {trackingStopped ? (
             <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-red-500/10 border-red-500/30 text-red-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Session Ended
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Session
+              Ended
             </span>
           ) : locationMode === "gps" && sharerOnline ? (
             <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
@@ -460,7 +590,6 @@ const LiveMap = () => {
 
       {/* Main Content Layout */}
       <div className="flex flex-col lg:flex-row gap-6 mb-8">
-
         {/* Left Column: Map */}
         <div className="w-full lg:w-1/3 xl:w-[35%] lg:sticky lg:top-6 h-fit">
           <div
@@ -468,11 +597,12 @@ const LiveMap = () => {
             style={{
               height: "calc(100vh - 200px)",
               minHeight: "550px",
-              borderColor: locationMode === "gps"
-                ? "rgba(34,197,94,0.3)"
-                : locationMode === "ip"
-                ? "rgba(249,115,22,0.3)"
-                : "rgba(99,102,241,0.2)",
+              borderColor:
+                locationMode === "gps"
+                  ? "rgba(34,197,94,0.3)"
+                  : locationMode === "ip"
+                    ? "rgba(249,115,22,0.3)"
+                    : "rgba(99,102,241,0.2)",
               transition: "border-color 1s ease",
             }}
           >
@@ -518,13 +648,19 @@ const LiveMap = () => {
                         </p>
                         <div className="space-y-1">
                           {ipLocation.city && (
-                            <p className="text-gray-600 text-xs">🏙️ {ipLocation.city}</p>
+                            <p className="text-gray-600 text-xs">
+                              🏙️ {ipLocation.city}
+                            </p>
                           )}
                           {ipLocation.country && (
-                            <p className="text-gray-600 text-xs">🌍 {ipLocation.country}</p>
+                            <p className="text-gray-600 text-xs">
+                              🌍 {ipLocation.country}
+                            </p>
                           )}
                           {ipLocation.isp && (
-                            <p className="text-gray-500 text-xs">📶 {ipLocation.isp}</p>
+                            <p className="text-gray-500 text-xs">
+                              📶 {ipLocation.isp}
+                            </p>
                           )}
                         </div>
                         <p className="text-gray-400 text-xs mt-2">
@@ -553,20 +689,28 @@ const LiveMap = () => {
                           ✅ Precise GPS Location
                         </p>
                         {addrLoading ? (
-                          <p className="text-gray-400 text-xs">Fetching address...</p>
+                          <p className="text-gray-400 text-xs">
+                            Fetching address...
+                          </p>
                         ) : address ? (
                           <div className="space-y-1">
                             <p className="text-gray-700 text-xs leading-snug font-medium">
                               {address.formatted}
                             </p>
                             {address.road && (
-                              <p className="text-gray-500 text-xs">🛣️ {address.road}</p>
+                              <p className="text-gray-500 text-xs">
+                                🛣️ {address.road}
+                              </p>
                             )}
                             {address.area && (
-                              <p className="text-gray-500 text-xs">🏘️ {address.area}</p>
+                              <p className="text-gray-500 text-xs">
+                                🏘️ {address.area}
+                              </p>
                             )}
                             {address.city && (
-                              <p className="text-gray-500 text-xs">🏙️ {address.city}</p>
+                              <p className="text-gray-500 text-xs">
+                                🏙️ {address.city}
+                              </p>
                             )}
                           </div>
                         ) : (
@@ -600,21 +744,27 @@ const LiveMap = () => {
                 {activePos && locationMode !== "gps" && (
                   <Marker
                     position={[activePos.latitude, activePos.longitude]}
-                    icon={new L.divIcon({
-                      className: "",
-                      html: `<div style="
+                    icon={
+                      new L.divIcon({
+                        className: "",
+                        html: `<div style="
                         width:14px;height:14px;border-radius:50%;
                         background:rgba(148,163,184,0.8);border:2px solid rgba(100,116,139,0.6);
                         opacity:0.6;
                       "></div>`,
-                      iconSize: [14, 14],
-                      iconAnchor: [7, 7],
-                    })}
+                        iconSize: [14, 14],
+                        iconAnchor: [7, 7],
+                      })
+                    }
                   >
                     <Popup>
                       <div className="text-sm">
-                        <p className="font-semibold text-gray-600 mb-1">Last GPS Position</p>
-                        <p className="text-gray-400 text-xs">GPS is currently off</p>
+                        <p className="font-semibold text-gray-600 mb-1">
+                          Last GPS Position
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          GPS is currently off
+                        </p>
                       </div>
                     </Popup>
                   </Marker>
@@ -623,7 +773,10 @@ const LiveMap = () => {
                 {/* Movement path (GPS only) */}
                 {locationHistory.length > 1 && (
                   <Polyline
-                    positions={locationHistory.map((p) => [p.latitude, p.longitude])}
+                    positions={locationHistory.map((p) => [
+                      p.latitude,
+                      p.longitude,
+                    ])}
                     color={locationMode === "gps" ? "#22c55e" : "#6366f1"}
                     weight={3}
                     opacity={0.5}
@@ -657,33 +810,92 @@ const LiveMap = () => {
             {locationMode === "ip" && ipLocation && (
               <div
                 style={{
-                  background: "linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(234,88,12,0.05) 100%)",
+                  background:
+                    "linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(234,88,12,0.05) 100%)",
                   border: "1px solid rgba(249,115,22,0.25)",
-                  borderRadius: 12, padding: "12px 16px",
+                  borderRadius: 12,
+                  padding: "12px 16px",
                 }}
               >
-                <p style={{ color: "#f97316", fontWeight: 700, fontSize: 12, margin: "0 0 8px" }}>
+                <p
+                  style={{
+                    color: "#f97316",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    margin: "0 0 8px",
+                  }}
+                >
                   🛰️ Internet-Mode Location Details
                 </p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 8,
+                  }}
+                >
                   <div>
-                    <p style={{ color: "rgba(249,115,22,0.5)", fontSize: 10, margin: 0 }}>Approx. Coordinates</p>
-                    <p style={{ color: "#fdba74", fontSize: 11, fontFamily: "monospace", margin: 0 }}>
-                      {ipLocation.latitude?.toFixed(4)}, {ipLocation.longitude?.toFixed(4)}
+                    <p
+                      style={{
+                        color: "rgba(249,115,22,0.5)",
+                        fontSize: 10,
+                        margin: 0,
+                      }}
+                    >
+                      Approx. Coordinates
+                    </p>
+                    <p
+                      style={{
+                        color: "#fdba74",
+                        fontSize: 11,
+                        fontFamily: "monospace",
+                        margin: 0,
+                      }}
+                    >
+                      {ipLocation.latitude?.toFixed(4)},{" "}
+                      {ipLocation.longitude?.toFixed(4)}
                     </p>
                   </div>
                   <div>
-                    <p style={{ color: "rgba(249,115,22,0.5)", fontSize: 10, margin: 0 }}>Region</p>
+                    <p
+                      style={{
+                        color: "rgba(249,115,22,0.5)",
+                        fontSize: 10,
+                        margin: 0,
+                      }}
+                    >
+                      Region
+                    </p>
                     <p style={{ color: "#fdba74", fontSize: 11, margin: 0 }}>
-                      {[ipLocation.city, ipLocation.region, ipLocation.country].filter(Boolean).join(", ") || "—"}
+                      {[ipLocation.city, ipLocation.region, ipLocation.country]
+                        .filter(Boolean)
+                        .join(", ") || "—"}
                     </p>
                   </div>
                   <div>
-                    <p style={{ color: "rgba(249,115,22,0.5)", fontSize: 10, margin: 0 }}>Internet Provider</p>
-                    <p style={{ color: "#fdba74", fontSize: 11, margin: 0 }}>{ipLocation.isp || "—"}</p>
+                    <p
+                      style={{
+                        color: "rgba(249,115,22,0.5)",
+                        fontSize: 10,
+                        margin: 0,
+                      }}
+                    >
+                      Internet Provider
+                    </p>
+                    <p style={{ color: "#fdba74", fontSize: 11, margin: 0 }}>
+                      {ipLocation.isp || "—"}
+                    </p>
                   </div>
                   <div>
-                    <p style={{ color: "rgba(249,115,22,0.5)", fontSize: 10, margin: 0 }}>Last Updated</p>
+                    <p
+                      style={{
+                        color: "rgba(249,115,22,0.5)",
+                        fontSize: 10,
+                        margin: 0,
+                      }}
+                    >
+                      Last Updated
+                    </p>
                     <p style={{ color: "#fdba74", fontSize: 11, margin: 0 }}>
                       {ipLocation.timestamp?.toLocaleTimeString() || "—"}
                     </p>
@@ -694,10 +906,16 @@ const LiveMap = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    marginTop: 10, padding: "4px 10px",
-                    background: "rgba(249,115,22,0.2)", borderRadius: 6,
-                    color: "#f97316", fontSize: 11, textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    marginTop: 10,
+                    padding: "4px 10px",
+                    background: "rgba(249,115,22,0.2)",
+                    borderRadius: 6,
+                    color: "#f97316",
+                    fontSize: 11,
+                    textDecoration: "none",
                   }}
                 >
                   🗺️ View Approximate Area on Maps
@@ -711,13 +929,22 @@ const LiveMap = () => {
                 <p className="text-xs text-slate-500 mb-1">📍 Address</p>
                 {locationMode === "ip" ? (
                   <p className="text-sm text-orange-400 font-medium">
-                    📡 {[ipLocation?.city, ipLocation?.region, ipLocation?.country].filter(Boolean).join(", ") || "Internet-based location"}
-                    <span className="text-xs text-orange-600 ml-2">(approximate)</span>
+                    📡{" "}
+                    {[ipLocation?.city, ipLocation?.region, ipLocation?.country]
+                      .filter(Boolean)
+                      .join(", ") || "Internet-based location"}
+                    <span className="text-xs text-orange-600 ml-2">
+                      (approximate)
+                    </span>
                   </p>
                 ) : addrLoading ? (
-                  <p className="text-xs text-indigo-400 animate-pulse">Fetching address...</p>
+                  <p className="text-xs text-indigo-400 animate-pulse">
+                    Fetching address...
+                  </p>
                 ) : address?.formatted ? (
-                  <p className="text-sm text-white font-medium leading-snug">{address.formatted}</p>
+                  <p className="text-sm text-white font-medium leading-snug">
+                    {address.formatted}
+                  </p>
                 ) : (
                   <p className="text-sm text-slate-500">—</p>
                 )}
@@ -725,30 +952,52 @@ const LiveMap = () => {
 
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">🏢 Company</p>
-                <p className="font-semibold text-white truncate">{address?.company || "—"}</p>
+                <p className="font-semibold text-white truncate">
+                  {address?.company || "—"}
+                </p>
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">🏬 Building</p>
-                <p className="font-semibold text-white truncate">{address?.building || "—"}</p>
+                <p className="font-semibold text-white truncate">
+                  {address?.building || "—"}
+                </p>
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">🏛️ Landmark</p>
-                <p className="font-semibold text-white truncate">{address?.landmark || "—"}</p>
+                <p className="font-semibold text-white truncate">
+                  {address?.landmark || "—"}
+                </p>
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">🏙️ City</p>
-                <p className="font-semibold text-white truncate">{address?.city || ipLocation?.city || "—"}</p>
+                <p className="font-semibold text-white truncate">
+                  {address?.city || ipLocation?.city || "—"}
+                </p>
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">📌 State</p>
-                <p className="font-semibold text-white truncate">{address?.state || ipLocation?.region || "—"}</p>
+                <p className="font-semibold text-white truncate">
+                  {address?.state || ipLocation?.region || "—"}
+                </p>
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">Tracking Mode</p>
-                <p className="font-semibold capitalize" style={{
-                  color: locationMode === "gps" ? "#10b981" : locationMode === "ip" ? "#f97316" : "#94a3b8"
-                }}>
-                  {locationMode === "gps" ? "✅ GPS Precise" : locationMode === "ip" ? "⚠️ Internet" : "❌ Offline"}
+                <p
+                  className="font-semibold capitalize"
+                  style={{
+                    color:
+                      locationMode === "gps"
+                        ? "#10b981"
+                        : locationMode === "ip"
+                          ? "#f97316"
+                          : "#94a3b8",
+                  }}
+                >
+                  {locationMode === "gps"
+                    ? "✅ GPS Precise"
+                    : locationMode === "ip"
+                      ? "⚠️ Internet"
+                      : "❌ Offline"}
                 </p>
               </div>
               <div className="card">
@@ -757,21 +1006,30 @@ const LiveMap = () => {
                   {locationMode === "gps" && location?.accuracy
                     ? `±${Math.round(location.accuracy)}m`
                     : locationMode === "ip"
-                    ? "±1–5km"
-                    : "—"}
+                      ? "±1–5km"
+                      : "—"}
                 </p>
               </div>
               <div className="card col-span-2 sm:col-span-2">
                 <p className="text-xs text-slate-500 mb-1">
-                  {locationMode === "ip" ? "Approx. Coordinates" : "Exact Coordinates"}
+                  {locationMode === "ip"
+                    ? "Approx. Coordinates"
+                    : "Exact Coordinates"}
                 </p>
-                {(activePos || ipLocation) ? (
+                {activePos || ipLocation ? (
                   <>
                     <p className="font-mono text-sm text-indigo-400 mb-2">
-                      {(activePos || ipLocation).latitude.toFixed(locationMode === "ip" ? 4 : 8)},{" "}
-                      {(activePos || ipLocation).longitude.toFixed(locationMode === "ip" ? 4 : 8)}
+                      {(activePos || ipLocation).latitude.toFixed(
+                        locationMode === "ip" ? 4 : 8,
+                      )}
+                      ,{" "}
+                      {(activePos || ipLocation).longitude.toFixed(
+                        locationMode === "ip" ? 4 : 8,
+                      )}
                       {locationMode === "ip" && (
-                        <span className="text-orange-500 text-xs ml-2">(approx.)</span>
+                        <span className="text-orange-500 text-xs ml-2">
+                          (approx.)
+                        </span>
                       )}
                     </p>
                     <a
@@ -780,10 +1038,17 @@ const LiveMap = () => {
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-colors"
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                       </svg>
-                      {locationMode === "ip" ? "View Approx. Area on Maps" : "Open in Google Maps"}
+                      {locationMode === "ip"
+                        ? "View Approx. Area on Maps"
+                        : "Open in Google Maps"}
                     </a>
                   </>
                 ) : (
@@ -792,15 +1057,21 @@ const LiveMap = () => {
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">🛣️ Street</p>
-                <p className="text-sm text-white truncate">{address?.road || "—"}</p>
+                <p className="text-sm text-white truncate">
+                  {address?.road || "—"}
+                </p>
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">🏘️ Area</p>
-                <p className="text-sm text-white truncate">{address?.area || "—"}</p>
+                <p className="text-sm text-white truncate">
+                  {address?.area || "—"}
+                </p>
               </div>
               <div className="card">
                 <p className="text-xs text-slate-500 mb-1">Updates</p>
-                <p className="font-semibold text-white">{locationHistory.length}</p>
+                <p className="font-semibold text-white">
+                  {locationHistory.length}
+                </p>
               </div>
             </div>
           </div>

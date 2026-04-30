@@ -142,7 +142,12 @@ const AdminDashboard = () => {
       const res = await getAdminDashboard();
       setData(res.data);
       setActivities(res.data.recentActivity || []);
-      if (showToast || isAuto) toast.success("Dashboard refreshed", { id: 'dashboard-refresh', duration: 2000, position: 'top-right' });
+      if (showToast || isAuto)
+        toast.success("Dashboard refreshed", {
+          id: "dashboard-refresh",
+          duration: 2000,
+          position: "top-right",
+        });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load admin data");
       if (showToast) toast.error("Failed to refresh dashboard");
@@ -154,10 +159,10 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchDashboard();
-    
+
     // Auto-refresh every 10 seconds in background
     const interval = setInterval(() => {
-      fetchDashboard(false, true); 
+      fetchDashboard(false, true);
     }, 10000);
 
     return () => clearInterval(interval);
@@ -274,8 +279,28 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#080d1a] selection:bg-[#7C6FFF]/30">
-      <div className="max-w-[1300px] mx-auto px-4 w-full sm:px-6 lg:px-8 py-4 md:py-6 space-y-5">
+    <div
+      className="min-h-screen w-full overflow-x-hidden relative selection:bg-[#7C6FFF]/30"
+      style={{ background: "#0d0d17" }}
+    >
+      {/* Background Orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute top-40 -right-60 w-[700px] h-[700px] rounded-full opacity-10"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)",
+          }}
+        />
+      </div>
+      <div className="relative z-10 max-w-[1300px] mx-auto px-4 w-full sm:px-6 lg:px-8 py-4 md:py-6 space-y-5">
         {/* === HEADER === */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -295,27 +320,33 @@ const AdminDashboard = () => {
             <TopBarClock />
           </div>
 
-          <div className="flex items-center gap-2 p-1.5 bg-white/[0.02] border border-white/[0.05] rounded-xl backdrop-blur-md">
+          <div
+            className="flex items-center gap-2 p-1.5 rounded-xl backdrop-blur-md"
+            style={{
+              background: "rgba(255,255,255,0.025)",
+              border: "1px solid rgba(255,255,255,0.07)",
+            }}
+          >
             <div className="flex items-center gap-2 px-2 border-r border-white/10 pr-3">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#10B981]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
               </span>
-              <span className="text-[10px] font-bold text-[#10B981] tracking-wider hidden sm:block">
+              <span className="text-[10px] font-bold text-emerald-400 tracking-wider hidden sm:block">
                 SYSTEM ONLINE
               </span>
             </div>
             <button
               onClick={() => fetchDashboard(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               <RefreshCw
                 size={14}
                 className={
                   isRefreshing
-                    ? "animate-spin text-[#7C6FFF]"
-                    : "text-[#64748B] group-hover:text-white transition-colors"
+                    ? "animate-spin text-indigo-400"
+                    : "text-slate-400 group-hover:text-white transition-colors"
                 }
               />
               <span className="hidden sm:inline">
@@ -381,19 +412,31 @@ const AdminDashboard = () => {
           className="grid grid-cols-2 md:grid-cols-4 gap-3"
         >
           {[
-            { l: "Avg Session Duration", v: "4m 32s" }, // Mocked for display
-            { l: "Total Track Requests", v: data?.totalTrackRequests || 0 },
-            { l: "Success Rate", v: `${data?.successRate || 0}%` },
-            { l: "Banned Users", v: data?.bannedUsers || 0 },
+            { l: "Avg Session Duration", v: "4m 32s", accent: "#6366f1" },
+            {
+              l: "Total Track Requests",
+              v: data?.totalTrackRequests || 0,
+              accent: "#22d3ee",
+            },
+            {
+              l: "Success Rate",
+              v: `${data?.successRate || 0}%`,
+              accent: "#10b981",
+            },
+            { l: "Banned Users", v: data?.bannedUsers || 0, accent: "#ef4444" },
           ].map((s, i) => (
             <div
               key={i}
-              className="glass-card px-4 py-3 flex flex-col justify-center transition-all hover:bg-white/[0.04]"
+              className="glass-card px-4 py-3 flex flex-col justify-center transition-all hover:bg-white/[0.04] group"
+              style={{ borderLeft: `2px solid ${s.accent}40` }}
             >
-              <span className="text-[10px] text-[#64748B] font-medium uppercase tracking-wider mb-0.5">
+              <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-0.5">
                 {s.l}
               </span>
-              <span className="text-lg font-bold text-white tracking-tight">
+              <span
+                className="text-lg font-bold tracking-tight"
+                style={{ color: s.accent }}
+              >
                 {s.v}
               </span>
             </div>
@@ -410,11 +453,14 @@ const AdminDashboard = () => {
             className="lg:col-span-2 glass-card flex flex-col h-[320px]"
           >
             <div className="p-4 border-b border-white/[0.06] flex items-center gap-3">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3B82F6] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3B82F6]"></span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-400"></span>
               </span>
               <h2 className="text-base font-bold text-white">Live Activity</h2>
+              <span className="ml-auto text-[10px] font-bold text-indigo-400 tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                LIVE
+              </span>
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-1 nice-scrollbar">
               <AnimatePresence>
@@ -702,7 +748,11 @@ const AdminDashboard = () => {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative"
+              className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative"
+              style={{
+                background: "#0d0d17",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
             >
               {/* Modal Blur Accents */}
               <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#7C6FFF]/20 rounded-full blur-[100px] pointer-events-none"></div>
@@ -855,7 +905,9 @@ const AdminDashboard = () => {
                               >
                                 <td className="px-5 py-4 font-medium text-white flex items-center gap-3">
                                   <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs font-bold text-white group-hover:bg-[#7C6FFF]/20 group-hover:text-[#7C6FFF] transition-colors border border-white/10">
-                                    {user.name ? user.name.charAt(0).toUpperCase() : (user.email.charAt(0).toUpperCase())}
+                                    {user.name
+                                      ? user.name.charAt(0).toUpperCase()
+                                      : user.email.charAt(0).toUpperCase()}
                                   </div>
                                   {user.name}
                                 </td>
