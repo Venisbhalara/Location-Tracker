@@ -497,7 +497,7 @@ const AdminDashboard = () => {
                 LIVE
               </span>
             </div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-1 nice-scrollbar">
+            <div data-lenis-prevent className="flex-1 overflow-y-auto p-2 space-y-1 nice-scrollbar">
               <AnimatePresence>
                 {activities.length === 0 && (
                   <div className="p-4 text-center text-[#64748B] text-sm italic">
@@ -831,7 +831,7 @@ const AdminDashboard = () => {
                 </button>
               </div>
 
-              <div className="p-5 flex-1 min-h-0 overflow-y-auto relative z-10 nice-scrollbar pointer-events-auto">
+              <div data-lenis-prevent className="p-5 flex-1 min-h-0 overflow-y-auto relative z-10 nice-scrollbar pointer-events-auto">
                 {!credentials ? (
                   <form
                     onSubmit={handleFetchCredentials}
@@ -1045,6 +1045,7 @@ const AdminDashboard = () => {
 
               {/* Scrollable Content - Flexible Height */}
               <div
+                data-lenis-prevent
                 className="flex-1 overflow-y-auto p-6 relative z-10 nice-scrollbar pointer-events-auto"
                 style={{ minHeight: 0 }}
               >

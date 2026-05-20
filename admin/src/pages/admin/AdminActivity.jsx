@@ -618,7 +618,7 @@ const AdminActivity = () => {
             </div>
 
             {/* event list */}
-            <div className="flex-1 overflow-y-auto px-1 py-2 space-y-0.5" style={{ maxHeight: 340, scrollbarWidth: "none" }}>
+            <div data-lenis-prevent className="flex-1 overflow-y-auto px-1 py-2 space-y-0.5" style={{ maxHeight: 340, scrollbarWidth: "none" }}>
               {loading ? (
                 [...Array(6)].map((_, i) => <Skeleton key={i} className="h-9 mx-2 mb-1" />)
               ) : (
