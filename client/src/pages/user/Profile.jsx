@@ -139,15 +139,15 @@ export default function Profile() {
     : user?.name?.charAt(0).toUpperCase() || "U";
 
   return (
-    <div className="min-h-screen bg-slate-900 py-12 px-4 sm:px-6 lg:px-8 text-white pt-24 font-['Inter']">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+    <div className="min-h-screen bg-slate-900 py-6 px-4 sm:px-6 lg:px-8 text-white pt-20 font-['Inter']">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold mb-5 flex items-center gap-3">
           Profile Settings
         </h1>
 
-        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
           {/* Sidebar Tabs */}
-          <div className="w-full md:w-64 bg-slate-800/30 p-6 flex md:flex-col gap-2 overflow-x-auto border-b md:border-b-0 md:border-r border-slate-700/50">
+          <div className="w-full md:w-56 bg-slate-800/30 p-4 flex md:flex-col gap-1.5 overflow-x-auto border-b md:border-b-0 md:border-r border-slate-700/50">
             <TabButton
               active={activeTab === "general"}
               onClick={() => setActiveTab("general")}
@@ -172,36 +172,36 @@ export default function Profile() {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 p-6 md:p-8">
+          <div className="flex-1 p-5 md:p-6">
             {/* GENERAL TAB */}
             {activeTab === "general" && (
               <div className="animate-fade-in">
-                <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-white/10">
+                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-white/10">
                   Personal Details
                 </h2>
 
                 {/* Initial Avatar */}
-                <div className="flex items-center gap-6 mb-8">
+                <div className="flex items-center gap-4 mb-5">
                   <div className="relative">
                     {/* Ring for decoration */}
                     <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full blur opacity-30"></div>
-                    <div className="relative w-24 h-24 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-4xl font-bold text-white shadow-xl shadow-indigo-500/20">
+                    <div className="relative w-16 h-16 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-2xl font-bold text-white shadow-xl shadow-indigo-500/20">
                       {initial}
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium">
+                    <h3 className="text-base font-semibold">
                       {profileData.name || "User"}
                     </h3>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-slate-400 text-xs">
                       Update your basic information below.
                     </p>
                   </div>
                 </div>
 
-                <form onSubmit={handleUpdateProfile} className="space-y-5">
+                <form onSubmit={handleUpdateProfile} className="space-y-3.5">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
                       Full Name
                     </label>
                     <input
@@ -210,11 +210,11 @@ export default function Profile() {
                       value={profileData.name}
                       onChange={handleProfileChange}
                       required
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
                       Email Address
                     </label>
                     <input
@@ -223,13 +223,13 @@ export default function Profile() {
                       value={profileData.email}
                       onChange={handleProfileChange}
                       required
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-300 cursor-not-allowed"
+                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300 cursor-not-allowed"
                       disabled
                       title="Email cannot be changed directly"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
                       Phone Number
                     </label>
                     <input
@@ -238,10 +238,10 @@ export default function Profile() {
                       value={profileData.phoneNumber}
                       onChange={handleProfileChange}
                       placeholder="Add phone number"
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                     />
                   </div>
-                  <div className="pt-4">
+                  <div className="pt-2.5">
                     <SaveButton
                       loading={profileLoading}
                       saved={profileSaved}
@@ -255,19 +255,19 @@ export default function Profile() {
             {/* SECURITY TAB */}
             {activeTab === "security" && (
               <div className="animate-fade-in">
-                <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-white/10">
+                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-white/10">
                   Security Settings
                 </h2>
 
                 <form
                   onSubmit={handleUpdatePassword}
-                  className="space-y-5 bg-slate-900/30 p-6 rounded-xl border border-slate-700/50 mb-8"
+                  className="space-y-3.5 bg-slate-900/30 p-4 rounded-xl border border-slate-700/50 mb-5"
                 >
-                  <h3 className="font-medium text-indigo-400 mb-4">
+                  <h3 className="font-semibold text-indigo-400 mb-2.5 text-sm">
                     Change Password
                   </h3>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
                       Current Password
                     </label>
                     <input
@@ -276,11 +276,11 @@ export default function Profile() {
                       value={passwordData.currentPassword}
                       onChange={handlePasswordChange}
                       required
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
                       New Password
                     </label>
                     <input
@@ -290,11 +290,11 @@ export default function Profile() {
                       onChange={handlePasswordChange}
                       required
                       minLength={6}
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
                       Confirm New Password
                     </label>
                     <input
@@ -304,7 +304,7 @@ export default function Profile() {
                       onChange={handlePasswordChange}
                       required
                       minLength={6}
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                   <div className="pt-2">
@@ -317,8 +317,8 @@ export default function Profile() {
                   </div>
                 </form>
 
-                <div className="bg-slate-900/30 p-6 rounded-xl border border-slate-700/50">
-                  <h3 className="font-medium text-indigo-400 mb-2">
+                <div className="bg-slate-900/30 p-4 rounded-xl border border-slate-700/50">
+                  <h3 className="font-semibold text-indigo-400 mb-1 text-sm">
                     Active Sessions
                   </h3>
                   <p className="text-sm text-slate-400 mb-4">
@@ -337,16 +337,16 @@ export default function Profile() {
             {/* PREFERENCES TAB */}
             {activeTab === "preferences" && (
               <div className="animate-fade-in">
-                <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-white/10">
+                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-white/10">
                   App Settings
                 </h2>
 
-                <form onSubmit={handleUpdateProfile} className="space-y-6">
-                  <div className="bg-slate-900/30 p-6 rounded-xl border border-slate-700/50">
-                    <h3 className="font-medium text-indigo-400 mb-1">
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                  <div className="bg-slate-900/30 p-4 rounded-xl border border-slate-700/50">
+                    <h3 className="font-semibold text-indigo-400 mb-0.5 text-sm">
                       Default Tracking Link Expiration
                     </h3>
-                    <p className="text-sm text-slate-400 mb-5">
+                    <p className="text-xs text-slate-400 mb-4">
                       Set the standard duration before your sharing links
                       automatically expire.
                     </p>
@@ -374,15 +374,15 @@ export default function Profile() {
             {/* DANGER ZONE TAB */}
             {activeTab === "danger" && (
               <div className="animate-fade-in">
-                <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-red-500/30 text-red-500">
+                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-red-500/30 text-red-500">
                   Danger Zone
                 </h2>
 
-                <div className="bg-red-950/20 p-6 rounded-xl border border-red-900/50">
-                  <h3 className="font-medium text-red-400 mb-2">
+                <div className="bg-red-950/20 p-4 rounded-xl border border-red-900/50">
+                  <h3 className="font-semibold text-red-400 mb-1 text-sm">
                     Delete Account
                   </h3>
-                  <p className="text-sm text-slate-400 mb-6">
+                  <p className="text-xs text-slate-400 mb-4">
                     Once you delete your account, there is no going back. Please
                     be certain. All your tracking data and settings will be
                     permanently erased.
@@ -390,10 +390,10 @@ export default function Profile() {
 
                   <form
                     onSubmit={handleDeleteAccount}
-                    className="space-y-4 max-w-sm"
+                    className="space-y-3 max-w-sm"
                   >
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">
+                      <label className="block text-xs font-semibold text-slate-300 mb-0.5">
                         Confirm Identity
                       </label>
                       <input
@@ -404,13 +404,13 @@ export default function Profile() {
                           setDeleteData({ password: e.target.value })
                         }
                         required
-                        className="w-full bg-slate-900/80 border border-red-900/50 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                        className="w-full bg-slate-900/80 border border-red-900/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={deleteLoading}
-                      className="w-full px-6 py-2.5 bg-red-600/80 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 border border-red-500/50 flex items-center justify-center gap-2"
+                      className="w-full px-5 py-2 bg-red-600/80 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 border border-red-500/50 flex items-center justify-center gap-2 text-sm"
                     >
                       {deleteLoading ? (
                         <>
@@ -450,7 +450,7 @@ export default function Profile() {
 // ─── Premium Save Button with spinner + green check ───────────────────────────
 const SaveButton = ({ loading, saved, label, variant = "primary" }) => {
   const base =
-    "inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 disabled:opacity-60 focus:outline-none";
+    "inline-flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-60 focus:outline-none";
   const styles = {
     primary: `${base} bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30`,
     secondary: `${base} bg-slate-700 hover:bg-slate-600 text-white`,
@@ -498,7 +498,7 @@ const SaveButton = ({ loading, saved, label, variant = "primary" }) => {
 const TabButton = ({ active, onClick, label, danger }) => (
   <button
     onClick={onClick}
-    className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${
+    className={`w-full text-left px-3.5 py-2.5 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${
       active
         ? danger
           ? "bg-red-500/10 text-red-400 border border-red-500/20"
@@ -646,7 +646,7 @@ const EXPIRATION_OPTIONS = [
 
 const ExpirationPicker = ({ value, onChange }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
       {EXPIRATION_OPTIONS.map((opt) => {
         const isActive = value === opt.value;
         return (
@@ -655,11 +655,11 @@ const ExpirationPicker = ({ value, onChange }) => {
             type="button"
             onClick={() => onChange(opt.value)}
             className={`
-              relative flex items-center gap-4 p-4 rounded-xl border text-left
+              relative flex items-center gap-3 p-3 rounded-lg border text-left
               transition-all duration-200 group overflow-hidden
               ${
                 isActive
-                  ? `bg-gradient-to-br ${opt.accent} ${opt.ring} ring-1 border-transparent shadow-lg`
+                  ? `bg-gradient-to-br ${opt.accent} ${opt.ring} ring-1 border-transparent shadow-md`
                   : "bg-slate-800/40 border-slate-700/60 hover:border-slate-600 hover:bg-slate-800/70"
               }
             `}

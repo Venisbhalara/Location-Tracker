@@ -204,7 +204,8 @@ const PhoneInputSection = ({ onChange }) => {
             {/* Dropdown Menu */}
             {isDropdownOpen && (
               <div 
-                className="absolute top-full left-0 mt-2 w-72 max-h-80 glass-panel rounded-xl flex flex-col z-50 animate-in fade-in zoom-in-95 duration-200"
+                className="absolute top-full left-0 mt-2 w-72 max-h-80 rounded-xl flex flex-col z-50 animate-in fade-in zoom-in-95 duration-200 border border-white/10 shadow-2xl"
+                style={{ background: "#11111e" }}
                 onWheel={(e) => e.stopPropagation()}
               >
                 <div className="p-3 border-b border-slate-700/50">

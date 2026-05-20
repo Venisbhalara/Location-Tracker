@@ -38,11 +38,14 @@ const Navbar = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 font-bold text-base text-white"
+            className="flex items-center gap-2.5 font-bold text-base text-white"
           >
             <img src="/location.png" alt="Logo" className="w-6 h-6 object-contain" />
-            <span className="hidden sm:block">
-              Location<span className="text-indigo-400">Tracker</span>
+            <span className="hidden sm:block font-bold text-lg text-white tracking-tight">
+              Nex<span style={{ color: "#a3a6ff" }}>Track</span>
+              <span className="text-[10px] text-indigo-400 font-semibold uppercase tracking-widest ml-1.5 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
+                Admin
+              </span>
             </span>
           </Link>
 

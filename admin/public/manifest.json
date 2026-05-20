@@ -1,6 +1,6 @@
 {
-  "name": "Live Location Tracker",
-  "short_name": "Tracker",
+  "name": "NexTrack Admin",
+  "short_name": "NexTrack",
   "description": "A persistent live location tracking progressive web app.",
   "start_url": "/",
   "display": "standalone",
