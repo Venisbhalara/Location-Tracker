@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 /**
  * sendEmail — dual-mode email utility
@@ -16,11 +16,15 @@ const nodemailer = require('nodemailer');
 let _smtpTransporter = null;
 
 const getSmtpTransporter = () => {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  if (
+    !process.env.SMTP_HOST ||
+    !process.env.SMTP_USER ||
+    !process.env.SMTP_PASS
+  ) {
     return null;
   }
   if (!_smtpTransporter) {
-    const port = parseInt(process.env.SMTP_PORT || '587', 10);
+    const port = parseInt(process.env.SMTP_PORT || "587", 10);
     const isSecurePort = port === 465;
 
     _smtpTransporter = nodemailer.createTransport({
@@ -32,7 +36,7 @@ const getSmtpTransporter = () => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
+      tls: { rejectUnauthorized: false, minVersion: "TLSv1.2" },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 15000,
@@ -43,10 +47,10 @@ const getSmtpTransporter = () => {
 
     _smtpTransporter.verify((err) => {
       if (err) {
-        console.error('❌ SMTP transporter verification failed:', err.message);
+        console.error("❌ SMTP transporter verification failed:", err.message);
         _smtpTransporter = null;
       } else {
-        console.log('✅ SMTP transporter ready');
+        console.log("✅ SMTP transporter ready");
       }
     });
   }
@@ -55,23 +59,23 @@ const getSmtpTransporter = () => {
 
 // ─── Resend API sender (production / Render) ───────────────────────────────
 const sendViaResend = async (options) => {
-  const apiKey   = process.env.RESEND_API_KEY;
-  const fromName  = process.env.FROM_NAME  || 'NexTrack';
-  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'; // default resend sandbox
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromName = process.env.FROM_NAME || "NexTrack";
+  const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev"; // default resend sandbox
 
   const body = {
-    from:    `${fromName} <${fromEmail}>`,
-    to:      [options.to],
+    from: `${fromName} <${fromEmail}>`,
+    to: [options.to],
     subject: options.subject,
-    html:    options.html,
-    text:    options.text,
+    html: options.html,
+    text: options.text,
   };
 
-  const response = await fetch('https://api.resend.com/emails', {
-    method:  'POST',
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type':  'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
   });
@@ -79,7 +83,9 @@ const sendViaResend = async (options) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(`Resend API error ${response.status}: ${JSON.stringify(data)}`);
+    throw new Error(
+      `Resend API error ${response.status}: ${JSON.stringify(data)}`,
+    );
   }
 
   console.log(`✅ Email sent via Resend to ${options.to} | id: ${data.id}`);
@@ -91,25 +97,27 @@ const sendViaSmtp = async (options) => {
   const transporter = getSmtpTransporter();
   if (!transporter) return null; // signals "not available"
 
-  const fromName  = process.env.FROM_NAME  || 'NexTrack';
+  const fromName = process.env.FROM_NAME || "NexTrack";
   const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER;
 
   const message = {
-    from:    `"${fromName}" <${fromEmail}>`,
-    to:      options.to,
+    from: `"${fromName}" <${fromEmail}>`,
+    to: options.to,
     subject: options.subject,
-    html:    options.html,
-    text:    options.text,
+    html: options.html,
+    text: options.text,
     headers: {
-      'X-Priority': '1',
-      'X-Mailer':   'NexTrack Mailer',
-      'Reply-To':   fromEmail,
+      "X-Priority": "1",
+      "X-Mailer": "NexTrack Mailer",
+      "Reply-To": fromEmail,
     },
   };
 
   try {
     const info = await transporter.sendMail(message);
-    console.log(`✅ Email sent via SMTP to ${options.to} | msgId: ${info.messageId}`);
+    console.log(
+      `✅ Email sent via SMTP to ${options.to} | msgId: ${info.messageId}`,
+    );
     return info;
   } catch (err) {
     console.error(`❌ SMTP send failed for ${options.to}:`, err.message);
@@ -130,10 +138,10 @@ const sendEmail = async (options) => {
   if (smtpResult !== null) return smtpResult;
 
   // 3. Mock (development fallback — no credentials configured)
-  console.log('\n================ EMAIL MOCK ================');
+  console.log("\n================ EMAIL MOCK ================");
   console.log(`To: ${options.to}\nSubject: ${options.subject}`);
-  console.log(`Body:\n${options.text || options.html || ''}`);
-  console.log('============================================\n');
+  console.log(`Body:\n${options.text || options.html || ""}`);
+  console.log("============================================\n");
   return { mocked: true };
 };
 
