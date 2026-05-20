@@ -798,7 +798,9 @@ const AdminDashboard = () => {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="rounded-2xl shadow-2xl w-full max-w-4xl h-fit max-h-[90vh] overflow-hidden flex flex-col relative pointer-events-auto"
+              className={`rounded-2xl shadow-2xl w-full ${
+                credentials ? "max-w-4xl" : "max-w-md"
+              } h-fit max-h-[90vh] overflow-hidden flex flex-col relative pointer-events-auto`}
               style={{
                 background: "#0d0d17",
                 border: "1px solid rgba(255,255,255,0.08)",
@@ -808,10 +810,10 @@ const AdminDashboard = () => {
               <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#7C6FFF]/20 rounded-full blur-[100px] pointer-events-none"></div>
               <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#EAB308]/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-              <div className="p-6 border-b border-white/[0.06] flex justify-between items-center relative z-10 bg-black/20">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#EAB308]/20 flex items-center justify-center border border-[#EAB308]/30">
-                    <LockKeyhole className="text-[#EAB308]" size={20} />
+              <div className="p-5 border-b border-white/[0.06] flex justify-between items-center relative z-10 bg-black/20">
+                <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#EAB308]/20 flex items-center justify-center border border-[#EAB308]/30">
+                    <LockKeyhole className="text-[#EAB308]" size={18} />
                   </div>
                   Secure Vault Access
                 </h2>
@@ -821,31 +823,31 @@ const AdminDashboard = () => {
                     setCredentials(null);
                     setCredPassword("");
                   }}
-                  className="p-2 text-[#64748B] hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                  className="p-1.5 text-[#64748B] hover:text-white hover:bg-white/5 rounded-xl transition-all"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </button>
               </div>
 
-              <div className="p-6 flex-1 min-h-0 overflow-y-auto relative z-10 nice-scrollbar pointer-events-auto">
+              <div className="p-5 flex-1 min-h-0 overflow-y-auto relative z-10 nice-scrollbar pointer-events-auto">
                 {!credentials ? (
                   <form
                     onSubmit={handleFetchCredentials}
-                    className="max-w-md mx-auto space-y-6 py-12"
+                    className="max-w-md mx-auto space-y-4 py-4"
                   >
-                    <div className="text-center mb-10">
-                      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#EF4444]/10 text-[#EF4444] mb-6 border border-[#EF4444]/20 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
-                        <Shield size={32} />
+                    <div className="text-center mb-5">
+                      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#EF4444]/10 text-[#EF4444] mb-3 border border-[#EF4444]/20 shadow-[0_0_25px_rgba(239,68,68,0.15)]">
+                        <Shield size={24} />
                       </div>
-                      <h3 className="text-2xl font-bold text-white tracking-tight">
+                      <h3 className="text-xl font-bold text-white tracking-tight">
                         Authentication Required
                       </h3>
                       {lockoutTime ? (
-                        <p className="text-[#EF4444] mt-3 font-medium">
+                        <p className="text-[#EF4444] mt-2 font-medium text-sm">
                           Security lockout active due to failed attempts.
                           <br />
                           Try again in:{" "}
-                          <span className="font-mono text-lg font-bold">
+                          <span className="font-mono text-base font-bold">
                             {Math.floor(remainingLockTime / 60)}:
                             {(remainingLockTime % 60)
                               .toString()
@@ -853,17 +855,17 @@ const AdminDashboard = () => {
                           </span>
                         </p>
                       ) : (
-                        <p className="text-[#64748B] mt-2">
+                        <p className="text-xs text-[#64748B] mt-1.5">
                           Verify identity to access sensitive credentials.
                         </p>
                       )}
                     </div>
 
                     <div
-                      className={`space-y-5 transition-opacity ${lockoutTime ? "opacity-50" : "opacity-100"}`}
+                      className={`space-y-4 transition-opacity ${lockoutTime ? "opacity-50" : "opacity-100"}`}
                     >
                       <div>
-                        <label className="block text-sm font-medium text-[#64748B] mb-2 uppercase tracking-wider">
+                        <label className="block text-xs font-semibold text-[#64748B] mb-1.5 uppercase tracking-wider">
                           Admin Email
                         </label>
                         <input
@@ -872,12 +874,12 @@ const AdminDashboard = () => {
                           disabled={!!lockoutTime}
                           value={credEmail}
                           onChange={(e) => setCredEmail(e.target.value)}
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:ring-2 focus:ring-[#EAB308] focus:border-transparent outline-none transition-all disabled:opacity-50 font-mono"
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-[#EAB308] focus:border-transparent outline-none transition-all disabled:opacity-50 font-mono"
                           placeholder="admin@system.io"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-[#64748B] mb-2 uppercase tracking-wider">
+                        <label className="block text-xs font-semibold text-[#64748B] mb-1.5 uppercase tracking-wider">
                           Master Password
                         </label>
                         <input
@@ -886,14 +888,14 @@ const AdminDashboard = () => {
                           disabled={!!lockoutTime}
                           value={credPassword}
                           onChange={(e) => setCredPassword(e.target.value)}
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:ring-2 focus:ring-[#EAB308] focus:border-transparent outline-none transition-all disabled:opacity-50 font-mono tracking-widest"
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-[#EAB308] focus:border-transparent outline-none transition-all disabled:opacity-50 font-mono tracking-widest"
                           placeholder="••••••••"
                         />
                       </div>
                       <button
                         type="submit"
                         disabled={credLoading || !!lockoutTime}
-                        className="w-full bg-[#EAB308] hover:bg-[#FACC15] disabled:bg-white/10 disabled:text-[#64748B] text-[#080d1a] font-bold py-4 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(234,179,8,0.2)] hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] hover:-translate-y-1 mt-6"
+                        className="w-full bg-[#EAB308] hover:bg-[#FACC15] disabled:bg-white/10 disabled:text-[#64748B] text-[#080d1a] font-bold py-2.5 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(234,179,8,0.2)] hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] hover:-translate-y-0.5 mt-4"
                       >
                         {lockoutTime
                           ? "LOCKED OUT"
