@@ -1,69 +1,96 @@
 const nodemailer = require('nodemailer');
 
-// ─── Singleton transporter (connection pool) ───────────────────────────────
-// Created once when the module loads, reused for every email to avoid
-// the overhead of a new TCP + TLS handshake on every request.
-let _transporter = null;
+/**
+ * sendEmail — dual-mode email utility
+ *
+ * Priority:
+ *  1. Resend API  (RESEND_API_KEY set)  → works on Render/Vercel/any host
+ *  2. SMTP        (SMTP_HOST + SMTP_USER + SMTP_PASS set) → works on localhost
+ *  3. Mock        (nothing configured)  → logs to console only
+ *
+ * WHY: Render free tier blocks outbound SMTP (ports 25, 465, 587).
+ *      Resend uses HTTPS so it is never blocked.
+ */
 
-const getTransporter = () => {
-  // Return null (mock mode) if SMTP is not configured
+// ─── SMTP singleton (localhost / VPS only) ────────────────────────────────
+let _smtpTransporter = null;
+
+const getSmtpTransporter = () => {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return null;
   }
-
-  if (!_transporter) {
+  if (!_smtpTransporter) {
     const port = parseInt(process.env.SMTP_PORT || '587', 10);
-    const isSecurePort = port === 465; // port 465 uses SSL, 587 uses STARTTLS
+    const isSecurePort = port === 465;
 
-    _transporter = nodemailer.createTransport({
+    _smtpTransporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port,
-      secure: isSecurePort,          // true for 465, false for 587 (STARTTLS)
-      requireTLS: !isSecurePort,     // force STARTTLS upgrade on port 587
+      secure: isSecurePort,
+      requireTLS: !isSecurePort,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      tls: {
-        rejectUnauthorized: false,   // accept self-signed certs (safe for Gmail)
-        minVersion: 'TLSv1.2',
-      },
-      connectionTimeout: 10000,      // 10s – fail fast instead of hanging
+      tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
+      connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 15000,
-      pool: true,                    // keep connections alive between sends
+      pool: true,
       maxConnections: 3,
       maxMessages: 100,
     });
 
-    // Verify once so config errors surface at startup, not at send time
-    _transporter.verify((err) => {
+    _smtpTransporter.verify((err) => {
       if (err) {
         console.error('❌ SMTP transporter verification failed:', err.message);
-        _transporter = null; // reset so next call retries with fresh config
+        _smtpTransporter = null;
       } else {
-        console.log('✅ SMTP transporter ready — emails will be delivered');
+        console.log('✅ SMTP transporter ready');
       }
     });
   }
-
-  return _transporter;
+  return _smtpTransporter;
 };
 
-// ─── sendEmail ────────────────────────────────────────────────────────────
-const sendEmail = async (options) => {
-  const transporter = getTransporter();
+// ─── Resend API sender (production / Render) ───────────────────────────────
+const sendViaResend = async (options) => {
+  const apiKey   = process.env.RESEND_API_KEY;
+  const fromName  = process.env.FROM_NAME  || 'NexTrack';
+  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'; // default resend sandbox
 
-  // ── Mock mode (no SMTP credentials configured) ─────────────────────────
-  if (!transporter) {
-    console.log('\n================ EMAIL MOCK ================');
-    console.log(`To: ${options.to}\nSubject: ${options.subject}`);
-    console.log(`Body:\n${options.html || options.text || ''}`);
-    console.log('============================================\n');
-    return { mocked: true };
+  const body = {
+    from:    `${fromName} <${fromEmail}>`,
+    to:      [options.to],
+    subject: options.subject,
+    html:    options.html,
+    text:    options.text,
+  };
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method:  'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(`Resend API error ${response.status}: ${JSON.stringify(data)}`);
   }
 
-  // ── Real send ──────────────────────────────────────────────────────────
+  console.log(`✅ Email sent via Resend to ${options.to} | id: ${data.id}`);
+  return data;
+};
+
+// ─── SMTP sender (localhost / VPS) ─────────────────────────────────────────
+const sendViaSmtp = async (options) => {
+  const transporter = getSmtpTransporter();
+  if (!transporter) return null; // signals "not available"
+
   const fromName  = process.env.FROM_NAME  || 'NexTrack';
   const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER;
 
@@ -72,8 +99,7 @@ const sendEmail = async (options) => {
     to:      options.to,
     subject: options.subject,
     html:    options.html,
-    text:    options.text,   // plain-text fallback (reduces spam score)
-    // ── Anti-spam / deliverability headers ──────────────────────────────
+    text:    options.text,
     headers: {
       'X-Priority': '1',
       'X-Mailer':   'NexTrack Mailer',
@@ -83,14 +109,32 @@ const sendEmail = async (options) => {
 
   try {
     const info = await transporter.sendMail(message);
-    console.log(`✅ Email sent to ${options.to} | msgId: ${info.messageId}`);
+    console.log(`✅ Email sent via SMTP to ${options.to} | msgId: ${info.messageId}`);
     return info;
-  } catch (error) {
-    console.error(`❌ Email to ${options.to} failed:`, error.message);
-    // Reset cached transporter so the next call gets a fresh connection
-    _transporter = null;
-    throw error; // bubble up so the caller can return a proper 500
+  } catch (err) {
+    console.error(`❌ SMTP send failed for ${options.to}:`, err.message);
+    _smtpTransporter = null; // reset pool on error
+    throw err;
   }
+};
+
+// ─── Public API ────────────────────────────────────────────────────────────
+const sendEmail = async (options) => {
+  // 1. Resend API (production — works on Render, Vercel, Railway, etc.)
+  if (process.env.RESEND_API_KEY) {
+    return sendViaResend(options);
+  }
+
+  // 2. SMTP (localhost / VPS with open SMTP ports)
+  const smtpResult = await sendViaSmtp(options);
+  if (smtpResult !== null) return smtpResult;
+
+  // 3. Mock (development fallback — no credentials configured)
+  console.log('\n================ EMAIL MOCK ================');
+  console.log(`To: ${options.to}\nSubject: ${options.subject}`);
+  console.log(`Body:\n${options.text || options.html || ''}`);
+  console.log('============================================\n');
+  return { mocked: true };
 };
 
 module.exports = sendEmail;
