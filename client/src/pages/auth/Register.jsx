@@ -167,8 +167,19 @@ const Register = () => {
   const [showPw, setShowPw] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0); // seconds remaining
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const startCooldown = (seconds = 60) => {
+    setResendCooldown(seconds);
+    const interval = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) { clearInterval(interval); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -178,9 +189,27 @@ const Register = () => {
       await sendOtp(form);
       toast.success("OTP sent to your email!");
       setShowOtpModal(true);
+      setOtp("");
+      startCooldown(60);
     } catch (err) {
       console.error("Send OTP error:", err);
-      toast.error(err.response?.data?.message || "Failed to send OTP.");
+      toast.error(err.response?.data?.message || "Failed to send OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || loading) return;
+    setLoading(true);
+    try {
+      await sendOtp(form);
+      toast.success("New OTP sent to your email!");
+      setOtp("");
+      startCooldown(60);
+    } catch (err) {
+      console.error("Resend OTP error:", err);
+      toast.error(err.response?.data?.message || "Failed to resend OTP.");
     } finally {
       setLoading(false);
     }
@@ -425,6 +454,24 @@ const Register = () => {
                 {loading ? "Verifying..." : "Verify & Register"}
               </button>
               
+              {/* Resend OTP */}
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={resendCooldown > 0 || loading}
+                  className="text-sm font-semibold transition-colors disabled:cursor-not-allowed"
+                  style={{ color: resendCooldown > 0 ? "rgba(255,255,255,0.3)" : "#818cf8" }}
+                >
+                  {resendCooldown > 0
+                    ? `Resend code in ${resendCooldown}s`
+                    : "Didn't receive it? Resend OTP"}
+                </button>
+                <p className="text-[11px] text-center" style={{ color: "rgba(255,255,255,0.25)" }}>
+                  📬 Check your <strong style={{ color: "rgba(255,255,255,0.4)" }}>Spam / Junk</strong> folder if you don't see it
+                </p>
+              </div>
+
               <button
                 type="button"
                 onClick={() => setShowOtpModal(false)}
@@ -433,6 +480,7 @@ const Register = () => {
                 Cancel
               </button>
             </form>
+
           </div>
         </div>
       )}

@@ -108,14 +108,14 @@ const User = sequelize.define(
       // Hash password before creating a user
       beforeCreate: async (user) => {
         if (user.password) {
-          const salt = await bcrypt.genSalt(12);
+          const salt = await bcrypt.genSalt(10); // 10 is secure & ~4x faster than 12
           user.password = await bcrypt.hash(user.password, salt);
         }
       },
       // Hash password before updating if changed
       beforeUpdate: async (user) => {
         if (user.changed("password")) {
-          const salt = await bcrypt.genSalt(12);
+          const salt = await bcrypt.genSalt(10); // 10 is secure & ~4x faster than 12
           user.password = await bcrypt.hash(user.password, salt);
         }
       },
