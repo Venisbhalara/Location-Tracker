@@ -800,8 +800,10 @@ const AdminDashboard = () => {
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               className={`rounded-2xl shadow-2xl w-full ${
                 credentials ? "max-w-4xl" : "max-w-md"
-              } h-fit max-h-[90vh] overflow-hidden flex flex-col relative pointer-events-auto`}
+              } overflow-hidden flex flex-col relative pointer-events-auto`}
               style={{
+                height: credentials ? "80vh" : "auto",
+                maxHeight: "90vh",
                 background: "#0d0d17",
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
@@ -1014,7 +1016,7 @@ const AdminDashboard = () => {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               className="rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col bg-[#0d0d17] border border-white/10 relative overflow-hidden pointer-events-auto"
-              style={{ maxHeight: "90vh", height: "auto" }}
+              style={{ height: "80vh", maxHeight: "90vh" }}
             >
               {/* Modal Blur Accents */}
               <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
