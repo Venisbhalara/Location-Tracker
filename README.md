@@ -29,9 +29,11 @@ When you're finished, deleting the tracking session terminates it instantly on b
 ## 🚀 Core Features
 
 - 🔐 **Secure Auth** — JWT-based registration and login with robust bcrypt password hashing.
+- ✉️ **OTP Verification** — Secure email OTP verification during registration to ensure genuine users.
 - 👥 **Contact Management** — Comprehensive CRUD contact list acting as your secure address book for tracking targets.
 - 🔗 **Shareable Tracking Links** — Instantly generate a unique, tokenized tracking link for any contact.
 - 📡 **Live GPS Streaming** — Real-time location streaming over Socket.IO (no page refreshes required).
+- 👨‍👩‍👧‍👦 **Group Tracking** — Create groups and track multiple members simultaneously on a single live map with distinct color-coded markers.
 - 🗺️ **Interactive Map** — Beautiful Leaflet-powered maps featuring movement trails, smooth zoom controls, and live markers.
 - 📍 **Reverse Geocoding** — Detailed address breakdowns (road → area → city → state) powered by OpenStreetMap.
 - 🔄 **Auto-Refresh Engine** — Locations are intelligently re-sent every 10 minutes to maintain active sessions, even when stationary.
@@ -53,7 +55,7 @@ Our stack is meticulously chosen for performance, reliability, and developer exp
 | **Real-time** | Socket.IO (WebSocket with polling fallback) |
 | **Auth** | JSON Web Tokens, bcrypt |
 | **Geocoding** | OpenStreetMap Nominatim (free, no API key required) |
-| **Email** | Nodemailer (for access approval & rejection notifications) |
+| **Email** | Nodemailer (for access approval, rejection notifications & OTP) |
 
 ---
 
@@ -68,12 +70,12 @@ location-tracker/
 │   │   ├── components/             # Reusable UI (Navbar, Modals, LoadingScreen)
 │   │   ├── context/                # Global state management (AuthContext)
 │   │   ├── hooks/                  # Custom logic (useSocket, useGeolocation)
-│   │   ├── pages/                  # Route views (Dashboard, LiveMap, Contacts)
+│   │   ├── pages/                  # Route views (Dashboard, LiveMap, Contacts, GroupMap)
 │   │   └── services/               # API clients, Geocoding, Socket integrations
 │   └── ...
 ├── server/                         # Node.js + Express backend environment
 │   ├── config/                     # Database connections
-│   ├── controllers/                # Business logic (Auth, Contacts, Tracking)
+│   ├── controllers/                # Business logic (Auth, Contacts, Tracking, Groups)
 │   ├── middleware/                 # JWT verification, Role checks
 │   ├── models/                     # Sequelize models
 │   ├── routes/                     # API routing
@@ -134,7 +136,7 @@ JWT_EXPIRE=7d
 CLIENT_URL=http://localhost:3000
 NODE_ENV=development
 
-# Email Notifications
+# Email Notifications & OTP
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password
 ```
@@ -176,6 +178,7 @@ To track a mobile device during local development (devices must be on the same W
 
 - **Cryptography**: Passwords are hashed with `bcrypt`. Plaintext is never stored.
 - **Authentication**: All private routes are secured with `JWT Bearer tokens`.
+- **OTP Verification**: Email verification via OTP for newly registered accounts.
 - **CORS Policies**: Cross-Origin Resource Sharing is strictly limited to your configured `CLIENT_URL`.
 - **Ephemeral Tracking**: Tracking tokens automatically expire after **24 hours**.
 - **Admin Protection**: Administrative routes require re-verification and enforce account lockouts after 5 failed attempts.
@@ -191,7 +194,8 @@ A comprehensive suite of RESTful endpoints powers the application.
 
 | Method | Endpoint | Access | Description |
 | --- | --- | --- | --- |
-| `POST` | `/register` | Public | Create a new account |
+| `POST` | `/send-otp` | Public | Send verification OTP to email |
+| `POST` | `/register` | Public | Create a new account with OTP |
 | `POST` | `/login` | Public | Authenticate and receive JWT |
 | `GET` | `/me` | Private | Retrieve authenticated user profile |
 </details>
@@ -206,6 +210,19 @@ A comprehensive suite of RESTful endpoints powers the application.
 | `GET` | `/:token` | Public | Fetch session details via public token |
 | `POST` | `/update-location` | Public | Stream GPS coordinates |
 | `DELETE` | `/:id` | Private | Terminate tracking & notify sharer |
+</details>
+
+<details>
+<summary><strong>Groups API <code>/api/groups</code></strong></summary>
+
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| `GET` | `/` | Private | List all user's groups |
+| `POST` | `/` | Private | Create a new group |
+| `GET` | `/:groupId` | Private | Get group details & members |
+| `DELETE` | `/:groupId` | Private | Delete group & all members |
+| `POST` | `/:groupId/members` | Private | Add a member to a group |
+| `DELETE` | `/:groupId/members/:memberId` | Private | Remove a member |
 </details>
 
 <details>
