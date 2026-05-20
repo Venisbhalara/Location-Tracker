@@ -167,13 +167,13 @@ const PhoneInputSection = ({ onChange }) => {
   }, []);
 
   return (
-    <div className="space-y-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="space-y-4 w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
       {/* Phone Number Input Group */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-300 flex items-center justify-between">
+      <div className="space-y-1.5">
+        <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
           <span>Phone Number *</span>
           {phoneNumber && (
-            <span className={`text-xs transition-all duration-300 flex items-center gap-1 ${isValid ? "text-emerald-400" : "text-red-400"}`}>
+            <span className={`text-[10px] transition-all duration-300 flex items-center gap-1 ${isValid ? "text-emerald-400" : "text-red-400"}`}>
               {isValid ? (
                 <><span>✅</span> Valid Number</>
               ) : (
@@ -224,6 +224,7 @@ const PhoneInputSection = ({ onChange }) => {
                   </div>
                 </div>
                 <div 
+                  data-lenis-prevent
                   className="overflow-y-auto flex-1 nice-scrollbar py-1"
                   style={{ overscrollBehavior: "contain" }}
                 >
@@ -277,7 +278,7 @@ const PhoneInputSection = ({ onChange }) => {
           {/* Phone Input */}
           <input
             type="tel"
-            className={`input pl-28 pr-4 py-4 w-full transition-all duration-300 ${
+            className={`input pl-28 pr-4 py-2.5 w-full transition-all duration-300 text-sm ${
               phoneNumber && !isValid ? "border-red-500/50 focus:border-red-500 ring-red-500/10" : ""
             } ${phoneNumber && isValid ? "border-emerald-500/50 focus:border-emerald-500 ring-emerald-500/10" : ""}`}
             placeholder={placeholder}
@@ -303,9 +304,9 @@ const PhoneInputSection = ({ onChange }) => {
       </div>
 
       {/* Label / Nickname Field */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-slate-300">Label (Optional)</label>
+          <label className="text-xs font-semibold text-slate-300">Label (Optional)</label>
           <div className="group relative">
             <span className="cursor-help text-slate-500 hover:text-slate-300 transition-colors text-xs">
               ⓘ
@@ -319,7 +320,7 @@ const PhoneInputSection = ({ onChange }) => {
         <div className="relative">
           <input
             type="text"
-            className="input pr-16"
+            className="input pr-16 py-2.5 text-sm"
             placeholder="e.g. Mom's phone, Work device"
             value={label}
             onChange={handleLabelChange}

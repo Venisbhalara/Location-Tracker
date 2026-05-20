@@ -251,17 +251,17 @@ const CreateTracking = () => {
       </div>
 
       <div
-        className={`relative z-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20 transition-all duration-300 ease-out ${isClosing ? "opacity-0 translate-y-3 scale-[0.98] pointer-events-none" : "opacity-100 translate-y-0 scale-100"}`}
+        className={`relative z-10 max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 transition-all duration-300 ease-out ${isClosing ? "opacity-0 translate-y-3 scale-[0.98] pointer-events-none" : "opacity-100 translate-y-0 scale-100"}`}
       >
         {/* Header */}
-        <div className="mb-8 flex items-start justify-between gap-4">
+        <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-3 py-1 text-xs font-medium text-indigo-400 mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-3 py-0.5 text-[11px] font-medium text-indigo-400 mb-2">
+              <span className="w-1 h-1 rounded-full bg-indigo-400" />
               Generator
             </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Create Tracking Link</h1>
-            <p className="text-slate-400 text-sm mt-2">
+            <h1 className="text-2xl font-bold text-white tracking-tight">Create Tracking Link</h1>
+            <p className="text-slate-400 text-xs mt-1">
               Generate a secure, encrypted link to request location permission.
             </p>
           </div>
@@ -269,15 +269,15 @@ const CreateTracking = () => {
             type="button"
             onClick={handleClose}
             aria-label="Close"
-            className="w-12 h-12 flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all text-sm"
           >
             ✕
           </button>
         </div>
 
         {!result ? (
-          <div className="rounded-3xl p-6 sm:p-8 border border-white/[0.08] backdrop-blur-xl shadow-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+          <div className="rounded-2xl p-5 sm:p-6 border border-white/[0.08] backdrop-blur-xl shadow-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               
               <PhoneInputSection 
                 onChange={({ phoneNumber, label, isValid }) => 
@@ -286,25 +286,25 @@ const CreateTracking = () => {
               />
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider mb-3 block" style={{ color: "rgba(255,255,255,0.45)" }}>
+                <label className="text-[11px] font-semibold uppercase tracking-wider mb-2 block" style={{ color: "rgba(255,255,255,0.45)" }}>
                   Tracking Type
                 </label>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-3">
                   {["location"].map((type) => (
                     <button
                       key={type}
                       type="button"
                       onClick={() => setForm({ ...form, trackingType: type })}
-                      className={`p-5 rounded-2xl border flex items-center gap-4 text-left transition-all duration-300 ${form.trackingType === type ? "border-indigo-500 bg-indigo-500/10 shadow-[0_0_20px_rgba(99,102,241,0.15)]" : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"}`}
+                      className={`p-3.5 rounded-xl border flex items-center gap-3 text-left transition-all duration-300 ${form.trackingType === type ? "border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.15)]" : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"}`}
                     >
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner ${form.trackingType === type ? 'bg-indigo-500/20' : 'bg-black/20'}`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-inner ${form.trackingType === type ? 'bg-indigo-500/20' : 'bg-black/20'}`}>
                         📍
                       </div>
                       <div>
-                        <div className="font-semibold text-white capitalize tracking-wide">
+                        <div className="font-semibold text-white text-sm capitalize tracking-wide">
                           Live {type}
                         </div>
-                        <div className="text-xs mt-0.5 text-slate-400">
+                        <div className="text-[10px] mt-0.5 text-slate-400">
                           Capture continuous high-precision GPS coordinates via WebSocket
                         </div>
                       </div>
@@ -313,13 +313,13 @@ const CreateTracking = () => {
                 </div>
               </div>
 
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-xl flex-shrink-0 shadow-inner">
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-sm flex-shrink-0 shadow-inner">
                   ⚠️
                 </div>
                 <div>
-                  <h4 className="text-amber-400 font-semibold text-sm mb-1">Consent Required</h4>
-                  <p className="text-amber-200/70 text-sm leading-relaxed">
+                  <h4 className="text-amber-400 font-semibold text-xs mb-0.5">Consent Required</h4>
+                  <p className="text-amber-200/70 text-xs leading-relaxed">
                     The recipient must explicitly allow location access in their browser before any data is collected or transmitted.
                   </p>
                 </div>
@@ -327,12 +327,12 @@ const CreateTracking = () => {
 
               <button 
                 type="submit" 
-                className={`nextrack-btn-primary py-4 mt-2 ${!form.isValid ? "opacity-50 cursor-not-allowed" : ""}`} 
+                className={`nextrack-btn-primary py-3 mt-1 text-sm ${!form.isValid ? "opacity-50 cursor-not-allowed" : ""}`} 
                 disabled={loading || !form.isValid}
               >
                 {loading ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
