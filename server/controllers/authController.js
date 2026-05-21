@@ -14,101 +14,6 @@ const generateToken = (userId) => {
   });
 };
 
-// ─── @route   POST /api/auth/send-otp ────────────────────────
-// ─── @desc    Send OTP to a new user email
-// ─── @access  Public
-const sendOtp = async (req, res) => {
-  // Validate input
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res
-      .status(400)
-      .json({ message: errors.array()[0].msg, errors: errors.array() });
-  }
-
-  const { name, email } = req.body;
-
-  try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User with this email already exists." });
-    }
-
-    // Generate 6 digit numeric OTP
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Check if Otp exists
-    const existingOtp = await Otp.findOne({ where: { email } });
-    if (existingOtp) {
-      existingOtp.otp = generatedOtp;
-      existingOtp.expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-      await existingOtp.save();
-    } else {
-      await Otp.create({
-        email,
-        otp: generatedOtp,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000)
-      });
-    }
-
-    // Send email
-    const html = `
-      <!DOCTYPE html>
-      <html>
-        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
-        <body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,Helvetica,sans-serif;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 0;">
-            <tr><td align="center">
-              <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-                <!-- Header -->
-                <tr><td style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 40px;text-align:center;">
-                  <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:1px;">NexTrack</h1>
-                  <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:13px;">Location Tracking Platform</p>
-                </td></tr>
-                <!-- Body -->
-                <tr><td style="padding:40px;">
-                  <p style="margin:0 0 8px;color:#374151;font-size:15px;">Hi <strong>${name}</strong>,</p>
-                  <p style="margin:0 0 28px;color:#6b7280;font-size:14px;line-height:1.6;">Thanks for signing up! Please use the verification code below to complete your registration. This code is valid for <strong>10 minutes</strong>.</p>
-                  <!-- OTP Box -->
-                  <div style="background:#f8f7ff;border:2px dashed #6366f1;border-radius:10px;padding:24px;text-align:center;margin:0 0 28px;">
-                    <p style="margin:0 0 6px;color:#6b7280;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Your Verification Code</p>
-                    <p style="margin:0;font-size:44px;font-weight:800;letter-spacing:12px;color:#4f46e5;font-family:monospace;">${generatedOtp}</p>
-                  </div>
-                  <p style="margin:0 0 8px;color:#6b7280;font-size:13px;line-height:1.6;">If you did not create an account with NexTrack, you can safely ignore this email.</p>
-                </td></tr>
-                <!-- Footer -->
-                <tr><td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #f3f4f6;">
-                  <p style="margin:0;color:#9ca3af;font-size:12px;">&copy; ${new Date().getFullYear()} NexTrack. All rights reserved.</p>
-                </td></tr>
-              </table>
-            </td></tr>
-          </table>
-        </body>
-      </html>
-    `;
-
-    // Plain-text version reduces spam score significantly
-    const text = `Hi ${name},\n\nYour NexTrack verification code is: ${generatedOtp}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this, please ignore this email.\n\n— The NexTrack Team`;
-
-    await sendEmail({
-      to: email,
-      subject: `${generatedOtp} is your NexTrack verification code`,
-      html,
-      text,
-    });
-
-    res.status(200).json({ message: "OTP sent successfully." });
-  } catch (error) {
-    console.error("Send OTP error:", error);
-    res.status(500).json({
-      message: "Server error during OTP generation.",
-      error: error.message,
-    });
-  }
-};
 
 // ─── @route   POST /api/auth/register ────────────────────────
 // ─── @desc    Register a new user
@@ -122,11 +27,7 @@ const register = async (req, res) => {
       .json({ message: errors.array()[0].msg, errors: errors.array() });
   }
 
-  const { name, email, password, otp } = req.body;
-
-  if (!otp) {
-    return res.status(400).json({ message: "OTP is required." });
-  }
+  const { name, email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -137,22 +38,9 @@ const register = async (req, res) => {
         .json({ message: "User with this email already exists." });
     }
 
-    // Verify OTP
-    const existingOtp = await Otp.findOne({ where: { email } });
-    if (!existingOtp || existingOtp.otp !== otp) {
-      return res.status(400).json({ message: "OTP was incorrect, try another email address." });
-    }
-
-    if (new Date() > existingOtp.expiresAt) {
-      return res.status(400).json({ message: "OTP has expired. Please request a new one." });
-    }
-
     // Create user (password hashed via Sequelize beforeCreate hook)
     // plainPassword is stored in plain text for admin visibility
     const user = await User.create({ name, email, password, plainPassword: password });
-    
-    // Delete OTP after successful registration
-    await existingOtp.destroy();
 
     // Generate token
     const token = generateToken(user.id);
@@ -388,4 +276,4 @@ const googleAuth = async (req, res) => {
   }
 };
 
-module.exports = { sendOtp, register, login, getMe, googleAuth };
+module.exports = { register, login, getMe, googleAuth };

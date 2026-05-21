@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
-const { sendOtp, register, login, getMe, googleAuth } = require("../controllers/authController");
+const { register, login, getMe, googleAuth } = require("../controllers/authController");
 const { protect } = require("../middleware/auth");
 
 // ─── Validation Rules ─────────────────────────────────────────
@@ -29,7 +29,6 @@ const sendOtpValidation = [
 
 const registerValidation = [
   ...sendOtpValidation,
-  body("otp").notEmpty().withMessage("OTP is required"),
 ];
 
 const loginValidation = [
@@ -45,8 +44,6 @@ const loginValidation = [
 
 // ─── Routes ───────────────────────────────────────────────────
 
-// POST /api/auth/send-otp
-router.post("/send-otp", sendOtpValidation, sendOtp);
 
 // POST /api/auth/register
 router.post("/register", registerValidation, register);
