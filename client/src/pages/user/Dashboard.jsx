@@ -48,8 +48,10 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [trackings, setTrackings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const load = async () => {
+  const load = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
     try {
       const [tRes] = await Promise.all([getUserTrackings({ limit: 50 })]);
       setTrackings(tRes.data.trackings);
@@ -57,6 +59,7 @@ const Dashboard = () => {
       toast.error("Failed to load dashboard data.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -179,13 +182,31 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <Link
-            to="/tracking/create"
-            className="nextrack-btn-primary px-6 py-3 whitespace-nowrap"
-          >
-            <span className="mr-2 text-lg leading-none">+</span> New Tracking
-            Link
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => load(true)}
+              disabled={refreshing}
+              className="group relative flex items-center justify-center w-12 h-12 rounded-xl border border-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] active:scale-95 overflow-hidden disabled:opacity-70 disabled:hover:translate-y-0"
+              style={{ background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)" }}
+              title="Refresh Dashboard"
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <svg 
+                className={`w-5 h-5 text-slate-400 group-hover:text-white transition-all duration-500 ${refreshing ? 'animate-[spin_1s_ease-in-out_infinite] text-indigo-400' : 'group-hover:rotate-180'}`}
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            <Link
+              to="/tracking/create"
+              className="nextrack-btn-primary px-6 py-3 whitespace-nowrap"
+            >
+              <span className="mr-2 text-lg leading-none">+</span> New Tracking Link
+            </Link>
+          </div>
         </div>
 
         {/* Stats Grid */}
