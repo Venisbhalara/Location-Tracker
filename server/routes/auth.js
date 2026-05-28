@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
-const { register, login, getMe, googleAuth } = require("../controllers/authController");
+const {
+  register,
+  login,
+  getMe,
+  googleAuth,
+} = require("../controllers/authController");
 const { protect } = require("../middleware/auth");
 
 // ─── Validation Rules ─────────────────────────────────────────
@@ -27,9 +32,7 @@ const sendOtpValidation = [
     .withMessage("Password must be at least 6 characters"),
 ];
 
-const registerValidation = [
-  ...sendOtpValidation,
-];
+const registerValidation = [...sendOtpValidation];
 
 const loginValidation = [
   body("email")
@@ -43,7 +46,6 @@ const loginValidation = [
 ];
 
 // ─── Routes ───────────────────────────────────────────────────
-
 
 // POST /api/auth/register
 router.post("/register", registerValidation, register);
@@ -60,9 +62,9 @@ router.post(
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        message: errors.array()[0].msg, 
-        errors: errors.array() 
+      return res.status(400).json({
+        message: errors.array()[0].msg,
+        errors: errors.array(),
       });
     }
     next();
