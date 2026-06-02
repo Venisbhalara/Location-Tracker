@@ -245,7 +245,7 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-24 px-4 relative overflow-hidden bg-[#030307]">
+    <div className="min-h-screen pt-24 pb-24 px-4 relative overflow-hidden bg-[#0a0a10]">
       <Helmet>
         <title>NexTrack Pricing | GPS Location Tracking Plans — From ₹10</title>
         <meta
@@ -269,26 +269,31 @@ const Pricing = () => {
         </ol>
       </nav>
 
-      {/* Premium Background Elements */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Animated Gradient Orbs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] rounded-full opacity-20 bg-indigo-600/30 blur-[120px] animate-pulse" />
-        <div
-          className="absolute bottom-[-10%] right-[-10%] w-[800px] h-[800px] rounded-full opacity-20 bg-purple-600/20 blur-[120px] animate-pulse"
-          style={{ animationDelay: "2s" }}
-        />
-
-        {/* Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        {/* Diagonal Light Streak */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5 rotate-12 scale-150" />
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(50px, -50px) scale(1.1); }
+          66% { transform: translate(-40px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        .bg-grid {
+          background-size: 40px 40px;
+          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+          mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+          -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+      `}} />
+      
+      {/* Animated Premium LED Grid & Orbs Background */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center">
+        <div className="absolute inset-0 bg-grid opacity-70"></div>
+        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
+        <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">

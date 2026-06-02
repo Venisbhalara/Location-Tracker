@@ -12,15 +12,39 @@ const Section = ({ title, children }) => (
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen py-16 px-4">
+    <div className="min-h-screen py-16 px-4 bg-[#0a0a10] relative overflow-hidden">
       <Helmet>
         <title>Privacy Policy | NexTrack GPS Location Sharing</title>
         <meta name="description" content="NexTrack Privacy Policy — learn how we handle your data, location permissions, and what we never store. Your privacy is our foundation." />
         <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://locationtracker.app/privacy-policy" />
       </Helmet>
-      {/* Background glow */}
-      <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-indigo-700/10 blur-3xl" />
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(50px, -50px) scale(1.1); }
+          66% { transform: translate(-40px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        .bg-grid {
+          background-size: 40px 40px;
+          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+          mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+          -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+      `}} />
+      
+      {/* Animated Premium LED Grid & Orbs Background */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
+        <div className="absolute inset-0 bg-grid opacity-70"></div>
+        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
+        <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
+      </div>
 
       <div className="relative z-10 max-w-3xl mx-auto">
         {/* Header */}
