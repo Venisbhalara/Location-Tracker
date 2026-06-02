@@ -141,9 +141,20 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-slate-900 py-6 px-4 sm:px-6 lg:px-8 text-white pt-20 font-['Inter']">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold mb-5 flex items-center gap-3">
-          Profile Settings
-        </h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+          <h1 className="text-2xl font-bold flex items-center gap-3">
+            Profile Settings
+          </h1>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2 bg-slate-800/50 px-3.5 py-2 rounded-lg border border-slate-700/50 hover:bg-slate-700/80 w-fit"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
 
         <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
           {/* Sidebar Tabs */}
