@@ -225,15 +225,39 @@ const GroupMap = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: "#0a0a14" }}>
-      {/* Keyframes */}
-      <style>{`
+    <div className="h-screen flex flex-col relative overflow-hidden bg-[#0a0a10] font-['Inter']">
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(50px, -50px) scale(1.1); }
+          66% { transform: translate(-40px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        .bg-grid {
+          background-size: 40px 40px;
+          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+          mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+          -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
         @keyframes member-pulse {
           0%, 100% { box-shadow: 0 0 0 3px rgba(99,102,241,0.4), 0 4px 12px rgba(0,0,0,0.4); }
           50%  { box-shadow: 0 0 0 8px rgba(99,102,241,0.08), 0 4px 12px rgba(0,0,0,0.4); }
         }
-      `}</style>
+      `}} />
 
+      {/* Animated Premium LED Grid & Orbs Background */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
+        <div className="absolute inset-0 bg-grid opacity-70"></div>
+        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
+        <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
+      </div>
+
+      <div className="flex flex-col h-full relative z-10 w-full">
       {/* ── TOP HEADER BAR ── */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.07] flex-shrink-0"
         style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(16px)" }}>
@@ -420,6 +444,7 @@ const GroupMap = () => {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

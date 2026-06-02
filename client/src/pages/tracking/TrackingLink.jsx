@@ -36,28 +36,34 @@ const STYLES = `
 
 /* ─── shared wrapper ────────────────────────────────────────────────────── */
 const Page = ({ children }) => (
-  <div
-    className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden"
-    style={{ background: "#0d0d17" }}
-  >
+  <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-[#0a0a10] font-['Inter']">
     <style>{STYLES}</style>
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(50px, -50px) scale(1.1); }
+        66% { transform: translate(-40px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+      }
+      .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
+      .animation-delay-2000 { animation-delay: 2s; }
+      .animation-delay-4000 { animation-delay: 4s; }
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+      }
+    `}} />
 
-    {/* ambient orbs */}
-    <div
-      className="orb-float pointer-events-none absolute -top-40 -left-32 w-[500px] h-[500px] rounded-full opacity-20"
-      style={{
-        background:
-          "radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)",
-      }}
-    />
-    <div
-      className="orb-float pointer-events-none absolute -bottom-40 -right-32 w-[600px] h-[600px] rounded-full opacity-10"
-      style={{
-        background:
-          "radial-gradient(circle, rgba(34,211,238,0.12) 0%, transparent 70%)",
-        animationDelay: "3s",
-      }}
-    />
+    {/* Animated Premium LED Grid & Orbs Background */}
+    <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
+      <div className="absolute inset-0 bg-grid opacity-70"></div>
+      <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
+      <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
+      <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
+    </div>
 
     <div className="relative z-10 w-full max-w-sm">{children}</div>
   </div>
