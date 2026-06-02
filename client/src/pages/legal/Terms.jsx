@@ -1,3 +1,5 @@
+import { Helmet } from "react-helmet-async";
+
 const Section = ({ title, children }) => (
   <div className="mb-10">
     <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
@@ -11,6 +13,12 @@ const Section = ({ title, children }) => (
 const Terms = () => {
   return (
     <div className="min-h-screen py-16 px-4">
+      <Helmet>
+        <title>Terms &amp; Conditions | NexTrack GPS Location Sharing</title>
+        <meta name="description" content="NexTrack Terms and Conditions — understand your rights and obligations when using our real-time GPS location sharing platform." />
+        <meta name="robots" content="noindex, follow" />
+        <link rel="canonical" href="https://locationtracker.app/terms" />
+      </Helmet>
       <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-purple-700/10 blur-3xl" />
 
       <div className="relative z-10 max-w-3xl mx-auto">
@@ -18,7 +26,7 @@ const Terms = () => {
           <span className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 text-xs text-purple-400 uppercase tracking-widest mb-5">
             Legal Document
           </span>
-          <h1 className="text-4xl font-bold text-white mb-3">Terms &amp; Conditions</h1>
+          <h1 className="text-4xl font-bold text-white mb-3">Terms &amp; Conditions — NexTrack</h1>
           <p className="text-slate-500 text-sm">
             Effective Date: <span className="text-slate-400">March 19, 2026</span> &nbsp;·&nbsp; Last Updated:{" "}
             <span className="text-slate-400">March 19, 2026</span>
@@ -30,7 +38,7 @@ const Terms = () => {
           <div>
             <p className="text-amber-400 font-semibold text-sm mb-1">Please Read Carefully</p>
             <p className="text-slate-400 text-sm leading-relaxed">
-              By accessing or using Location Tracker, you agree to be bound by these Terms & Conditions. If you do not
+              By accessing or using NexTrack, you agree to be bound by these Terms & Conditions. If you do not
               agree, do not use the Service.
             </p>
           </div>
@@ -40,15 +48,15 @@ const Terms = () => {
 
           <Section title="1. Acceptance of Terms">
             <p>
-              These Terms & Conditions ("Terms") govern your use of Location Tracker (the "Service"), operated by
-              Location Tracker ("we", "us", "our"). By creating an account or using any part of the Service, you agree
+              These Terms & Conditions ("Terms") govern your use of NexTrack (the "Service"), operated by
+              NexTrack ("we", "us", "our"). By creating an account or using any part of the Service, you agree
               to these Terms in full.
             </p>
           </Section>
 
           <Section title="2. Description of Service">
             <p>
-              Location Tracker is a web-based platform that allows registered users to generate secure tracking links
+              NexTrack is a web-based platform that allows registered users to generate secure tracking links
               and share them with contacts. When a contact opens the link and grants permission through their browser,
               their real-time location is transmitted to the link creator via WebSocket.
             </p>
@@ -94,7 +102,7 @@ const Terms = () => {
               </li>
             </ol>
             <div className="mt-3 border border-red-500/30 bg-red-500/5 rounded-xl p-4 text-xs text-red-400">
-              ❌ <strong>Prohibited:</strong> Using Location Tracker to track anyone without their explicit consent.
+              ❌ <strong>Prohibited:</strong> Using NexTrack to track anyone without their explicit consent.
               Violations may result in immediate account termination and may be reported to relevant authorities.
             </div>
           </Section>
@@ -107,14 +115,14 @@ const Terms = () => {
               <li>Circumvent browser location permission dialogs</li>
               <li>Scrape, reverse-engineer, or exploit the Service</li>
               <li>Violate any applicable local, national, or international law</li>
-              <li>Impersonate Location Tracker or any other entity</li>
+              <li>Impersonate NexTrack or any other entity</li>
               <li>Attempt unauthorized access to any part of the Service or its infrastructure</li>
             </ul>
           </Section>
 
           <Section title="6. Intellectual Property">
             <p>
-              All content, design, code, and branding associated with Location Tracker are owned by us and protected
+              All content, design, code, and branding associated with NexTrack are owned by us and protected
               by applicable intellectual property laws. You may not copy, modify, distribute, or create derivative
               works without our written permission.
             </p>
@@ -134,7 +142,7 @@ const Terms = () => {
 
           <Section title="8. Limitation of Liability">
             <p>
-              To the maximum extent permitted by law, Location Tracker shall not be liable for any indirect,
+              To the maximum extent permitted by law, NexTrack shall not be liable for any indirect,
               incidental, special, consequential, or punitive damages, including but not limited to loss of data,
               loss of privacy, or personal harm arising from misuse of the Service.
             </p>
@@ -169,7 +177,7 @@ const Terms = () => {
 
           <Section title="12. Contact">
             <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm">
-              <p className="text-white font-medium">Location Tracker Legal Team</p>
+              <p className="text-white font-medium">NexTrack Legal Team</p>
               <p className="text-indigo-400 mt-1">📧 legal@locationtracker.app</p>
             </div>
           </Section>

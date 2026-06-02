@@ -1,12 +1,17 @@
 {
-  "name": "Live Location Tracker",
-  "short_name": "Tracker",
-  "description": "A persistent live location tracking progressive web app.",
+  "name": "NexTrack — Real-Time Location Sharing",
+  "short_name": "NexTrack",
+  "description": "Share a secure GPS link. Track live location in real time. No app download required.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#317EFB",
+  "background_color": "#0d0d17",
+  "theme_color": "#6366f1",
   "icons": [
+    {
+      "src": "/location.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
       "src": "/location.png",
       "sizes": "512x512",

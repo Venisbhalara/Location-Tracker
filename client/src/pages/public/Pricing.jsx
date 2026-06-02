@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { createPaymentOrder, verifyPayment } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
@@ -122,6 +123,22 @@ const Pricing = () => {
       q: "What happens if a link expires?",
       a: "Once a link expires, it becomes inactive and the associated tracking slot is returned to your account balance, allowing you to create a new link.",
     },
+    {
+      q: "Can someone track me without my knowledge?",
+      a: "Never. The recipient must explicitly tap 'Allow Location' in their browser. NexTrack cannot override or bypass browser permissions. If you close the tab or deny permission, no data is transmitted.",
+    },
+    {
+      q: "Does the recipient need to download an app?",
+      a: "No. Recipients open the tracking link in any smartphone browser — Chrome, Safari, Firefox. No account, no download, no friction.",
+    },
+    {
+      q: "Can I track multiple people at once?",
+      a: "Yes. NexTrack supports group tracking. Create a group, add members, and track everyone simultaneously on one shared live map with colour-coded markers.",
+    },
+    {
+      q: "Is there a refund policy?",
+      a: "If you experience a technical issue that prevents you from using your purchased slots, please contact support@locationtracker.app within 7 days of purchase and we will review your case.",
+    },
   ];
 
   const loadRazorpay = () => {
@@ -208,8 +225,50 @@ const Pricing = () => {
     }
   };
 
+  const schemaPricing = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://locationtracker.app/" },
+      { "@type": "ListItem", position: 2, name: "Pricing", item: "https://locationtracker.app/pricing" },
+    ],
+  };
+
   return (
     <div className="min-h-screen pt-24 pb-24 px-4 relative overflow-hidden bg-[#030307]">
+      <Helmet>
+        <title>NexTrack Pricing | GPS Location Tracking Plans — From ₹10</title>
+        <meta
+          name="description"
+          content="Choose the right NexTrack plan. From 5 to 25 secure GPS tracking slots. Instant activation, real-time WebSocket updates, bank-grade encryption. No subscriptions."
+        />
+        <link rel="canonical" href="https://locationtracker.app/pricing" />
+        <meta property="og:title" content="NexTrack Pricing | GPS Tracking Plans Starting at ₹10" />
+        <meta property="og:description" content="Pick the perfect tracking plan. 5 to 25 slots, real-time GPS, encryption included. No hidden fees." />
+        <meta property="og:url" content="https://locationtracker.app/pricing" />
+        <script type="application/ld+json">{JSON.stringify(schemaPricing)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
+      </Helmet>
+
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto relative z-10 mb-4">
+        <ol className="flex items-center gap-2 text-xs text-slate-500">
+          <li><Link to="/" className="hover:text-indigo-400 transition-colors">Home</Link></li>
+          <li className="text-slate-700">/</li>
+          <li className="text-slate-400">Pricing</li>
+        </ol>
+      </nav>
+
       {/* Premium Background Elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {/* Animated Gradient Orbs */}
@@ -239,17 +298,18 @@ const Pricing = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
             </span>
-            Flexible Plans
+            Flexible Plans — No Subscriptions
           </div>
           <h1 className="text-4xl sm:text-6xl font-black text-white mb-6 tracking-tighter leading-tight">
-            Elevate Your <br />
+            NexTrack Pricing —{" "}<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 animate-gradient-x">
-              Tracking Experience
+              Choose Your Plan
             </span>
           </h1>
           <p className="text-slate-400 max-w-xl mx-auto text-lg font-light leading-relaxed">
-            Choose a precision-engineered plan tailored for your needs. No
-            hidden fees, just pure performance.
+            Every plan includes live GPS tracking, end-to-end encryption, and instant activation.
+            Buy a slot package once — use it when you need it.{" "}
+            <Link to="/about" className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2">Learn about our security practices →</Link>
           </p>
         </div>
 

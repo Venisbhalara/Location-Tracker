@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /tracking/
+Disallow: /groups/
+Disallow: /ghost
+Disallow: /track/
+
+Sitemap: https://locationtracker.app/sitemap.xml

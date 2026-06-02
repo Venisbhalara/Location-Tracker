@@ -6,8 +6,9 @@ const Footer = () => {
   const footerLinks = {
     Product: [
       { label: "Home", to: "/" },
-      { label: "Dashboard", to: "/dashboard" },
+      { label: "Pricing", to: "/pricing" },
       { label: "New Tracking Link", to: "/tracking/create" },
+      { label: "Dashboard", to: "/dashboard" },
     ],
     Company: [
       { label: "About Us", to: "/about" },
@@ -21,7 +22,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="relative hidden sm:block overflow-hidden"
+      className="relative overflow-hidden"
       style={{
         background: "rgba(8,8,16,0.95)",
         borderTop: "1px solid rgba(255,255,255,0.06)",
@@ -112,7 +113,9 @@ const Footer = () => {
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
         >
           <p className="text-slate-600 text-xs">
-            © {year} NexTrack. All rights reserved. Built with privacy in mind.
+            © {year}{" "}
+            <a href="https://locationtracker.app" className="hover:text-slate-400 transition-colors">NexTrack</a>
+            . All rights reserved. Built with privacy in mind.
           </p>
           <div className="flex items-center gap-5">
             {[

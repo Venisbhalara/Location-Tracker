@@ -127,6 +127,7 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/push", require("./routes/push"));
 app.use("/api/payment", require("./routes/paymentRoutes"));
 app.use("/api/groups", require("./routes/groups"));
+app.use("/api/contact", require("./routes/contact"));
 
 // Root check
 app.get("/", (req, res) => {
@@ -351,7 +352,7 @@ const PORT = process.env.PORT || 5000;
 // ── Startup Diagnostics ─────────────────────────────────────────────────────
 function printStartupDiagnostics() {
   console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("  LOCATION TRACKER — STARTUP DIAGNOSTICS");
+  console.log("  NEXTRACK — STARTUP DIAGNOSTICS");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   const c = (k, v) => console.log(`  ${k.padEnd(22)}: ${v}`);
   c("NODE_ENV",            process.env.NODE_ENV             || "❌ NOT SET");

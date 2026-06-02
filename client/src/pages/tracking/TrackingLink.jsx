@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { getTrackingByToken } from "../../services/api";
 import locationService from "../../services/locationService";
 import geocodingService from "../../services/geocodingService";
@@ -277,14 +278,15 @@ const TrackingLink = () => {
   if (loading)
     return (
       <Page>
+        <Helmet>
+          <title>Loading… | NexTrack</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <GlassCard>
           <div className="text-center">
             <div
               className="w-14 h-14 rounded-full border-2 border-t-transparent mx-auto mb-6 animate-spin"
-              style={{
-                borderColor: "rgba(99,102,241,0.3)",
-                borderTopColor: "#6366f1",
-              }}
+              style={{ borderColor: "rgba(99,102,241,0.3)", borderTopColor: "#6366f1" }}
             />
             <p className="text-slate-400 text-sm font-medium tracking-wider uppercase">
               Initializing…

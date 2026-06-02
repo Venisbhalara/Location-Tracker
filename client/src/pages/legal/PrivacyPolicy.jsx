@@ -1,3 +1,5 @@
+import { Helmet } from "react-helmet-async";
+
 const Section = ({ title, children }) => (
   <div className="mb-10">
     <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
@@ -11,6 +13,12 @@ const Section = ({ title, children }) => (
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen py-16 px-4">
+      <Helmet>
+        <title>Privacy Policy | NexTrack GPS Location Sharing</title>
+        <meta name="description" content="NexTrack Privacy Policy — learn how we handle your data, location permissions, and what we never store. Your privacy is our foundation." />
+        <meta name="robots" content="noindex, follow" />
+        <link rel="canonical" href="https://locationtracker.app/privacy-policy" />
+      </Helmet>
       {/* Background glow */}
       <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-indigo-700/10 blur-3xl" />
 
@@ -20,7 +28,7 @@ const PrivacyPolicy = () => {
           <span className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-4 py-1.5 text-xs text-indigo-400 uppercase tracking-widest mb-5">
             Legal Document
           </span>
-          <h1 className="text-4xl font-bold text-white mb-3">Privacy Policy</h1>
+          <h1 className="text-4xl font-bold text-white mb-3">Privacy Policy — NexTrack</h1>
           <p className="text-slate-500 text-sm">
             Effective Date: <span className="text-slate-400">March 19, 2026</span> &nbsp;·&nbsp; Last Updated:{" "}
             <span className="text-slate-400">March 19, 2026</span>
@@ -33,7 +41,7 @@ const PrivacyPolicy = () => {
           <div>
             <p className="text-emerald-400 font-semibold text-sm mb-1">Your Privacy Comes First</p>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Location Tracker <strong className="text-white">only accesses your location with your explicit, informed
+              NexTrack <strong className="text-white">only accesses your location with your explicit, informed
               consent.</strong> You are in full control at all times. We never track you silently or without permission.
             </p>
           </div>
@@ -43,7 +51,7 @@ const PrivacyPolicy = () => {
 
           <Section title="1. Introduction">
             <p>
-              Welcome to <strong className="text-white">Location Tracker</strong> ("we", "our", "us"). This Privacy
+              Welcome to <strong className="text-white">NexTrack</strong> ("we", "our", "us"). This Privacy
               Policy explains how we collect, use, store, and protect your information when you use our platform at{" "}
               <span className="text-indigo-400">locationtracker.app</span> (the "Service").
             </p>
@@ -61,7 +69,7 @@ const PrivacyPolicy = () => {
             </ul>
             <p className="mt-3"><strong className="text-slate-300">b) Location Data (CONSENT-BASED ONLY):</strong></p>
             <p>
-              This is the most sensitive data we handle. Location Tracker accesses your geographic location{" "}
+              This is the most sensitive data we handle. NexTrack accesses your geographic location{" "}
               <strong className="text-white">ONLY when:</strong>
             </p>
             <ul className="list-disc pl-5 space-y-1">
@@ -187,7 +195,7 @@ const PrivacyPolicy = () => {
               If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at:
             </p>
             <div className="mt-2 bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm">
-              <p className="text-white font-medium">Location Tracker Support</p>
+              <p className="text-white font-medium">NexTrack Support</p>
               <p className="text-indigo-400 mt-1">📧 privacy@locationtracker.app</p>
               <p className="text-slate-400 mt-1">We respond to all privacy requests within 72 hours.</p>
             </div>
