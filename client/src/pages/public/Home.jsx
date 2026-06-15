@@ -443,6 +443,9 @@ const Home = () => {
                       <Link to="/pricing" className="nextrack-btn-ghost text-base px-10 py-4">
                         View Plans
                       </Link>
+                      <Link to="/blog" className="nextrack-btn-ghost text-base px-10 py-4">
+                        Read Our Blog
+                      </Link>
                     </div>
                   )}
                   <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-xs text-slate-500">

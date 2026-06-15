@@ -12,6 +12,7 @@ const Footer = () => {
     ],
     Company: [
       { label: "About Us", to: "/about" },
+      { label: "Blog", to: "/blog" },
       { label: "Contact Us", to: "/contact" },
     ],
     Legal: [

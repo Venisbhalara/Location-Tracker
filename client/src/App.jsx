@@ -21,6 +21,8 @@ const Terms          = lazy(() => import('./pages/legal/Terms'))
 const About          = lazy(() => import('./pages/public/About'))
 const Contact        = lazy(() => import('./pages/public/Contact'))
 const Pricing        = lazy(() => import('./pages/public/Pricing'))
+const Blog           = lazy(() => import('./pages/public/Blog'))
+const BlogArticle    = lazy(() => import('./pages/public/BlogArticle'))
 
 // ── Components (always needed, kept eager) ────────────────────────────────────
 import Navbar         from './components/layout/Navbar'
@@ -103,6 +105,8 @@ function App() {
           <Route path="/about"          element={<About />} />
           <Route path="/contact"        element={<Contact />} />
           <Route path="/pricing"        element={<Pricing />} />
+          <Route path="/blog"           element={<Blog />} />
+          <Route path="/blog/:slug"     element={<BlogArticle />} />
 
           {/* Protected */}
           <Route element={<ProtectedRoute />}>

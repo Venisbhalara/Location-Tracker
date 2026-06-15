@@ -96,6 +96,9 @@ const Navbar = () => {
                 <NavLink to="/about" className={navLinkClass}>
                   About
                 </NavLink>
+                <NavLink to="/blog" className={navLinkClass}>
+                  Blog
+                </NavLink>
                 <NavLink to="/contact" className={navLinkClass}>
                   Contact
                 </NavLink>
@@ -242,6 +245,13 @@ const Navbar = () => {
                 onClick={() => setMenuOpen(false)}
               >
                 About
+              </NavLink>
+              <NavLink
+                to="/blog"
+                className={navLinkClass}
+                onClick={() => setMenuOpen(false)}
+              >
+                Blog
               </NavLink>
               <NavLink
                 to="/contact"

@@ -16,8 +16,8 @@ const PrivacyPolicy = () => {
       <Helmet>
         <title>Privacy Policy | NexTrack GPS Location Sharing</title>
         <meta name="description" content="NexTrack Privacy Policy — learn how we handle your data, location permissions, and what we never store. Your privacy is our foundation." />
-        <meta name="robots" content="noindex, follow" />
-        <link rel="canonical" href="https://locationtracker.app/privacy-policy" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://location-trackers.vercel.app/privacy-policy" />
       </Helmet>
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes blob {
@@ -189,13 +189,17 @@ const PrivacyPolicy = () => {
             </ul>
           </Section>
 
-          <Section title="8. Third-Party Services">
+          <Section title="8. Third-Party Services & Advertising">
             <p>We use the following trusted third-party services that may process limited data:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li><strong className="text-slate-300">Leaflet.js</strong> — Open-source mapping library (no data sent to Leaflet)</li>
-              <li><strong className="text-slate-300">OpenStreetMap</strong> — Map tile provider (your IP may be visible when loading tiles)</li>
-              <li><strong className="text-slate-300">Socket.IO</strong> — Real-time communication library</li>
+              <li><strong className="text-slate-300">Google AdSense:</strong> We display advertisements served by Google AdSense. Google uses cookies (including the DoubleClick cookie) to serve ads based on your prior visits to our site or other sites on the internet. These cookies allow Google and its partners to serve ads to you based on your visit to our site and/or other sites on the internet. You may opt out of personalised advertising by visiting <a href="https://www.google.com/settings/ads" className="text-indigo-400 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">Google Ad Settings</a>. Alternatively, you can opt out of third-party vendor use of cookies for personalised advertising by visiting <a href="http://www.aboutads.info/choices/" className="text-indigo-400 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>.</li>
+              <li><strong className="text-slate-300">Leaflet.js:</strong> Open-source mapping library (no data sent to Leaflet)</li>
+              <li><strong className="text-slate-300">OpenStreetMap:</strong> Map tile provider (your IP may be visible when loading tiles)</li>
+              <li><strong className="text-slate-300">Socket.IO:</strong> Real-time communication library</li>
             </ul>
+            <p className="mt-2 p-3 bg-slate-800/60 rounded-xl border border-slate-700 text-xs text-slate-400">
+              🍪 <strong className="text-white">Cookies:</strong> We and our advertising partners use cookies to personalise content and ads, to provide social media features, and to analyse our traffic. By using this site you consent to our use of cookies in accordance with this policy.
+            </p>
           </Section>
 
           <Section title="9. Children's Privacy">
