@@ -1,5 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Syne:wght@600;700;800&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 'Clash Display', 'Syne', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
 
 /* ── Base ─────────────────────────────────────────────────────────── */
 @layer base {
@@ -13,134 +20,269 @@
 
   body {
     @apply text-slate-100 antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
-    background-color: #0d0d17;
+    font-family: var(--font-sans);
+    background-color: #090912;
+    color: #e2e8f0;
   }
 
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: #0d0d17; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+  h1, h2, h3, h4, h5, h6,
+  .display-hero,
+  .display-title,
+  .section-title {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+
+  code, kbd, samp, pre, .font-mono, .hud-telemetry, .gps-coord {
+    font-family: var(--font-mono);
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #090912; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 }
 
-/* ── Components ───────────────────────────────────────────────────── */
+/* ── Components & Design System ───────────────────────────────────── */
 @layer components {
 
-  /* ── Cards ── */
-  .card {
-    @apply border border-white/[0.07] rounded-2xl shadow-xl p-6;
-    background: rgba(255,255,255,0.025);
-    backdrop-filter: blur(12px);
+  /* ── Typography Scale & Hierarchy Tokens ── */
+  .display-hero {
+    @apply text-[22px] sm:text-3xl lg:text-[40px] font-bold tracking-tight text-white;
+    font-family: var(--font-display);
+    line-height: 1.25;
+    letter-spacing: -0.025em;
   }
 
-  /* ── NexTrack primary button (indigo-purple gradient) ── */
-  .nextrack-btn-primary {
-    @apply inline-flex items-center justify-center font-semibold rounded-xl
-           transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
-           focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    color: #fff;
-    box-shadow: 0 0 20px rgba(99,102,241,0.35);
+  .display-title {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white;
+    font-family: var(--font-display);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
   }
-  .nextrack-btn-primary:hover {
-    box-shadow: 0 0 35px rgba(99,102,241,0.55);
+
+  .section-title {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white;
+    font-family: var(--font-display);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .card-title {
+    @apply text-lg sm:text-xl font-semibold tracking-tight text-white;
+    font-family: var(--font-display);
+    line-height: 1.3;
+  }
+
+  .subheading-lead {
+    @apply text-base sm:text-lg lg:text-xl text-slate-300 font-normal leading-relaxed;
+  }
+
+  .body-primary {
+    @apply text-sm sm:text-base text-slate-300 leading-relaxed font-normal;
+  }
+
+  .body-secondary {
+    @apply text-xs sm:text-sm text-slate-400 leading-normal;
+  }
+
+  .caption-metadata {
+    @apply text-xs text-slate-400/90 font-medium tracking-normal;
+  }
+
+  .eyebrow-pill {
+    @apply inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold uppercase tracking-wider
+           bg-white/[0.04] border border-white/10 text-indigo-300 backdrop-blur-md shadow-sm;
+  }
+
+  /* ── Surfaces & Card Hierarchy ── */
+  /* Primary / Elevated card (featured item, active session, primary pricing tier) */
+  .surface-elevated {
+    @apply relative rounded-2xl border transition-all duration-300;
+    background: linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.02) 100%);
+    border-color: rgba(129, 140, 248, 0.35);
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7), 0 0 35px -5px rgba(99, 102, 241, 0.15);
+    backdrop-filter: blur(16px);
+  }
+
+  /* Standard card (features, general listings) */
+  .surface-card, .card {
+    @apply relative rounded-2xl border border-white/[0.08] transition-all duration-300;
+    background: rgba(255, 255, 255, 0.022);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(14px);
+  }
+
+  /* Quiet / Muted card (tertiary info, auxiliary stats) */
+  .surface-muted {
+    @apply rounded-xl border border-white/[0.05] transition-all duration-200;
+    background: rgba(255, 255, 255, 0.012);
+  }
+
+  /* ── Action / CTA Hierarchy ── */
+  /* Primary CTA: High contrast, vibrant, unmistakable primary intention */
+  .btn-cta-primary, .nextrack-btn-primary, .btn-primary {
+    @apply inline-flex items-center justify-center font-semibold rounded-xl text-white
+           transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-[#090912]
+           cursor-pointer px-6 py-3 text-sm;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+  }
+  .btn-cta-primary:hover, .nextrack-btn-primary:hover, .btn-primary:hover {
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  }
+
+  /* Secondary CTA / Ghost Button: Calm, readable, distinct secondary action */
+  .btn-cta-secondary, .nextrack-btn-ghost, .btn-secondary {
+    @apply inline-flex items-center justify-center font-semibold rounded-xl text-slate-200
+           transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#090912]
+           cursor-pointer px-5 py-2.5 text-sm;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+  }
+  .btn-cta-secondary:hover, .nextrack-btn-ghost:hover, .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
     transform: translateY(-1px);
   }
 
-  /* ── Ghost / outline button ── */
-  .nextrack-btn-ghost {
-    @apply inline-flex items-center justify-center font-semibold rounded-xl border
-           transition-all duration-300 active:scale-95 focus:outline-none
-           focus:ring-2 focus:ring-white/20 text-slate-200;
-    background: rgba(255,255,255,0.04);
-    border-color: rgba(255,255,255,0.12);
-    backdrop-filter: blur(12px);
-  }
-  .nextrack-btn-ghost:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(255,255,255,0.22);
-  }
-
-  /* ── Legacy btn-primary (kept for other pages) ── */
-  .btn-primary {
-    @apply bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl
-           transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
-           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900;
-  }
-
-  .btn-secondary {
-    @apply font-semibold px-6 py-3 rounded-xl
-           transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-slate-500;
-    background: rgba(255,255,255,0.06);
-    color: #cbd5e1;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .btn-secondary:hover {
-    background: rgba(255,255,255,0.1);
+  /* Tertiary / Text Action: Low-weight inline helper or link */
+  .btn-cta-tertiary {
+    @apply inline-flex items-center gap-1.5 font-medium text-indigo-400 hover:text-indigo-300
+           transition-colors duration-150 focus:outline-none focus:underline;
   }
 
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-500 text-white font-semibold px-6 py-3 rounded-xl
-           transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500;
+    @apply inline-flex items-center justify-center font-semibold px-4 py-2 rounded-xl text-white
+           transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500
+           cursor-pointer;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+  }
+  .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #ffffff;
   }
 
-  /* ── Inputs ── */
+  /* ── Form Inputs & Controls ── */
   .input {
-    @apply w-full border text-slate-100 placeholder-slate-500
+    @apply w-full border text-white placeholder-slate-500
            rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60
-           focus:border-transparent transition-all duration-200;
-    background: rgba(0,0,0,0.4);
-    border-color: rgba(255,255,255,0.1);
+           focus:border-indigo-500/70 transition-all duration-200;
+    background: rgba(13, 13, 23, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
   }
   .input:focus {
-    box-shadow: 0 0 0 2px rgba(99,102,241,0.4), 0 0 20px rgba(99,102,241,0.1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 0 16px rgba(99, 102, 241, 0.08);
   }
 
   .label {
-    @apply block text-sm font-medium text-slate-300 mb-1.5;
+    @apply block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2;
   }
 
   /* ── Badges ── */
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
   .badge-green {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/25;
   }
   .badge-yellow {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 border border-amber-500/25;
   }
   .badge-red {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/15 text-rose-400 border border-rose-500/25;
   }
   .badge-blue {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-400 border border-indigo-500/25;
   }
 
-  /* ── Scrollbars ── */
-  .nice-scrollbar::-webkit-scrollbar { width: 5px; }
+  /* ── Clean Ambient Background Utility ── */
+  .bg-ambient-pattern {
+    background-size: 36px 36px;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    mask-image: radial-gradient(ellipse at 50% 10%, black 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 10%, black 40%, transparent 80%);
+  }
+
+  .nice-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
   .nice-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .nice-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 9999px;
   }
   .nice-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.18);
+    background: rgba(255, 255, 255, 0.22);
   }
 
-  /* ── Glass panel ── */
-  .glass-panel {
-    @apply border rounded-2xl shadow-2xl;
-    background: rgba(255,255,255,0.03);
-    border-color: rgba(255,255,255,0.08);
-    backdrop-filter: blur(20px);
+  /* ── Ultra-Premium Hero Typography Animations ── */
+  @keyframes textShimmer {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
 
-  /* ── Admin glass card ── */
-  .glass-card {
-    @apply border rounded-2xl;
-    background: rgba(255,255,255,0.025);
-    border-color: rgba(255,255,255,0.07);
-    backdrop-filter: blur(16px);
+  .animate-text-shimmer {
+    background-size: 250% 100%;
+    animation: textShimmer 7s ease infinite;
+  }
+
+  @keyframes wordMorphIn {
+    0% {
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(3px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0px);
+    }
+  }
+
+  @keyframes wordMorphOut {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-14px);
+      filter: blur(3px);
+    }
+  }
+
+  .word-morph-in {
+    display: inline-block;
+    animation: wordMorphIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .word-morph-out {
+    display: inline-block;
+    animation: wordMorphOut 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 }

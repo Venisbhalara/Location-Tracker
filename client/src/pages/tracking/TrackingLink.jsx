@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { getTrackingByToken } from "../../services/api";
 import locationService from "../../services/locationService";
-import geocodingService from "../../services/geocodingService";
 import toast from "react-hot-toast";
 import io from "socket.io-client";
+import AmbientBackground from "../../components/common/AmbientBackground";
 
 const SOCKET_URL =
   import.meta.env.VITE_SOCKET_URL ||
@@ -15,126 +15,26 @@ const SOCKET_URL =
 
 const REFRESH_INTERVAL_SEC = 10 * 60;
 
-/* ─── tiny keyframes injected once ─────────────────────────────────────── */
-const STYLES = `
-  @keyframes orb-float {
-    0%,100% { transform: translateY(0px) scale(1); }
-    50%      { transform: translateY(-20px) scale(1.05); }
-  }
-  @keyframes ring-pulse {
-    0%   { transform: scale(1);   opacity:0.8; }
-    100% { transform: scale(2.2); opacity:0; }
-  }
-  @keyframes fade-up {
-    from { opacity:0; transform:translateY(16px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-  .orb-float  { animation: orb-float 6s ease-in-out infinite; }
-  .ring-pulse { animation: ring-pulse 1.8s ease-out infinite; }
-  .fade-up    { animation: fade-up 0.55s ease both; }
-`;
-
-/* ─── shared wrapper ────────────────────────────────────────────────────── */
-const Page = ({ children }) => (
-  <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-[#0a0a10] font-['Inter']">
-    <style>{STYLES}</style>
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes blob {
-        0% { transform: translate(0px, 0px) scale(1); }
-        33% { transform: translate(50px, -50px) scale(1.1); }
-        66% { transform: translate(-40px, 20px) scale(0.9); }
-        100% { transform: translate(0px, 0px) scale(1); }
-      }
-      .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-      .animation-delay-2000 { animation-delay: 2s; }
-      .animation-delay-4000 { animation-delay: 4s; }
-      .bg-grid {
-        background-size: 40px 40px;
-        background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                          linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-        mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-        -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-      }
-    `}} />
-
-    {/* Animated Premium LED Grid & Orbs Background */}
-    <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
-      <div className="absolute inset-0 bg-grid opacity-70"></div>
-      <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
-      <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
-      <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
-    </div>
-
-    <div className="relative z-10 w-full max-w-sm">{children}</div>
-  </div>
-);
-
-/* ─── glass card ────────────────────────────────────────────────────────── */
-const GlassCard = ({ children, style }) => (
-  <div
-    className="fade-up rounded-3xl p-8"
-    style={{
-      background: "rgba(255,255,255,0.03)",
-      border: "1px solid rgba(255,255,255,0.08)",
-      backdropFilter: "blur(20px)",
-      WebkitBackdropFilter: "blur(20px)",
-      boxShadow: "0 25px 60px rgba(0,0,0,0.4)",
-      ...style,
-    }}
-  >
-    {children}
-  </div>
-);
-
-/* ─── pulsing icon wrapper ─────────────────────────────────────────────── */
-const IconRing = ({ color, children }) => (
-  <div className="relative flex items-center justify-center w-24 h-24 mx-auto mb-6">
-    <span
-      className="ring-pulse absolute inset-0 rounded-full"
-      style={{ background: `${color}22` }}
-    />
-    <span
-      className="ring-pulse absolute inset-0 rounded-full"
-      style={{ background: `${color}11`, animationDelay: "0.6s" }}
-    />
-    <div
-      className="relative w-24 h-24 rounded-full flex items-center justify-center text-5xl"
-      style={{
-        background: `linear-gradient(135deg, ${color}20, ${color}08)`,
-        border: `1px solid ${color}40`,
-        boxShadow: `0 0 30px ${color}30`,
-      }}
-    >
-      {children}
-    </div>
-  </div>
-);
-
-/* ══════════════════════════════════════════════════════════════════════════
-   Main Component
-══════════════════════════════════════════════════════════════════════════ */
 const TrackingLink = () => {
   const { token } = useParams();
   const [tracking, setTracking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [consent, setConsent] = useState("idle");
   const [position, setPosition] = useState(null);
-  const [address, setAddress] = useState(null);
-  const [addrLoading, setAddrLoading] = useState(false);
   const [error, setError] = useState(null);
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL_SEC);
   const started = useRef(false);
   const countdownRef = useRef(null);
   const handleAllowRef = useRef(null);
 
-  /* ── load tracking ── */
+  /* ── Load tracking data ── */
   useEffect(() => {
     const load = async () => {
       try {
         const res = await getTrackingByToken(token);
         setTracking(res.data.tracking);
       } catch {
-        setError("Invalid or expired tracking link.");
+        setError("This tracking link is invalid or has expired.");
       } finally {
         setLoading(false);
       }
@@ -142,7 +42,7 @@ const TrackingLink = () => {
     load();
   }, [token]);
 
-  /* ── cleanup ── */
+  /* ── Cleanup on unmount ── */
   useEffect(() => {
     return () => {
       if (started.current) locationService.stop();
@@ -150,20 +50,7 @@ const TrackingLink = () => {
     };
   }, []);
 
-  /* ── reverse geocode ── */
-  const fetchAddress = useCallback(async (lat, lon) => {
-    setAddrLoading(true);
-    try {
-      const addr = await geocodingService.reverseGeocode(lat, lon);
-      setAddress(addr);
-    } catch {
-      setAddress(null);
-    } finally {
-      setAddrLoading(false);
-    }
-  }, []);
-
-  /* ── emit denial ── */
+  /* ── Emit denial ── */
   const emitDenial = useCallback(() => {
     const socket = io(SOCKET_URL, { transports: ["websocket", "polling"] });
     socket.on("connect", () => {
@@ -172,7 +59,7 @@ const TrackingLink = () => {
     });
   }, [token]);
 
-  /* ── countdown ── */
+  /* ── Countdown timer ── */
   const startCountdown = useCallback(() => {
     setCountdown(REFRESH_INTERVAL_SEC);
     if (countdownRef.current) clearInterval(countdownRef.current);
@@ -184,7 +71,7 @@ const TrackingLink = () => {
     }, 1000);
   }, []);
 
-  /* ── allow ── */
+  /* ── Allow location ── */
   const handleAllow = async () => {
     if (
       "Notification" in window &&
@@ -209,8 +96,6 @@ const TrackingLink = () => {
       onPosition: (pos) => {
         setPosition(pos);
         setConsent("tracking");
-        // No longer need to fetch address for local display as we show a thank you message
-        // fetchAddress(pos.latitude, pos.longitude);
         startCountdown();
       },
       onError: (msg) => {
@@ -225,14 +110,14 @@ const TrackingLink = () => {
       onStopped: () => {
         setConsent("stopped");
         if (countdownRef.current) clearInterval(countdownRef.current);
-        toast("📴 The requester ended this tracking session.", { icon: "🛑" });
+        toast("The requester ended this tracking session.", { icon: "🛑" });
       },
     });
 
     startCountdown();
   };
 
-  /* ── auto-resume ── */
+  /* ── Auto-resume handler ── */
   useEffect(() => {
     handleAllowRef.current = handleAllow;
   });
@@ -264,7 +149,6 @@ const TrackingLink = () => {
       }
     };
     attemptAutoResume();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tracking, consent]);
 
   const handleDeny = () => {
@@ -272,248 +156,236 @@ const TrackingLink = () => {
     emitDenial();
   };
 
-  const formatCountdown = (secs) => {
-    const m = Math.floor(secs / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (secs % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
+  const handleStopSharing = () => {
+    locationService.stop();
+    setConsent("stopped");
+    if (countdownRef.current) clearInterval(countdownRef.current);
   };
 
-  /* ══ LOADING ══════════════════════════════════════════════════════════ */
+  /* ══ 1. LOADING STATE ══════════════════════════════════════════════ */
   if (loading)
     return (
-      <Page>
+      <div className="relative min-h-screen flex items-center justify-center p-4">
         <Helmet>
-          <title>Loading… | NexTrack</title>
+          <title>Loading Tracking Link | NexTrack</title>
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
-        <GlassCard>
-          <div className="text-center">
-            <div
-              className="w-14 h-14 rounded-full border-2 border-t-transparent mx-auto mb-6 animate-spin"
-              style={{ borderColor: "rgba(99,102,241,0.3)", borderTopColor: "#6366f1" }}
-            />
-            <p className="text-slate-400 text-sm font-medium tracking-wider uppercase">
-              Initializing…
-            </p>
-          </div>
-        </GlassCard>
-      </Page>
+        <AmbientBackground />
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center">
+          <div className="w-10 h-10 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Verifying Link Security...
+          </p>
+        </div>
+      </div>
     );
 
-  /* ══ LINK INVALID ═════════════════════════════════════════════════════ */
+  /* ══ 2. INVALID / EXPIRED LINK ═════════════════════════════════════ */
   if (error && !tracking)
     return (
-      <Page>
-        <GlassCard style={{ borderColor: "rgba(239,68,68,0.2)" }}>
-          <IconRing color="#ef4444">🔗</IconRing>
-          <h1 className="text-2xl font-black text-white text-center mb-3 tracking-tight">
-            Link Expired
-          </h1>
-          <p className="text-slate-400 text-center text-sm leading-relaxed">
-            {error}
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <Helmet>
+          <title>Link Expired | NexTrack</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <AmbientBackground />
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-rose-500/30">
+          <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center text-2xl mx-auto mb-4">
+            ⚠️
+          </div>
+          <h1 className="text-xl font-bold text-white mb-2">Tracking Link Expired</h1>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            {error || "This tracking session is no longer active. Please request a new link from the sender."}
           </p>
-        </GlassCard>
-      </Page>
+        </div>
+      </div>
     );
 
-  /* ══ IDLE — consent screen ════════════════════════════════════════════ */
+  /* ══ 3. IDLE (CONSENT SCREEN - HIGHEST VISUAL PRIORITY) ════════════ */
   if (consent === "idle")
     return (
-      <Page>
-        <GlassCard>
-          {/* Header */}
-          <IconRing color="#6366f1">
-            <img src="/location.png" alt="NexTrack Logo" className="w-12 h-12 object-contain" />
-          </IconRing>
-          <h1 className="text-2xl font-black text-white text-center mb-2 tracking-tight">
+      <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6">
+        <Helmet>
+          <title>Location Permission Request | NexTrack</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <AmbientBackground />
+
+        <div className="relative z-10 surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-white/10 shadow-2xl text-center">
+          
+          {/* Identity Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center mx-auto mb-5 shadow-inner">
+            <img src="/location.png" alt="NexTrack" className="w-8 h-8 object-contain" />
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
             Location Request
           </h1>
-          <p className="text-slate-400 text-center text-sm mb-8 leading-relaxed">
-            Give location permission to share your position with the requester.
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+            A contact has requested to view your live GPS position on a secure private map.
           </p>
 
-          {/* Terms box */}
-          <div
-            className="rounded-2xl p-4 mb-7 text-sm"
-            style={{
-              background: "rgba(99,102,241,0.06)",
-              border: "1px solid rgba(99,102,241,0.2)",
-            }}
-          >
-            <p className="font-semibold text-indigo-300 mb-3 flex items-center gap-2">
-              <span>ℹ️</span> Terms &amp; Conditions
-            </p>
-            <ul className="space-y-1.5 text-slate-400 text-xs">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                Consent &amp; Privacy — you control when sharing starts/stops
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                User Responsibility — only share with trusted requesters
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                Data Security &amp; Limitations — GPS accuracy may vary
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                Accuracy &amp; Reliability — best outdoors with clear sky
-              </li>
+          {/* Reassurance & Terms Summary */}
+          <div className="surface-card p-4 rounded-2xl border-indigo-500/20 text-left mb-6 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-semibold text-indigo-300">
+              <span>🔒</span>
+              <span>100% Consent-Based &amp; Encrypted</span>
+            </div>
+            <ul className="text-xs text-slate-400 space-y-1.5 pl-5 list-disc leading-relaxed">
+              <li>Requires your explicit browser permission.</li>
+              <li>Coordinates are streamed live and never stored permanently.</li>
+              <li>You can end sharing at any time simply by closing this tab.</li>
             </ul>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-col gap-3">
+          {/* ACTION HIERARCHY: ALLOW (PRIMARY) vs DENY (SECONDARY) */}
+          <div className="space-y-3">
             <button
               onClick={handleAllow}
-              className="w-full py-4 rounded-2xl font-bold text-base text-white transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
-              style={{
-                background: "linear-gradient(135deg, #6366f1, #a855f7)",
-                boxShadow: "0 0 25px rgba(99,102,241,0.4)",
-              }}
+              className="btn-cta-primary w-full py-4 text-base font-bold shadow-lg"
             >
-              ✅ Allow
+              ✓ Allow Location Sharing
             </button>
             <button
               onClick={handleDeny}
-              className="w-full py-3 rounded-2xl font-semibold text-sm text-slate-400 transition-all duration-200 hover:text-white hover:bg-white/5 active:scale-95"
-              style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+              className="btn-cta-secondary w-full py-3 text-xs font-semibold text-slate-400"
             >
-              ❌ Deny
+              Decline / Cancel
             </button>
           </div>
-        </GlassCard>
-      </Page>
+
+          <div className="mt-6 pt-4 border-t border-white/[0.06]">
+            <p className="text-[11px] text-slate-500">
+              NexTrack cannot access your location without your device approval.
+            </p>
+          </div>
+        </div>
+      </div>
     );
 
-  /* ══ TRACKING ACTIVE ══════════════════════════════════════════════════ */
+  /* ══ 4. TRACKING ACTIVE ════════════════════════════════════════════ */
   if (consent === "tracking")
     return (
-      <Page>
-        <GlassCard style={{ borderColor: "rgba(34,211,238,0.15)" }}>
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <Helmet>
+          <title>Sharing Location Live | NexTrack</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <AmbientBackground />
+
+        <div className="surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-emerald-500/40 shadow-2xl text-center">
           {!position ? (
-            /* GPS acquiring — Minimalist Premium Loading */
-            <div className="text-center py-10">
-              <div className="relative flex items-center justify-center w-32 h-32 mx-auto">
-                {/* Background glow */}
-                <div className="absolute inset-0 rounded-full bg-indigo-500/20 blur-2xl animate-pulse" />
-
-                {/* Outer rotating ring */}
-                <div
-                  className="absolute inset-0 rounded-full border-[3px] border-indigo-500/10 border-t-indigo-500 animate-spin"
-                  style={{ animationDuration: "1.5s" }}
-                />
-
-                {/* Inner counter-rotating ring */}
-                <div
-                  className="absolute inset-4 rounded-full border-2 border-cyan-500/10 border-b-cyan-400 animate-spin"
-                  style={{
-                    animationDuration: "2.5s",
-                    animationDirection: "reverse",
-                  }}
-                />
-
-                {/* Center pulse dot */}
-                <div className="relative w-4 h-4 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.8)] animate-pulse" />
+            /* GPS ACQUIRING */
+            <div className="py-6">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <span className="text-2xl">📡</span>
               </div>
+              <h2 className="text-xl font-bold text-white mb-2">Acquiring GPS Signal...</h2>
+              <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                Connecting to satellites and initializing WebSocket telemetry. Please keep this tab open.
+              </p>
             </div>
           ) : (
-            /* Location confirmed — Simplified Thank You UI */
-            <div className="text-center py-4 animate-fade-in">
-              <div className="relative flex items-center justify-center w-24 h-24 mx-auto mb-8">
-                <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl animate-pulse" />
-                <div
-                  className="absolute -inset-4 rounded-full border border-emerald-500/10 animate-ping"
-                  style={{ animationDuration: "3s" }}
-                />
+            /* ACTIVE STREAMING */
+            <div className="py-4">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+                ✓
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-1">
+                Location Sharing Active
+              </h2>
+              <p className="text-xs text-slate-400 mb-6">
+                Your coordinates are streaming in real-time to the requester.
+              </p>
 
-                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-4xl shadow-[0_0_40px_rgba(16,185,129,0.45)] border border-emerald-300/30">
-                  <svg
-                    className="w-12 h-12 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={3.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+              <div className="surface-card p-4 rounded-2xl border-white/10 mb-6 text-xs text-slate-300 space-y-2 text-left">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Status</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Transmitting Live
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">GPS Precision</span>
+                  <span className="text-white font-medium">±{Math.round(position.accuracy || 10)}m</span>
                 </div>
               </div>
 
-              <h1 className="text-3xl font-black text-white mb-3 tracking-tight">
-                Thank You!
-              </h1>
+              <button
+                onClick={handleStopSharing}
+                className="btn-danger w-full py-3 text-xs font-semibold"
+              >
+                Stop Location Sharing
+              </button>
             </div>
           )}
-        </GlassCard>
-      </Page>
+        </div>
+      </div>
     );
 
-  /* ══ STOPPED ══════════════════════════════════════════════════════════ */
+  /* ══ 5. SESSION STOPPED ═════════════════════════════════════════════ */
   if (consent === "stopped")
     return (
-      <Page>
-        <GlassCard style={{ borderColor: "rgba(239,68,68,0.15)" }}>
-          <IconRing color="#ef4444">🛑</IconRing>
-          <h1 className="text-2xl font-black text-white text-center mb-3 tracking-tight">
-            Session Ended
-          </h1>
-          <p className="text-slate-400 text-center text-sm leading-relaxed">
-            The requester has ended this tracking session. Your location is no
-            longer being shared.
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <AmbientBackground />
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-white/10">
+          <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/10 text-slate-400 flex items-center justify-center text-2xl mx-auto mb-4">
+            🛑
+          </div>
+          <h1 className="text-xl font-bold text-white mb-2">Sharing Stopped</h1>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Location telemetry has been terminated. You can safely close this browser window.
           </p>
-        </GlassCard>
-      </Page>
+        </div>
+      </div>
     );
 
-  /* ══ DENIED ═══════════════════════════════════════════════════════════ */
+  /* ══ 6. DENIED ══════════════════════════════════════════════════════ */
   if (consent === "denied")
     return (
-      <Page>
-        <GlassCard style={{ borderColor: "rgba(245,158,11,0.15)" }}>
-          <IconRing color="#f59e0b">🚫</IconRing>
-          <h1 className="text-2xl font-black text-white text-center mb-3 tracking-tight">
-            Access Denied
-          </h1>
-          <p className="text-slate-400 text-center text-sm leading-relaxed">
-            You chose not to share your location. The requester will not receive
-            any location data.
-          </p>
-        </GlassCard>
-      </Page>
-    );
-
-  /* ══ ERROR ════════════════════════════════════════════════════════════ */
-  if (consent === "error")
-    return (
-      <Page>
-        <GlassCard style={{ borderColor: "rgba(239,68,68,0.15)" }}>
-          <IconRing color="#ef4444">⚠️</IconRing>
-          <h1 className="text-2xl font-black text-white text-center mb-3 tracking-tight">
-            Location Error
-          </h1>
-          <p className="text-slate-400 text-center text-sm mb-6 leading-relaxed">
-            {error}
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <AmbientBackground />
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-amber-500/30">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mx-auto mb-4">
+            🚫
+          </div>
+          <h1 className="text-xl font-bold text-white mb-2">Permission Declined</h1>
+          <p className="text-xs text-slate-400 leading-relaxed mb-6">
+            You chose not to share your location. No coordinates were transmitted to the requester.
           </p>
           <button
             onClick={handleAllow}
-            className="w-full py-4 rounded-2xl font-bold text-white transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #a855f7)",
-              boxShadow: "0 0 25px rgba(99,102,241,0.35)",
-            }}
+            className="btn-cta-secondary w-full py-2.5 text-xs font-medium"
           >
-            🔄 Try Again
+            Change Mind &amp; Allow
           </button>
-        </GlassCard>
-      </Page>
+        </div>
+      </div>
+    );
+
+  /* ══ 7. ERROR ═══════════════════════════════════════════════════════ */
+  if (consent === "error")
+    return (
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <AmbientBackground />
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-rose-500/30">
+          <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center text-2xl mx-auto mb-4">
+            ⚠️
+          </div>
+          <h1 className="text-xl font-bold text-white mb-2">Location Sensor Error</h1>
+          <p className="text-xs text-slate-400 leading-relaxed mb-6">
+            {error || "Unable to acquire GPS coordinates from your device."}
+          </p>
+          <button
+            onClick={handleAllow}
+            className="btn-cta-primary w-full py-3 text-xs font-semibold"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
     );
 
   return null;

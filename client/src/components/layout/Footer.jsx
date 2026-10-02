@@ -23,83 +23,46 @@ const Footer = () => {
 
   return (
     <footer
-      className="relative overflow-hidden"
+      className="relative border-t border-white/[0.08]"
       style={{
-        background: "rgba(8,8,16,0.95)",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
+        background: "rgba(7, 7, 14, 0.95)",
       }}
+      aria-label="Footer"
     >
-      {/* Top glow */}
-      <div
-        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(168,85,247,0.5), transparent)",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[500px] h-48 rounded-full opacity-20"
-        style={{
-          background:
-            "radial-gradient(ellipse, rgba(99,102,241,0.25) 0%, transparent 70%)",
-        }}
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Brand column */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12">
+          
+          {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-5">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-black"
-                style={{
-                  background: "linear-gradient(135deg, #6366f1, #a855f7)",
-                  boxShadow: "0 0 16px rgba(99,102,241,0.4)",
-                }}
-              >
-                LT
+            <Link to="/" className="flex items-center gap-2.5 mb-4 group">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
+                <img src="/location.png" alt="NexTrack" className="w-5 h-5 object-contain" />
               </div>
               <span className="font-bold text-lg text-white tracking-tight">
-                Nex<span style={{ color: "#a3a6ff" }}>Track</span>
+                Nex<span className="text-indigo-400">Track</span>
               </span>
             </Link>
-            <p className="text-slate-500 text-sm leading-relaxed mb-5 max-w-xs">
-              Real-time, consent-based location sharing for families, friends,
-              and teams. No app download required.
+            
+            <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
+              Real-time, consent-based GPS location sharing for families, friends,
+              and teams. Instant activation in any browser with zero app downloads.
             </p>
-            <div
-              className="inline-flex items-center gap-2 text-xs text-emerald-400 rounded-full px-3 py-1.5"
-              style={{
-                background: "rgba(16,185,129,0.08)",
-                border: "1px solid rgba(16,185,129,0.2)",
-              }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Location access requires your consent
-            </div>
           </div>
 
-          {/* Link columns */}
+          {/* Navigation Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4
-                className="text-white text-xs font-bold mb-5 uppercase tracking-widest"
-                style={{ color: "rgba(255,255,255,0.5)" }}
-              >
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 mb-4">
                 {title}
-              </h4>
-              <ul className="space-y-3">
-                {links.map((l) => (
-                  <li key={l.label}>
+              </h3>
+              <ul className="space-y-2.5">
+                {links.map((link) => (
+                  <li key={link.label}>
                     <Link
-                      to={l.to}
-                      className="text-slate-500 hover:text-indigo-400 text-sm transition-colors duration-200 flex items-center gap-1.5 group"
+                      to={link.to}
+                      className="text-sm text-slate-400 hover:text-white transition-colors duration-150 inline-block py-0.5"
                     >
-                      <span
-                        className="w-0 group-hover:w-2 h-px rounded-full transition-all duration-300"
-                        style={{ background: "#a3a6ff" }}
-                      />
-                      {l.label}
+                      {link.label}
                     </Link>
                   </li>
                 ))}
@@ -108,29 +71,16 @@ const Footer = () => {
           ))}
         </div>
 
-        {/* Bottom bar */}
-        <div
-          className="mt-14 pt-7 flex flex-col sm:flex-row items-center justify-between gap-4"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-        >
-          <p className="text-slate-600 text-xs">
+        {/* Bottom Metadata Bar */}
+        <div className="mt-12 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <p>
             © {year}{" "}
-            <a href="https://locationtracker.app" className="hover:text-slate-400 transition-colors">NexTrack</a>
-            . All rights reserved. Built with privacy in mind.
+            <span className="text-slate-400 font-medium">NexTrack</span>. All rights reserved. Built with privacy in mind.
           </p>
-          <div className="flex items-center gap-5">
-            {[
-              { label: "Privacy Policy", to: "/privacy-policy" },
-              { label: "Terms", to: "/terms" },
-            ].map((l) => (
-              <Link
-                key={l.label}
-                to={l.to}
-                className="text-slate-600 hover:text-slate-400 text-xs transition-colors"
-              >
-                {l.label}
-              </Link>
-            ))}
+          <div className="flex items-center gap-6">
+            <Link to="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+            <Link to="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
+            <Link to="/contact" className="hover:text-slate-300 transition-colors">Support</Link>
           </div>
         </div>
       </div>

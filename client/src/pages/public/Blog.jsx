@@ -1,222 +1,182 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import AmbientBackground from "../../components/common/AmbientBackground";
 
 export const blogArticles = [
   {
     slug: "how-gps-location-tracking-works",
-    title: "How GPS Location Tracking Works: A Complete Guide",
+    title: "How GPS Location Tracking Works: A Complete Technical Guide",
     excerpt:
-      "Ever wondered how your smartphone knows exactly where you are within a few metres? This in-depth guide breaks down the science behind GPS, cell-tower triangulation, and Wi-Fi positioning — and explains how NexTrack uses all three to deliver near-instant location updates.",
+      "Ever wondered how your smartphone calculates its exact coordinates within metres? This comprehensive guide breaks down satellite trilateration, cell-tower triangulation, Wi-Fi positioning, and how NexTrack's WebSocket stream delivers updates in real time.",
     category: "Technology",
-    author: "NexTrack Team",
+    author: "NexTrack Engineering",
     date: "June 10, 2026",
     readTime: "7 min read",
     icon: "📡",
-    color: "indigo",
   },
   {
     slug: "top-5-use-cases-for-location-trackers",
     title: "Top 5 Real-World Use Cases for Live Location Trackers",
     excerpt:
-      "From keeping children safe on their school commute to monitoring field delivery teams without expensive fleet software — real-time location trackers solve problems that no amount of phone calls can. Discover the five most impactful scenarios where NexTrack makes a real difference.",
-    category: "Use Cases",
-    author: "NexTrack Team",
+      "From keeping children safe during the school commute to lightweight field fleet management without bulky software — discover how real-time location sharing solves daily coordination challenges.",
+    category: "Guides",
+    author: "Product Team",
     date: "June 5, 2026",
     readTime: "6 min read",
     icon: "🗺️",
-    color: "purple",
   },
   {
     slug: "how-to-share-your-location-safely",
-    title: "How to Share Your Real-Time Location Safely: Privacy Tips & Best Practices",
+    title: "How to Share Your Real-Time Location Safely: Privacy Best Practices",
     excerpt:
-      "Sharing your live location with someone is incredibly useful — but only when done on your own terms. This guide covers everything you need to know about consent-based location sharing, what data is actually transmitted, how to revoke access instantly, and the red flags to watch for in other tracking apps.",
-    category: "Privacy & Safety",
-    author: "NexTrack Team",
+      "Sharing your live coordinates is invaluable, but only on your own terms. Learn about hardware browser permissions, how to revoke access instantly, and why consent-based design is critical.",
+    category: "Privacy & Security",
+    author: "Security Team",
     date: "May 28, 2026",
     readTime: "8 min read",
     icon: "🔒",
-    color: "cyan",
   },
 ];
-
-const colorMap = {
-  indigo: {
-    badge: "bg-indigo-500/10 border-indigo-500/30 text-indigo-400",
-    hover: "hover:border-indigo-500/40",
-    glow: "hover:shadow-[0_0_40px_rgba(99,102,241,0.12)]",
-    iconBg: "bg-indigo-500/10 border-indigo-500/20",
-  },
-  purple: {
-    badge: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-    hover: "hover:border-purple-500/40",
-    glow: "hover:shadow-[0_0_40px_rgba(168,85,247,0.12)]",
-    iconBg: "bg-purple-500/10 border-purple-500/20",
-  },
-  cyan: {
-    badge: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400",
-    hover: "hover:border-cyan-500/40",
-    glow: "hover:shadow-[0_0_40px_rgba(34,211,238,0.12)]",
-    iconBg: "bg-cyan-500/10 border-cyan-500/20",
-  },
-};
 
 const schemaBlog = {
   "@context": "https://schema.org",
   "@type": "Blog",
   name: "NexTrack Blog",
-  url: "https://location-trackers.vercel.app/blog",
+  url: "https://locationtracker.app/blog",
   description:
     "Expert articles on GPS tracking technology, privacy best practices, and real-world use cases for live location sharing.",
   publisher: {
     "@type": "Organization",
     name: "NexTrack",
-    url: "https://location-trackers.vercel.app",
+    url: "https://locationtracker.app",
   },
 };
 
 const Blog = () => {
+  const [featured, ...otherArticles] = blogArticles;
+
   return (
     <>
       <Helmet>
-        <title>Blog | NexTrack — GPS Tracking Guides & Privacy Tips</title>
+        <title>Blog | NexTrack — GPS Tracking Guides &amp; Privacy Telemetry</title>
         <meta
           name="description"
           content="Read expert guides on GPS location tracking technology, privacy best practices, and real-world use cases. Learn how live location sharing works and how to use it safely."
         />
-        <link rel="canonical" href="https://location-trackers.vercel.app/blog" />
-        <meta property="og:title" content="NexTrack Blog — GPS Tracking Guides & Privacy Tips" />
+        <link rel="canonical" href="https://locationtracker.app/blog" />
+        <meta property="og:title" content="NexTrack Blog — GPS Tracking Guides &amp; Privacy Telemetry" />
         <meta
           property="og:description"
           content="Expert articles on GPS technology, consent-based location sharing, and privacy best practices."
         />
-        <meta property="og:url" content="https://location-trackers.vercel.app/blog" />
+        <meta property="og:url" content="https://locationtracker.app/blog" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(schemaBlog)}</script>
       </Helmet>
 
-      <div className="min-h-screen py-16 px-4 bg-[#0a0a10] relative overflow-hidden">
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-40px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
-          }
-          .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-          .animation-delay-2000 { animation-delay: 2s; }
-          .animation-delay-4000 { animation-delay: 4s; }
-          .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-          }
-        `}} />
+      <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <AmbientBackground />
 
-        {/* Background orbs */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
-          <div className="absolute inset-0 bg-grid opacity-70" />
-          <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
-          <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
-          <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
-        </div>
+        {/* Breadcrumb */}
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex items-center gap-2 text-xs text-slate-400">
+            <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+            <li className="text-slate-600">/</li>
+            <li className="text-indigo-300 font-medium">Blog</li>
+          </ol>
+        </nav>
 
-        <div className="relative z-10 max-w-5xl mx-auto">
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="mb-10">
-            <ol className="flex items-center gap-2 text-xs text-slate-500">
-              <li><Link to="/" className="hover:text-indigo-400 transition-colors">Home</Link></li>
-              <li className="text-slate-700">/</li>
-              <li className="text-slate-400">Blog</li>
-            </ol>
-          </nav>
-
-          {/* Header */}
-          <div className="mb-14 text-center">
-            <span className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-4 py-1.5 text-xs text-indigo-400 uppercase tracking-widest mb-5">
-              Knowledge Base
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <span className="eyebrow-pill mb-4">Engineering &amp; Insights</span>
+          <h1 className="display-title mb-4">
+            The NexTrack{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-indigo-300">
+              Journal
             </span>
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-5 leading-tight">
-              NexTrack Blog —{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400">
-                GPS Guides & Privacy Tips
-              </span>
-            </h1>
-            <p className="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-              Welcome to the NexTrack knowledge base. Here you will find in-depth, practical articles
-              on how GPS and real-time location tracking actually works, the most impactful ways people
-              use live location sharing in everyday life, and how to protect your privacy while doing so.
-              Whether you are new to location tracking or looking to understand the technology under the
-              hood, our guides are written in plain language so anyone can follow along. We cover topics
-              from the satellite science behind GPS accuracy to step-by-step privacy checklists for safe
-              location sharing. Every article is researched, accurate, and regularly updated.
-            </p>
-          </div>
-
-          {/* Articles grid */}
-          <div className="grid grid-cols-1 gap-7 mb-16">
-            {blogArticles.map((article) => {
-              const c = colorMap[article.color];
-              return (
-                <Link
-                  key={article.slug}
-                  to={`/blog/${article.slug}`}
-                  className={`group relative block rounded-3xl border border-white/[0.07] p-7 sm:p-9 transition-all duration-500 hover:-translate-y-1 ${c.hover} ${c.glow}`}
-                  style={{ background: "rgba(255,255,255,0.02)" }}
-                >
-                  <div className="flex flex-col sm:flex-row gap-6 items-start">
-                    {/* Icon */}
-                    <div className={`w-16 h-16 flex-shrink-0 flex items-center justify-center rounded-2xl border text-3xl ${c.iconBg} transition-transform duration-300 group-hover:scale-110`}>
-                      {article.icon}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      {/* Category badge */}
-                      <span className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-0.5 text-xs font-semibold uppercase tracking-wider mb-3 ${c.badge}`}>
-                        {article.category}
-                      </span>
-
-                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug group-hover:text-indigo-200 transition-colors duration-300">
-                        {article.title}
-                      </h2>
-
-                      <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-5">
-                        {article.excerpt}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                        <span>✍️ {article.author}</span>
-                        <span>📅 {article.date}</span>
-                        <span>⏱ {article.readTime}</span>
-                        <span className="ml-auto text-indigo-400 font-semibold group-hover:translate-x-1 transition-transform duration-300 inline-flex items-center gap-1">
-                          Read article →
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Bottom CTA */}
-          <div className="text-center bg-slate-900/60 border border-slate-800 rounded-3xl p-8">
-            <h2 className="text-xl font-bold text-white mb-3">Want to try NexTrack?</h2>
-            <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">
-              Create a secure, consent-based location tracking link in seconds — no app download required for recipients.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/register" className="nextrack-btn-primary text-sm px-8 py-3">
-                Get Started Free
-              </Link>
-              <Link to="/about" className="nextrack-btn-ghost text-sm px-8 py-3">
-                Learn More
-              </Link>
-            </div>
-          </div>
+          </h1>
+          <p className="subheading-lead text-slate-300">
+            In-depth guides on geolocation telemetry, privacy architecture, and practical real-time tracking techniques.
+          </p>
         </div>
+
+        {/* ── FEATURED ARTICLE (DOMINANT VISUAL HIERARCHY) ── */}
+        {featured && (
+          <div className="mb-14">
+            <Link
+              to={`/blog/${featured.slug}`}
+              className="group block surface-elevated p-8 sm:p-10 rounded-3xl border-indigo-500/40 hover:border-indigo-400/60 transition-all duration-300"
+            >
+              <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                      Featured Guide
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      {featured.readTime}
+                    </span>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 group-hover:text-indigo-300 transition-colors leading-tight">
+                    {featured.title}
+                  </h2>
+
+                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-6">
+                    {featured.excerpt}
+                  </p>
+
+                  <div className="flex items-center gap-4 text-xs text-slate-400">
+                    <span className="font-medium text-slate-300">By {featured.author}</span>
+                    <span>•</span>
+                    <span>{featured.date}</span>
+                    <span className="ml-auto font-semibold text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                      Read Article →
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
+
+        {/* ── SECONDARY ARTICLES GRID ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {otherArticles.map((article) => (
+            <Link
+              key={article.slug}
+              to={`/blog/${article.slug}`}
+              className="group surface-card p-7 rounded-2xl hover:border-indigo-500/30 transition-all duration-200 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-white/[0.05] border border-white/10 text-slate-300">
+                    {article.category}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {article.readTime}
+                  </span>
+                </div>
+
+                <h3 className="card-title font-bold text-white mb-3 group-hover:text-indigo-300 transition-colors">
+                  {article.title}
+                </h3>
+
+                <p className="body-secondary text-slate-400 leading-relaxed mb-6">
+                  {article.excerpt}
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
+                <span>{article.date}</span>
+                <span className="font-semibold text-indigo-400 group-hover:translate-x-1 transition-transform">
+                  Read →
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
       </div>
     </>
   );

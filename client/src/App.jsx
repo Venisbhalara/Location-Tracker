@@ -2,13 +2,13 @@ import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useLenis } from './hooks/useLenis'
 
-// ── Lazy-loaded pages (each becomes its own JS chunk) ────────────────────────
+import Dashboard from './pages/user/Dashboard'
+import CreateTracking from './pages/tracking/CreateTracking'
+
+// ── Lazy-loaded secondary pages ──────────────────────────────────────────────
 const Home           = lazy(() => import('./pages/public/Home'))
 const Login          = lazy(() => import('./pages/auth/Login'))
 const Register       = lazy(() => import('./pages/auth/Register'))
-const Dashboard      = lazy(() => import('./pages/user/Dashboard'))
-
-const CreateTracking = lazy(() => import('./pages/tracking/CreateTracking'))
 const TrackingLink   = lazy(() => import('./pages/tracking/TrackingLink'))
 const LiveMap        = lazy(() => import('./pages/tracking/LiveMap'))
 const GhostLocation  = lazy(() => import('./pages/tracking/GhostLocation'))
@@ -93,7 +93,7 @@ function App() {
     <MainLayout hideFooter={isAuthRoute}>
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
-        <Routes>
+        <Routes location={location}>
           {/* Public */}
           <Route path="/"         element={<Home />} />
           <Route path="/login"    element={<Login />} />

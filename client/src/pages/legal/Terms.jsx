@@ -1,50 +1,27 @@
 import { Helmet } from "react-helmet-async";
+import AmbientBackground from "../../components/common/AmbientBackground";
 
 const Section = ({ title, children }) => (
   <div className="mb-10">
     <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-      <span className="w-1 h-6 rounded-full bg-gradient-to-b from-purple-400 to-indigo-500 inline-block" />
+      <span className="w-1 h-6 rounded-full bg-indigo-500 inline-block" />
       {title}
     </h2>
-    <div className="text-slate-400 text-sm leading-relaxed space-y-3">{children}</div>
+    <div className="text-slate-300 text-sm leading-relaxed space-y-3">{children}</div>
   </div>
 );
 
 const Terms = () => {
   return (
-    <div className="min-h-screen py-16 px-4 bg-[#0a0a10] relative overflow-hidden">
+    <div className="relative min-h-screen py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       <Helmet>
         <title>Terms &amp; Conditions | NexTrack GPS Location Sharing</title>
         <meta name="description" content="NexTrack Terms and Conditions — understand your rights and obligations when using our real-time GPS location sharing platform." />
         <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://locationtracker.app/terms" />
       </Helmet>
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(50px, -50px) scale(1.1); }
-          66% { transform: translate(-40px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-        .bg-grid {
-          background-size: 40px 40px;
-          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-          mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-          -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-        }
-      `}} />
-      
-      {/* Animated Premium LED Grid & Orbs Background */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
-        <div className="absolute inset-0 bg-grid opacity-70"></div>
-        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
-        <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
-      </div>
+
+      <AmbientBackground />
 
       <div className="relative z-10 max-w-3xl mx-auto">
         <div className="mb-12 text-center">

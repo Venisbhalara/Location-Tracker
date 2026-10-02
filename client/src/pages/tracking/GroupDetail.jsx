@@ -5,6 +5,7 @@ import {
   addGroupMember,
   removeGroupMember,
 } from "../../services/api";
+import AmbientBackground from "../../components/common/AmbientBackground";
 import toast from "react-hot-toast";
 
 const MEMBER_COLORS = ["#22c55e","#38bdf8","#f59e0b","#fb7185","#a78bfa"];
@@ -100,67 +101,61 @@ const GroupDetail = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden" style={{ background: "#0d0d17" }}>
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)" }} />
-      </div>
+    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden py-10 px-4 sm:px-6 lg:px-8">
+      <AmbientBackground />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="relative z-10 max-w-4xl mx-auto">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
-          <Link to="/dashboard" className="hover:text-slate-300 transition-colors">Dashboard</Link>
-          <span>/</span>
-          <Link to="/groups" className="hover:text-slate-300 transition-colors">Groups</Link>
-          <span>/</span>
-          <span className="text-slate-300 font-medium truncate">{group.name}</span>
+        <div className="flex items-center gap-2 text-sm text-slate-400 mb-8">
+          <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+          <span className="text-slate-600">/</span>
+          <Link to="/groups" className="hover:text-white transition-colors">Groups</Link>
+          <span className="text-slate-600">/</span>
+          <span className="text-white font-medium truncate">{group.name}</span>
         </div>
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5 mb-8">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold text-white">{group.name}</h1>
-              <span className={`inline-flex items-center gap-1 text-xs font-bold uppercase px-2.5 py-1 rounded-full border ${
+              <h1 className="display-title text-2xl sm:text-3xl font-bold text-white tracking-tight">{group.name}</h1>
+              <span className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1 rounded-full border ${
                 isExpired
-                  ? "bg-red-500/10 text-red-400 border-red-500/20"
-                  : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                  ? "bg-red-500/10 text-red-400 border-red-500/25"
+                  : "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
               }`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${isExpired ? "bg-red-400" : "bg-emerald-400 animate-pulse"}`} />
-                {isExpired ? "Expired" : "Active"}
+                {isExpired ? "Expired" : "Active Group"}
               </span>
             </div>
-            {group.description && <p className="text-slate-400">{group.description}</p>}
-            <p className="text-slate-600 text-sm mt-1">
-              ⏰ Expires: {new Date(group.expiresAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+            {group.description && <p className="body-secondary text-slate-400 text-sm mb-1">{group.description}</p>}
+            <p className="caption-metadata text-slate-500 text-xs">
+              ⏰ Session Expiry: {new Date(group.expiresAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
             </p>
           </div>
           {!isExpired && (
             <Link to={`/groups/${groupId}/map`}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm transition-all hover:opacity-90 whitespace-nowrap"
-              style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}>
-              🗺️ Open Group Map
+              className="btn-cta-primary px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 whitespace-nowrap shadow-lg shadow-indigo-500/20">
+              🗺️ Open Group Live Map
             </Link>
           )}
         </div>
 
         {/* Members Section */}
-        <div className="rounded-2xl border border-white/[0.07] overflow-hidden shadow-2xl mb-6"
-          style={{ background: "rgba(255,255,255,0.02)" }}>
-          <div className="px-6 py-5 border-b border-white/[0.07] flex items-center justify-between"
-            style={{ background: "rgba(0,0,0,0.2)" }}>
+        <div className="surface-card rounded-2xl overflow-hidden shadow-2xl mb-6">
+          <div className="px-6 py-4 border-b border-white/[0.07] flex items-center justify-between bg-black/20">
             <div>
-              <h2 className="text-lg font-semibold text-white">Members</h2>
-              <p className="text-slate-500 text-xs mt-0.5">{group.members.length}/5 members • 1 tracking credit per member</p>
+              <h2 className="card-title text-base font-semibold text-white">Active Members</h2>
+              <p className="caption-metadata text-slate-400 text-xs mt-0.5">{group.members.length}/5 member slots active • 1 credit per member</p>
             </div>
             {!isExpired && group.members.length < 5 && (
               <button onClick={() => setShowAddForm(!showAddForm)}
-                className={`flex items-center gap-1.5 text-sm px-4 py-2 rounded-xl font-medium transition-all ${
+                className={`text-xs px-3.5 py-2 rounded-lg font-medium transition-all ${
                   showAddForm
                     ? "bg-slate-700 text-slate-300"
-                    : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                    : "btn-cta-secondary"
                 }`}>
-                {showAddForm ? "✕ Cancel" : "+ Add Member"}
+                {showAddForm ? "✕ Close Form" : "+ Add Member"}
               </button>
             )}
           </div>

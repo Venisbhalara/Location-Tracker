@@ -1,48 +1,38 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import AmbientBackground from "../../components/common/AmbientBackground";
 
 const values = [
   {
     icon: "🔒",
     title: "Privacy First",
-    color: "indigo",
-    desc: "We built consent into the core of our system — not as an afterthought. Location access requires your explicit permission, every single time.",
+    desc: "We built consent into the foundation of our architecture — not as an afterthought. Location transmission requires explicit hardware-level browser permission every single time.",
   },
   {
     icon: "⚡",
-    title: "Real-Time Precision",
-    color: "purple",
-    desc: "Powered by WebSocket technology, location updates appear on the map in milliseconds — not minutes. No polling. No delays.",
+    title: "Sub-Second Precision",
+    desc: "Powered by bidirectional WebSocket streams, coordinates update across clients in milliseconds rather than minutes. Zero polling, zero delays.",
   },
   {
     icon: "🌍",
-    title: "Accessible to All",
-    color: "cyan",
-    desc: "No app download. No complicated setup. Just a link and a browser. Anyone can share their location in seconds from any smartphone.",
+    title: "Accessible to Everyone",
+    desc: "No app installations, no accounts for recipients, and no complicated setup. Anyone with a smartphone browser can share their location safely.",
   },
   {
     icon: "🛡️",
-    title: "Transparency",
-    color: "emerald",
-    desc: "We are clear about what data we collect, how we use it, and how long we keep it. No hidden tracking. No secret profiling.",
+    title: "Complete Transparency",
+    desc: "We are clear about what telemetry is gathered, how it is routed, and when it is discarded. Coordinates are never written to permanent storage.",
   },
 ];
 
 const techStack = [
-  { name: "React 18", desc: "Fast, component-driven frontend UI" },
-  { name: "Node.js + Express", desc: "Scalable REST API backend" },
-  { name: "Socket.IO", desc: "Sub-second real-time communication" },
-  { name: "MySQL + Sequelize", desc: "Reliable relational database" },
-  { name: "Leaflet.js", desc: "Interactive, open-source maps" },
-  { name: "JWT Auth", desc: "Stateless, secure session management" },
+  { name: "React 18", role: "Frontend UI", desc: "Component architecture with sub-second reactive state updates" },
+  { name: "Node.js & Express", role: "Backend API", desc: "High-throughput asynchronous REST endpoint routing" },
+  { name: "Socket.IO", role: "Telemetry Stream", desc: "Bidirectional WebSocket connection for live GPS transmission" },
+  { name: "MySQL & Sequelize", role: "Relational DB", desc: "Encrypted token metadata and session access control" },
+  { name: "Leaflet.js", role: "Map Engine", desc: "Vector mapping with custom accuracy circles and path history" },
+  { name: "JWT & Bcrypt", role: "Authentication", desc: "Stateless session authentication with cryptographic hashing" },
 ];
-
-const colorMap = {
-  indigo: "bg-indigo-500/10 border-indigo-500/30 text-indigo-400",
-  purple: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-  cyan: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400",
-  emerald: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
-};
 
 const schemaOrg = {
   "@context": "https://schema.org",
@@ -85,155 +75,111 @@ const About = () => {
         <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
       </Helmet>
 
-      <div className="min-h-screen py-16 px-4 bg-[#0a0a10] relative overflow-hidden">
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-40px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
-          }
-          .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-          .animation-delay-2000 { animation-delay: 2s; }
-          .animation-delay-4000 { animation-delay: 4s; }
-          .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-          }
-        `}} />
-        
-        {/* Animated Premium LED Grid & Orbs Background */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
-          <div className="absolute inset-0 bg-grid opacity-70"></div>
-          <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
-          <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
-          <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
+      <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <AmbientBackground />
+
+        {/* Breadcrumb Hierarchy */}
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex items-center gap-2 text-xs text-slate-400">
+            <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+            <li className="text-slate-600">/</li>
+            <li className="text-indigo-300 font-medium">About</li>
+          </ol>
+        </nav>
+
+        {/* Hero Section */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="eyebrow-pill mb-4">Our Mission &amp; Purpose</span>
+          <h1 className="display-title mb-6">
+            Location Sharing Grounded in{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-indigo-300">
+              Consent &amp; Simplicity
+            </span>
+          </h1>
+          <p className="subheading-lead text-slate-300 leading-relaxed">
+            We built NexTrack because staying connected with family, friends, or team members shouldn’t require invasive app surveillance or complex configurations.
+          </p>
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto">
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="mb-10">
-            <ol className="flex items-center gap-2 text-xs text-slate-500">
-              <li><Link to="/" className="hover:text-indigo-400 transition-colors">Home</Link></li>
-              <li className="text-slate-700">/</li>
-              <li className="text-slate-400">About</li>
-            </ol>
-          </nav>
-
-          {/* Header */}
-          <div className="mb-16 text-center">
-            <span className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-4 py-1.5 text-xs text-indigo-400 uppercase tracking-widest mb-5">
-              Our Story
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-5 leading-tight">
-              About NexTrack —{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400">
-                Built for Trust, Designed for Safety
-              </span>
-            </h1>
-            <p className="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-              NexTrack was created with a simple belief: knowing where your loved ones are should be
-              safe, easy, and respectful of everyone's privacy. No app downloads. No silent
-              tracking. Just a link and explicit consent.
+        {/* Mission Statement Box */}
+        <div className="surface-elevated p-8 sm:p-10 rounded-3xl mb-16 border-indigo-500/30">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
+            The Problem with Traditional Tracking Apps
+          </h2>
+          <div className="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+            <p>
+              Most existing tracking solutions operate by having both parties install native apps, granting broad background permissions, and storing permanent movement logs on cloud servers. This approach creates security vulnerabilities and feels invasive.
+            </p>
+            <p>
+              NexTrack operates on a completely different model: <strong className="text-white">temporary, browser-native sessions with explicit recipient permission</strong>. When a session ends, the connection closes and no permanent location records remain.
             </p>
           </div>
+        </div>
 
-          {/* Mission card */}
-          <div className="relative mb-12">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-cyan-500/50 blur-sm opacity-30" />
-            <div className="relative bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10">
-              <h2 className="text-2xl font-bold text-white mb-4">Our Mission</h2>
-              <p className="text-slate-400 leading-relaxed mb-4">
-                We built NexTrack to solve a real problem: parents wanting to know their child
-                arrived safely, friends trying to find each other at a crowded festival, families
-                coordinating during emergencies, field teams needing live driver visibility without
-                a dedicated fleet app.
-              </p>
-              <p className="text-slate-400 leading-relaxed mb-4">
-                Every existing solution either required a dedicated app, demanded account creation
-                on both ends, or silently harvested data in the background. We said — there has to
-                be a better way.
-              </p>
-              <p className="text-slate-400 leading-relaxed">
-                So we built NexTrack: a single link replaces an entire app. The recipient sees
-                exactly what they're sharing, decides whether to share it, and can stop at any
-                moment by closing their browser tab.{" "}
-                <strong className="text-white">
-                  No background tracking. No data harvesting. No surprises.
-                </strong>
-              </p>
-            </div>
+        {/* Core Principles */}
+        <div className="mb-20">
+          <div className="text-center mb-10">
+            <h2 className="section-title">What We Stand For</h2>
           </div>
 
-          {/* Values grid */}
-          <h2 className="text-2xl font-bold text-white text-center mb-8">What We Stand For</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {values.map((v) => (
               <div
                 key={v.title}
-                className="group bg-slate-900/70 border border-slate-800 rounded-2xl p-6 hover:border-slate-700 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+                className="surface-card p-7 hover:border-indigo-500/30 transition-all duration-200"
               >
-                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center text-2xl mb-4 ${colorMap[v.color]}`}>
+                <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl mb-4">
                   {v.icon}
                 </div>
-                <h3 className="text-white font-semibold text-base mb-2">{v.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{v.desc}</p>
+                <h3 className="card-title font-bold text-white mb-2">{v.title}</h3>
+                <p className="body-secondary text-slate-400 leading-relaxed">{v.desc}</p>
               </div>
             ))}
           </div>
+        </div>
 
-          {/* Who Uses NexTrack */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 mb-12">
-            <h2 className="text-xl font-bold text-white mb-6 text-center">Who Uses NexTrack?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-              {[
-                { icon: "👨‍👩‍👧‍👦", title: "Families", desc: "Parents tracking kids' commutes, checking arrivals, coordinating pickups — without phone tag." },
-                { icon: "🎉", title: "Friends & Groups", desc: "Meet-ups, festivals, road trips — everyone on one live map, no confusion about 'where are you?'" },
-                { icon: "🚚", title: "Field & Delivery Teams", desc: "Lightweight location sharing for drivers, field agents, or couriers — no fleet software required." },
-              ].map((u) => (
-                <div key={u.title}>
-                  <div className="text-3xl mb-3">{u.icon}</div>
-                  <h3 className="text-white font-semibold text-sm mb-2">{u.title}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">{u.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Tech Stack */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 mb-12">
-            <h2 className="text-xl font-bold text-white mb-6 text-center">Built With Modern Technology</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {techStack.map((t) => (
-                <div key={t.name} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-center hover:border-indigo-500/40 transition-colors duration-300">
-                  <p className="text-white font-medium text-sm">{t.name}</p>
-                  <p className="text-slate-500 text-xs mt-0.5">{t.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center">
-            <p className="text-slate-400 mb-6">
-              Ready to experience safe, consent-based location sharing?
+        {/* Technical Architecture */}
+        <div className="mb-20">
+          <div className="text-center mb-10">
+            <h2 className="section-title">Technology Architecture</h2>
+            <p className="body-secondary text-slate-400 mt-2">
+              Engineered with modern, reliable web technologies for ultra-low latency.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/register" className="nextrack-btn-primary text-base px-10 py-3.5">
-                Get Started Free
-              </Link>
-              <Link to="/pricing" className="nextrack-btn-ghost text-base px-8 py-3.5">
-                View Pricing
-              </Link>
-              <Link to="/contact" className="nextrack-btn-ghost text-base px-8 py-3.5">
-                Contact Us
-              </Link>
-            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {techStack.map((t) => (
+              <div key={t.name} className="surface-card p-6 border-white/[0.07]">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-base font-bold text-white">{t.name}</h3>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    {t.role}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">{t.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Bottom CTA */}
+        <div className="surface-card p-10 text-center rounded-3xl border-white/10">
+          <h2 className="text-2xl font-bold text-white mb-3">
+            Ready to experience safe, consent-based tracking?
+          </h2>
+          <p className="text-sm text-slate-400 mb-6 max-w-md mx-auto">
+            Get started in under 30 seconds with no app download required.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/register" className="btn-cta-primary px-8 py-3.5 text-sm font-semibold">
+              Start Tracking Free
+            </Link>
+            <Link to="/pricing" className="btn-cta-secondary px-8 py-3.5 text-sm font-medium">
+              View Pricing Plans
+            </Link>
+          </div>
+        </div>
+
       </div>
     </>
   );

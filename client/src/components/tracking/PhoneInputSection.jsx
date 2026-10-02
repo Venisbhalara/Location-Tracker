@@ -126,18 +126,28 @@ const PhoneInputSection = ({ onChange }) => {
     setLabel(value);
   };
 
-  // Emit changes to parent
+  const onChangeRef = useRef(onChange);
   useEffect(() => {
-    // Get full international number for output
+    onChangeRef.current = onChange;
+  });
+
+  const lastEmittedRef = useRef("");
+
+  // Emit changes to parent safely without infinite re-render loops
+  useEffect(() => {
     const fullNumber = phoneNumber ? parsePhoneNumberFromString(phoneNumber, countryCode)?.formatInternational() : "";
-    
-    onChange?.({
+    const payload = {
       phoneNumber: fullNumber || phoneNumber,
       countryCode,
       label,
-      isValid
-    });
-  }, [phoneNumber, countryCode, label, isValid, onChange]);
+      isValid,
+    };
+    const key = `${payload.phoneNumber}|${payload.countryCode}|${payload.label}|${payload.isValid}`;
+    if (key !== lastEmittedRef.current) {
+      lastEmittedRef.current = key;
+      onChangeRef.current?.(payload);
+    }
+  }, [phoneNumber, countryCode, label, isValid]);
 
   // 4. Lock body scroll when dropdown is open
   useEffect(() => {

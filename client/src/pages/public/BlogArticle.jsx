@@ -1,6 +1,7 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { blogArticles } from "./Blog";
+import AmbientBackground from "../../components/common/AmbientBackground";
 
 /* ─────────────────────────────────────────────
    ARTICLE CONTENT — 500+ words each
@@ -249,137 +250,92 @@ const BlogArticle = () => {
       <Helmet>
         <title>{article.title} | NexTrack Blog</title>
         <meta name="description" content={article.excerpt} />
-        <link rel="canonical" href={`https://location-trackers.vercel.app/blog/${article.slug}`} />
+        <link rel="canonical" href={`https://locationtracker.app/blog/${article.slug}`} />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
-        <meta property="og:url" content={`https://location-trackers.vercel.app/blog/${article.slug}`} />
+        <meta property="og:url" content={`https://locationtracker.app/blog/${article.slug}`} />
         <meta property="og:type" content="article" />
         <script type="application/ld+json">{JSON.stringify(schemaArticle)}</script>
       </Helmet>
 
-      <div className="min-h-screen py-16 px-4 bg-[#0a0a10] relative overflow-hidden">
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes blob {
-            0% { transform: translate(0px,0px) scale(1); }
-            33% { transform: translate(50px,-50px) scale(1.1); }
-            66% { transform: translate(-40px,20px) scale(0.9); }
-            100% { transform: translate(0px,0px) scale(1); }
-          }
-          .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-          .animation-delay-2000 { animation-delay: 2s; }
-          .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right,rgba(255,255,255,0.03) 1px,transparent 1px),
-                              linear-gradient(to bottom,rgba(255,255,255,0.03) 1px,transparent 1px);
-            mask-image: linear-gradient(to bottom,transparent,black 10%,black 90%,transparent);
-            -webkit-mask-image: linear-gradient(to bottom,transparent,black 10%,black 90%,transparent);
-          }
-          .prose-content h2 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 2rem;
-            margin-bottom: 0.75rem;
-          }
-          .prose-content h3 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-          }
-          .prose-content p {
-            color: #94a3b8;
-            line-height: 1.85;
-            margin-bottom: 1rem;
-            font-size: 0.975rem;
-          }
-          .prose-content ul, .prose-content ol {
-            color: #94a3b8;
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.975rem;
-          }
-          .prose-content li {
-            margin-bottom: 0.4rem;
-            line-height: 1.7;
-          }
-          .prose-content strong { color: #e2e8f0; }
-        `}} />
+      <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+        <AmbientBackground />
 
-        <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
-          <div className="absolute inset-0 bg-grid opacity-70" />
-          <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
-          <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
-        </div>
+        {/* Breadcrumb Hierarchy */}
+        <nav aria-label="Breadcrumb" className="mb-8">
+          <ol className="flex items-center gap-2 text-xs text-slate-400 flex-wrap">
+            <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+            <li className="text-slate-600">/</li>
+            <li><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+            <li className="text-slate-600">/</li>
+            <li className="text-indigo-300 font-medium truncate max-w-[240px]">{article.title}</li>
+          </ol>
+        </nav>
 
-        <div className="relative z-10 max-w-3xl mx-auto">
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="mb-10">
-            <ol className="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
-              <li><Link to="/" className="hover:text-indigo-400 transition-colors">Home</Link></li>
-              <li className="text-slate-700">/</li>
-              <li><Link to="/blog" className="hover:text-indigo-400 transition-colors">Blog</Link></li>
-              <li className="text-slate-700">/</li>
-              <li className="text-slate-400 truncate max-w-[200px]">{article.title}</li>
-            </ol>
-          </nav>
+        {/* Article Editorial Header */}
+        <header className="mb-10 pb-8 border-b border-white/[0.08]">
+          <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 mb-4">
+            {article.category}
+          </span>
+          
+          <h1 className="display-title mb-6 leading-tight text-white font-extrabold">
+            {article.title}
+          </h1>
 
-          {/* Article header */}
-          <div className="mb-10">
-            <span className={`inline-flex items-center border rounded-full px-3 py-0.5 text-xs font-semibold uppercase tracking-wider mb-5 ${colorMap[article.color]}`}>
-              {article.category}
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-              {article.title}
-            </h1>
-            <p className="text-slate-400 text-base leading-relaxed mb-6">{article.excerpt}</p>
-            <div className="flex flex-wrap items-center gap-5 text-xs text-slate-500 pb-8 border-b border-white/[0.06]">
-              <span>✍️ {article.author}</span>
-              <span>📅 {article.date}</span>
-              <span>⏱ {article.readTime}</span>
-            </div>
+          <p className="subheading-lead text-slate-300 mb-6">
+            {article.excerpt}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+            <span className="text-white font-medium">By {article.author}</span>
+            <span>•</span>
+            <span>{article.date}</span>
+            <span>•</span>
+            <span className="text-indigo-300 font-medium">{article.readTime}</span>
           </div>
+        </header>
 
-          {/* Article body */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-7 sm:p-10 mb-10">
+        {/* Article Body Container */}
+        <article className="surface-card p-8 sm:p-12 rounded-3xl border-white/[0.08] mb-12">
+          <div className="prose-content space-y-6 text-slate-300 leading-relaxed text-base">
             {content.body}
           </div>
+        </article>
 
-          {/* Navigation */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <Link to="/blog" className="nextrack-btn-ghost text-sm px-6 py-2.5">
-              ← Back to Blog
-            </Link>
-            <Link to="/register" className="nextrack-btn-primary text-sm px-8 py-2.5">
-              Try NexTrack Free →
-            </Link>
-          </div>
+        {/* Bottom Actions Bar */}
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-16 pt-6 border-t border-white/[0.08]">
+          <Link to="/blog" className="btn-cta-secondary px-6 py-3 text-sm font-medium w-full sm:w-auto text-center">
+            ← Return to Blog
+          </Link>
+          <Link to="/register" className="btn-cta-primary px-8 py-3 text-sm font-semibold w-full sm:w-auto text-center">
+            Start Tracking Free →
+          </Link>
+        </div>
 
-          {/* Related articles */}
-          <div className="mt-14">
-            <h2 className="text-lg font-bold text-white mb-6">More Articles</h2>
-            <div className="flex flex-col gap-4">
-              {blogArticles
-                .filter((a) => a.slug !== slug)
-                .map((a) => (
-                  <Link
-                    key={a.slug}
-                    to={`/blog/${a.slug}`}
-                    className="group flex items-start gap-4 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all duration-300"
-                  >
-                    <span className="text-2xl flex-shrink-0">{a.icon}</span>
-                    <div>
-                      <p className="text-white font-semibold text-sm mb-1 group-hover:text-indigo-300 transition-colors">
-                        {a.title}
-                      </p>
-                      <p className="text-slate-500 text-xs">{a.readTime} · {a.date}</p>
-                    </div>
-                  </Link>
-                ))}
-            </div>
+        {/* Related Articles */}
+        <div>
+          <h2 className="text-xl font-bold text-white mb-6">More Articles to Read</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {blogArticles
+              .filter((a) => a.slug !== slug)
+              .map((a) => (
+                <Link
+                  key={a.slug}
+                  to={`/blog/${a.slug}`}
+                  className="group surface-card p-6 rounded-2xl hover:border-indigo-500/30 transition-all duration-200"
+                >
+                  <span className="text-2xl mb-3 block">{a.icon}</span>
+                  <h3 className="text-base font-semibold text-white mb-2 group-hover:text-indigo-300 transition-colors">
+                    {a.title}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {a.readTime} · {a.date}
+                  </p>
+                </Link>
+              ))}
           </div>
         </div>
+
       </div>
     </>
   );

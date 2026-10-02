@@ -13,6 +13,7 @@ import L from "leaflet";
 import { getTrackingByToken } from "../../services/api";
 import geocodingService from "../../services/geocodingService";
 import useSocket from "../../hooks/useSocket";
+import AmbientBackground from "../../components/common/AmbientBackground";
 import toast from "react-hot-toast";
 
 // Fix Leaflet default icon
@@ -494,24 +495,9 @@ const LiveMap = () => {
     );
 
   return (
-    <div className="min-h-screen bg-[#0a0a10] py-6 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-['Inter']">
+    <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-['Inter']">
+      <AmbientBackground />
       <style dangerouslySetInnerHTML={{__html: `
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(50px, -50px) scale(1.1); }
-          66% { transform: translate(-40px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-        .bg-grid {
-          background-size: 40px 40px;
-          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-          mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-          -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-        }
         @keyframes gps-pulse {
           0%, 100% { box-shadow: 0 0 0 4px rgba(34,197,94,0.4); }
           50% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
@@ -522,66 +508,59 @@ const LiveMap = () => {
         }
       `}} />
 
-      {/* Animated Premium LED Grid & Orbs Background */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center z-0">
-        <div className="absolute inset-0 bg-grid opacity-70"></div>
-        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
-        <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
-      </div>
-
       <div className="max-w-7xl mx-auto relative z-10">
 
       {/* GPS Restored / Mode Change Toast Emitter */}
       <GpsRestoredToast locationMode={locationMode} />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            {tracking?.label ? tracking.label : "Live Location Map"}
-          </h1>
-          <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
-            <span>📞 {tracking?.phoneNumber}</span>
+          <div className="flex items-center gap-2.5">
+            <h1 className="card-title text-2xl font-bold text-white tracking-tight">
+              {tracking?.label ? tracking.label : "Live Location Tracking"}
+            </h1>
             {tracking?.label && (
-              <span className="text-slate-600 px-2 py-0.5 rounded bg-slate-800/50 text-[10px] uppercase tracking-wider">
-                Target Link
+              <span className="text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                Target Device
               </span>
             )}
+          </div>
+          <p className="caption-metadata text-slate-400 text-sm mt-1 flex items-center gap-2">
+            <span>📞 {tracking?.phoneNumber}</span>
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {trackingStopped ? (
-            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-red-500/10 border-red-500/30 text-red-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Session
-              Ended
+            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-red-500/10 border-red-500/30 text-red-400 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Session Ended
             </span>
           ) : locationMode === "gps" && sharerOnline ? (
-            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
+            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               GPS Live
             </span>
           ) : locationMode === "ip" ? (
-            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-orange-500/10 border-orange-500/30 text-orange-400">
+            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-orange-500/10 border-orange-500/30 text-orange-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
               Internet Mode
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-slate-800 border-slate-700 text-slate-500">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-              {connected ? "Waiting..." : "Connecting..."}
+            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-slate-800/90 border-slate-700 text-slate-400 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+              {connected ? "Waiting for GPS..." : "Connecting..."}
             </span>
           )}
 
           {!trackingStopped && (
             <button
               onClick={handlePing}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+              className="btn-cta-secondary text-xs px-3 py-1.5 flex items-center gap-1.5"
             >
               🔔 Ping
             </button>
           )}
-          <Link to="/dashboard" className="btn-secondary text-xs px-3 py-1.5">
+          <Link to="/dashboard" className="btn-cta-secondary text-xs px-3 py-1.5">
             ← Dashboard
           </Link>
         </div>
@@ -599,7 +578,7 @@ const LiveMap = () => {
 
       {/* Tracking stopped banner */}
       {trackingStopped && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4 flex items-center gap-3">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 flex items-center gap-3">
           <span className="text-2xl">🛑</span>
           <div>
             <p className="text-red-400 font-semibold text-sm">
@@ -613,15 +592,15 @@ const LiveMap = () => {
         </div>
       )}
 
-      {/* Main Content Layout */}
-      <div className="flex flex-col lg:flex-row gap-6 mb-8">
-        {/* Left Column: Map */}
-        <div className="w-full lg:w-1/3 xl:w-[35%] lg:sticky lg:top-6 h-fit">
+      {/* Main Content Layout — Map as PRIMARY (60-65% width) */}
+      <div className="flex flex-col lg:flex-row gap-6 mb-8 items-start">
+        {/* Left Column: Map (Dominant Canvas) */}
+        <div className="w-full lg:w-7/12 xl:w-2/3 lg:sticky lg:top-20">
           <div
-            className="card p-0 overflow-hidden shadow-2xl ring-1 ring-white/5"
+            className="surface-card p-0 overflow-hidden shadow-2xl rounded-2xl border"
             style={{
-              height: "calc(100vh - 200px)",
-              minHeight: "550px",
+              height: "calc(100vh - 180px)",
+              minHeight: "520px",
               borderColor:
                 locationMode === "gps"
                   ? "rgba(34,197,94,0.3)"
@@ -824,307 +803,190 @@ const LiveMap = () => {
           </div>
         </div>
 
-        {/* Right Column: Tracking Details */}
-        <div className="w-full lg:w-2/3 xl:w-[65%] flex flex-col gap-6">
-          <div className="space-y-4">
-            <h2 className="text-lg font-medium text-white/90 border-b border-white/10 pb-2">
-              <img src="/location.png" alt="" className="w-5 h-5 inline-block mr-2" />
-              Location Insights
-            </h2>
-
-            {/* ── Neural Ping Info Block ─────────────────────────── */}
-            {locationMode === "ip" && ipLocation && (
-              <div
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(234,88,12,0.05) 100%)",
-                  border: "1px solid rgba(249,115,22,0.25)",
-                  borderRadius: 12,
-                  padding: "12px 16px",
-                }}
-              >
-                <p
-                  style={{
-                    color: "#f97316",
-                    fontWeight: 700,
-                    fontSize: 12,
-                    margin: "0 0 8px",
-                  }}
-                >
-                  🛰️ Internet-Mode Location Details
-                </p>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 8,
-                  }}
-                >
-                  <div>
-                    <p
-                      style={{
-                        color: "rgba(249,115,22,0.5)",
-                        fontSize: 10,
-                        margin: 0,
-                      }}
-                    >
-                      Approx. Coordinates
-                    </p>
-                    <p
-                      style={{
-                        color: "#fdba74",
-                        fontSize: 11,
-                        fontFamily: "monospace",
-                        margin: 0,
-                      }}
-                    >
-                      {ipLocation.latitude?.toFixed(4)},{" "}
-                      {ipLocation.longitude?.toFixed(4)}
-                    </p>
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        color: "rgba(249,115,22,0.5)",
-                        fontSize: 10,
-                        margin: 0,
-                      }}
-                    >
-                      Region
-                    </p>
-                    <p style={{ color: "#fdba74", fontSize: 11, margin: 0 }}>
-                      {[ipLocation.city, ipLocation.region, ipLocation.country]
-                        .filter(Boolean)
-                        .join(", ") || "—"}
-                    </p>
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        color: "rgba(249,115,22,0.5)",
-                        fontSize: 10,
-                        margin: 0,
-                      }}
-                    >
-                      Internet Provider
-                    </p>
-                    <p style={{ color: "#fdba74", fontSize: 11, margin: 0 }}>
-                      {ipLocation.isp || "—"}
-                    </p>
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        color: "rgba(249,115,22,0.5)",
-                        fontSize: 10,
-                        margin: 0,
-                      }}
-                    >
-                      Last Updated
-                    </p>
-                    <p style={{ color: "#fdba74", fontSize: 11, margin: 0 }}>
-                      {ipLocation.timestamp?.toLocaleTimeString() || "—"}
-                    </p>
-                  </div>
+        {/* Right Column: Tracking Details & Telemetry (Structured Hierarchy) */}
+        <div className="w-full lg:w-5/12 xl:w-1/3 flex flex-col gap-4">
+          {/* ── Neural Ping Info Block (when in IP mode) ── */}
+          {locationMode === "ip" && ipLocation && (
+            <div className="surface-card p-4 border-orange-500/30 bg-orange-500/5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-orange-400 font-bold text-xs">🛰️ Internet-Mode Telemetry</span>
+                <span className="ml-auto text-[10px] text-orange-400/80 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20 font-semibold">
+                  Uncertainty Circle
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-slate-400 mb-3">
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase">Region</span>
+                  <span className="text-orange-300 font-medium truncate block">
+                    {[ipLocation.city, ipLocation.region, ipLocation.country].filter(Boolean).join(", ") || "—"}
+                  </span>
                 </div>
-                <a
-                  href={`https://www.google.com/maps?q=${ipLocation.latitude},${ipLocation.longitude}&z=13`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    marginTop: 10,
-                    padding: "4px 10px",
-                    background: "rgba(249,115,22,0.2)",
-                    borderRadius: 6,
-                    color: "#f97316",
-                    fontSize: 11,
-                    textDecoration: "none",
-                  }}
-                >
-                  🗺️ View Approximate Area on Maps
-                </a>
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase">Carrier / ISP</span>
+                  <span className="text-orange-300 font-medium truncate block">{ipLocation.isp || "—"}</span>
+                </div>
               </div>
+              <a
+                href={`https://www.google.com/maps?q=${ipLocation.latitude},${ipLocation.longitude}&z=13`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-cta-secondary w-full py-2 text-xs flex items-center justify-center gap-1.5 text-orange-300 border-orange-500/30 hover:bg-orange-500/10"
+              >
+                🗺️ View Approximate Radius on Maps
+              </a>
+            </div>
+          )}
+
+          {/* ── PRIMARY CARD: Location & Direct Navigation CTA ── */}
+          <div className="surface-card p-5 space-y-4 border-indigo-500/20">
+            <div className="flex items-center justify-between">
+              <span className="eyebrow-pill text-indigo-300 bg-indigo-500/10 border border-indigo-500/20">
+                Current Pinpoint
+              </span>
+              <span className="caption-metadata text-xs">
+                {activePos?.timestamp
+                  ? new Date(activePos.timestamp).toLocaleTimeString()
+                  : location?.timestamp
+                    ? new Date(location.timestamp).toLocaleTimeString()
+                    : "Live Feed"}
+              </span>
+            </div>
+
+            {/* Address */}
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                📍 Street Address
+              </p>
+              {locationMode === "ip" ? (
+                <p className="text-base font-semibold text-orange-300 leading-snug">
+                  📡 {[ipLocation?.city, ipLocation?.region, ipLocation?.country].filter(Boolean).join(", ") || "Internet-based approximate location"}
+                  <span className="text-xs text-orange-400/70 block mt-1 font-normal">
+                    (Target GPS is inactive · showing network tower area)
+                  </span>
+                </p>
+              ) : addrLoading ? (
+                <p className="text-sm text-indigo-400 animate-pulse font-medium">
+                  Resolving reverse geocoded address...
+                </p>
+              ) : address?.formatted ? (
+                <p className="text-base font-semibold text-white leading-snug">
+                  {address.formatted}
+                </p>
+              ) : (
+                <p className="text-sm text-slate-400 italic">
+                  Awaiting first GPS coordinate broadcast...
+                </p>
+              )}
+            </div>
+
+            {/* Coordinates Spec Strip */}
+            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
+                  Coordinates
+                </span>
+                <span className="font-mono text-xs text-indigo-300 font-semibold">
+                  {(activePos || ipLocation)
+                    ? `${(activePos || ipLocation).latitude.toFixed(locationMode === "ip" ? 4 : 6)}, ${(activePos || ipLocation).longitude.toFixed(locationMode === "ip" ? 4 : 6)}`
+                    : "—"}
+                </span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider text-slate-400 bg-slate-800/80 border-slate-700">
+                {locationMode === "ip" ? "Approx" : "WGS84"}
+              </span>
+            </div>
+
+            {/* Primary Action Button */}
+            {(activePos || ipLocation) && (
+              <a
+                href={`https://www.google.com/maps?q=${(activePos || ipLocation).latitude},${(activePos || ipLocation).longitude}&z=${locationMode === "ip" ? 13 : 18}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-cta-primary w-full py-2.5 flex items-center justify-center gap-2 text-xs font-semibold"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                </svg>
+                {locationMode === "ip" ? "Inspect Radius in Google Maps" : "Open in Google Maps"}
+              </a>
             )}
+          </div>
 
-            {/* Info Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-4">
-              <div className="card col-span-2 sm:col-span-3 xl:col-span-3">
-                <p className="text-xs text-slate-500 mb-1">📍 Address</p>
-                {locationMode === "ip" ? (
-                  <p className="text-sm text-orange-400 font-medium">
-                    📡{" "}
-                    {[ipLocation?.city, ipLocation?.region, ipLocation?.country]
-                      .filter(Boolean)
-                      .join(", ") || "Internet-based location"}
-                    <span className="text-xs text-orange-600 ml-2">
-                      (approximate)
-                    </span>
-                  </p>
-                ) : addrLoading ? (
-                  <p className="text-xs text-indigo-400 animate-pulse">
-                    Fetching address...
-                  </p>
-                ) : address?.formatted ? (
-                  <p className="text-sm text-white font-medium leading-snug">
-                    {address.formatted}
-                  </p>
-                ) : (
-                  <p className="text-sm text-slate-500">—</p>
-                )}
-              </div>
+          {/* ── TELEMETRY & HARDWARE METRICS STRIP ── */}
+          <div className="surface-card p-4 grid grid-cols-3 gap-3 text-center border-white/[0.06]">
+            <div className="p-2 rounded-lg bg-white/[0.02]">
+              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider block">Mode</span>
+              <span className={`text-xs font-bold mt-0.5 block ${
+                locationMode === "gps" ? "text-emerald-400" : locationMode === "ip" ? "text-orange-400" : "text-slate-400"
+              }`}>
+                {locationMode === "gps" ? "GPS Live" : locationMode === "ip" ? "Internet" : "Offline"}
+              </span>
+            </div>
+            <div className="p-2 rounded-lg bg-white/[0.02]">
+              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider block">Accuracy</span>
+              <span className="text-xs font-bold text-white mt-0.5 block">
+                {locationMode === "gps" && location?.accuracy
+                  ? `±${Math.round(location.accuracy)}m`
+                  : locationMode === "ip"
+                    ? "±1–5km"
+                    : "—"}
+              </span>
+            </div>
+            <div className="p-2 rounded-lg bg-white/[0.02]">
+              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider block">Pings</span>
+              <span className="text-xs font-bold text-indigo-300 mt-0.5 block">
+                {locationHistory.length}
+              </span>
+            </div>
+          </div>
 
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">🏢 Company</p>
-                <p className="font-semibold text-white truncate">
-                  {address?.company || "—"}
-                </p>
+          {/* ── STRUCTURED GEOGRAPHIC SPECS ── */}
+          <div className="surface-card p-5 border-white/[0.06] space-y-3">
+            <h3 className="card-title text-sm font-semibold text-white flex items-center gap-2 pb-2 border-b border-white/[0.06]">
+              <span>🏛️</span> Geographic Breakdown
+            </h3>
+            <div className="divide-y divide-white/[0.04] text-xs">
+              <div className="py-2 flex items-center justify-between">
+                <span className="text-slate-400">City</span>
+                <span className="font-semibold text-white">{address?.city || ipLocation?.city || "—"}</span>
               </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">🏬 Building</p>
-                <p className="font-semibold text-white truncate">
-                  {address?.building || "—"}
-                </p>
+              <div className="py-2 flex items-center justify-between">
+                <span className="text-slate-400">State / Region</span>
+                <span className="font-semibold text-white">{address?.state || ipLocation?.region || "—"}</span>
               </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">🏛️ Landmark</p>
-                <p className="font-semibold text-white truncate">
-                  {address?.landmark || "—"}
-                </p>
+              <div className="py-2 flex items-center justify-between">
+                <span className="text-slate-400">Neighborhood / Area</span>
+                <span className="font-semibold text-white truncate max-w-[180px]">{address?.area || "—"}</span>
               </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">🏙️ City</p>
-                <p className="font-semibold text-white truncate">
-                  {address?.city || ipLocation?.city || "—"}
-                </p>
+              <div className="py-2 flex items-center justify-between">
+                <span className="text-slate-400">Street / Road</span>
+                <span className="font-semibold text-white truncate max-w-[180px]">{address?.road || "—"}</span>
               </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">📌 State</p>
-                <p className="font-semibold text-white truncate">
-                  {address?.state || ipLocation?.region || "—"}
-                </p>
-              </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">Tracking Mode</p>
-                <p
-                  className="font-semibold capitalize"
-                  style={{
-                    color:
-                      locationMode === "gps"
-                        ? "#10b981"
-                        : locationMode === "ip"
-                          ? "#f97316"
-                          : "#94a3b8",
-                  }}
-                >
-                  {locationMode === "gps"
-                    ? "✅ GPS Precise"
-                    : locationMode === "ip"
-                      ? "⚠️ Internet"
-                      : "❌ Offline"}
-                </p>
-              </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">GPS Accuracy</p>
-                <p className="font-semibold text-white">
-                  {locationMode === "gps" && location?.accuracy
-                    ? `±${Math.round(location.accuracy)}m`
-                    : locationMode === "ip"
-                      ? "±1–5km"
-                      : "—"}
-                </p>
-              </div>
-              <div className="card col-span-2 sm:col-span-2">
-                <p className="text-xs text-slate-500 mb-1">
-                  {locationMode === "ip"
-                    ? "Approx. Coordinates"
-                    : "Exact Coordinates"}
-                </p>
-                {activePos || ipLocation ? (
-                  <>
-                    <p className="font-mono text-sm text-indigo-400 mb-2">
-                      {(activePos || ipLocation).latitude.toFixed(
-                        locationMode === "ip" ? 4 : 8,
-                      )}
-                      ,{" "}
-                      {(activePos || ipLocation).longitude.toFixed(
-                        locationMode === "ip" ? 4 : 8,
-                      )}
-                      {locationMode === "ip" && (
-                        <span className="text-orange-500 text-xs ml-2">
-                          (approx.)
-                        </span>
-                      )}
-                    </p>
-                    <a
-                      href={`https://www.google.com/maps?q=${(activePos || ipLocation).latitude},${(activePos || ipLocation).longitude}&z=${locationMode === "ip" ? 13 : 18}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                      </svg>
-                      {locationMode === "ip"
-                        ? "View Approx. Area on Maps"
-                        : "Open in Google Maps"}
-                    </a>
-                  </>
-                ) : (
-                  <p className="font-mono text-sm text-slate-500">—</p>
-                )}
-              </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">🛣️ Street</p>
-                <p className="text-sm text-white truncate">
-                  {address?.road || "—"}
-                </p>
-              </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">🏘️ Area</p>
-                <p className="text-sm text-white truncate">
-                  {address?.area || "—"}
-                </p>
-              </div>
-              <div className="card">
-                <p className="text-xs text-slate-500 mb-1">Updates</p>
-                <p className="font-semibold text-white">
-                  {locationHistory.length}
-                </p>
+              <div className="py-2 flex items-center justify-between">
+                <span className="text-slate-400">Landmark / Venue</span>
+                <span className="font-semibold text-white truncate max-w-[180px]">{address?.landmark || "—"}</span>
               </div>
             </div>
           </div>
 
-          {/* Share link */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-medium text-white/90 border-b border-white/10 pb-2">
-              🔗 Share Tracking
-            </h2>
-            <div className="card relative overflow-hidden border-indigo-500/10 shadow-lg group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-700" />
-              <p className="text-sm text-slate-400 mb-2 relative z-10">
-                Tracking Link (share with target)
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2 relative z-10">
-                <input
-                  readOnly
-                  className="input flex-1 text-xs font-mono"
-                  value={trackingLink}
-                />
-                <button
-                  onClick={copyLink}
-                  className="btn-secondary text-sm px-4 whitespace-nowrap"
-                >
-                  📋 Copy
-                </button>
-              </div>
+          {/* ── SHARE TRACKING LINK ── */}
+          <div className="surface-card p-5 border-white/[0.06] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="card-title text-xs font-semibold text-white">🔗 Shareable Tracking Link</span>
+              <span className="text-[10px] text-slate-500">Recipient uses this URL</span>
+            </div>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                className="input flex-1 text-xs font-mono py-2 bg-white/[0.03]"
+                value={trackingLink}
+              />
+              <button
+                onClick={copyLink}
+                className="btn-cta-secondary text-xs px-3.5 whitespace-nowrap"
+              >
+                📋 Copy
+              </button>
             </div>
           </div>
         </div>

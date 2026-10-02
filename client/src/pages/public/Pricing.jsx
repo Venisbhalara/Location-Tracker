@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { createPaymentOrder, verifyPayment } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import AmbientBackground from "../../components/common/AmbientBackground";
 
 const plans = [
   {
@@ -11,135 +12,78 @@ const plans = [
     name: "Basic",
     price: 10,
     slots: 5,
-    desc: "Essential tracking for individuals.",
+    tagline: "Essential tracking for individuals and occasional check-ins.",
     features: [
-      "5 Secure tracking links",
-      "Live GPS updates",
-      "24h link expiration",
-      "Standard map overlay",
-      "Email support",
+      "5 Active tracking link slots",
+      "24-Hour automatic link expiration",
+      "Reusable slots upon expiry or deletion",
+      "Standard email support",
     ],
-    color: "from-blue-600/20 to-blue-400/5",
-    accent: "blue",
-    border: "border-blue-500/20 hover:border-blue-500/50",
-    btnColor: "bg-blue-600 hover:bg-blue-500 shadow-blue-500/20",
+    isPopular: false,
   },
   {
     id: "plan_20",
     name: "Professional",
     price: 20,
     slots: 15,
-    desc: "Advanced features for power users.",
+    tagline: "Most popular choice for families and frequent coordinators.",
     features: [
-      "15 Secure tracking links",
-      "Priority Socket.IO sync",
-      "Custom link labels",
-      "Extended path history",
-      "Satellite view mode",
-      "Real-time alerts",
+      "15 Active tracking link slots",
+      "Route path history & address geocoding",
+      "Reusable slots upon expiry or deletion",
+      "Priority customer support",
     ],
-    color: "from-indigo-600/20 to-purple-600/5",
-    accent: "indigo",
-    border: "border-indigo-500/30 hover:border-indigo-500/60",
-    btnColor: "bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20",
-    popular: true,
+    isPopular: true,
   },
   {
     id: "plan_30",
     name: "Enterprise",
     price: 30,
     slots: 25,
-    desc: "Maximum capacity for high-volume tracking.",
+    tagline: "Maximum slot capacity for field teams and power users.",
     features: [
-      "25 Secure tracking links",
-      "Ultra-low latency updates",
-      "Advanced accuracy overlay",
-      "Priority 24/7 support",
-      "API Access (Coming Soon)",
-      "Multi-device sync",
+      "25 Active tracking link slots",
+      "Multi-link group monitoring",
+      "Reusable slots upon expiry or deletion",
+      "Dedicated 24/7 priority support",
     ],
-    color: "from-emerald-600/20 to-teal-600/5",
-    accent: "emerald",
-    border: "border-emerald-500/20 hover:border-emerald-500/50",
-    btnColor: "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20",
+    isPopular: false,
   },
 ];
 
-const SpotlightCard = ({ children, className, borderClassName, glowColor }) => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-  const containerRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  return (
-    <div
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setOpacity(1)}
-      onMouseLeave={() => setOpacity(0)}
-      className={`relative transition-all duration-500 ${className}`}
-    >
-      {/* Spotlight effect layer with overflow-hidden */}
-      <div className="absolute inset-0 overflow-hidden rounded-[inherit] pointer-events-none">
-        <div
-          className="absolute -inset-px transition duration-300"
-          style={{
-            background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${glowColor}, transparent 40%)`,
-            opacity,
-          }}
-        />
-      </div>
-      {children}
-    </div>
-  );
-};
+const faqs = [
+  {
+    q: "How do tracking slots work?",
+    a: "Each slot allows you to create one unique tracking link. Once the link expires or is deleted by you, the slot returns to your balance for future use. You only recharge when you need more concurrent links.",
+  },
+  {
+    q: "Is there an ongoing recurring subscription?",
+    a: "No. NexTrack is 100% pay-as-you-go. You make a one-time purchase of tracking slots and use them at your own pace without automatic monthly renewals or unexpected fees.",
+  },
+  {
+    q: "Can I use NexTrack internationally?",
+    a: "Yes. Our telemetry engine leverages standard GPS satellite positioning and operates in all countries across modern mobile browsers.",
+  },
+  {
+    q: "Is my tracking data secure and private?",
+    a: "Completely. Location telemetry is streamed live over TLS/SSL encryption and never stored in permanent database records. Once you close the session, temporary coordinates disappear.",
+  },
+  {
+    q: "Does the recipient need to download an app?",
+    a: "No. Recipients simply tap the link on any mobile browser (Safari, Chrome, Firefox) and grant location permission. No installation or registration is needed.",
+  },
+  {
+    q: "What is your refund policy?",
+    a: "If you experience any technical impediment that prevents you from generating or sharing tracking links, please email support@locationtracker.app within 7 days and our team will assist or refund promptly.",
+  },
+];
 
 const Pricing = () => {
   const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [activeFAQ, setActiveFAQ] = useState(0);
-
-  const faqs = [
-    {
-      q: "How do tracking slots work?",
-      a: "Each slot allows you to create one unique tracking link. Once the link expires or is deleted, the slot becomes available again. You can recharge anytime to add more slots to your balance.",
-    },
-    {
-      q: "Can I use NexTrack globally?",
-      a: "Yes, our GPS engine works across all borders with high precision and low latency. It leverages global satellite networks to provide real-time updates anywhere in the world.",
-    },
-    {
-      q: "Is my tracking data secure?",
-      a: "Absolutely. All tracking links are encrypted and feature automatic expiration. We use bank-grade SSL encryption to ensure your location data remains private and accessible only by you.",
-    },
-    {
-      q: "What happens if a link expires?",
-      a: "Once a link expires, it becomes inactive and the associated tracking slot is returned to your account balance, allowing you to create a new link.",
-    },
-    {
-      q: "Can someone track me without my knowledge?",
-      a: "Never. The recipient must explicitly tap 'Allow Location' in their browser. NexTrack cannot override or bypass browser permissions. If you close the tab or deny permission, no data is transmitted.",
-    },
-    {
-      q: "Does the recipient need to download an app?",
-      a: "No. Recipients open the tracking link in any smartphone browser — Chrome, Safari, Firefox. No account, no download, no friction.",
-    },
-    {
-      q: "Can I track multiple people at once?",
-      a: "Yes. NexTrack supports group tracking. Create a group, add members, and track everyone simultaneously on one shared live map with colour-coded markers.",
-    },
-    {
-      q: "Is there a refund policy?",
-      a: "If you experience a technical issue that prevents you from using your purchased slots, please contact support@locationtracker.app within 7 days of purchase and we will review your case.",
-    },
-  ];
+  const [activeFAQ, setActiveFAQ] = useState(null);
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
@@ -153,7 +97,7 @@ const Pricing = () => {
 
   const handlePaymentInitiate = (planId) => {
     if (!isAuthenticated) {
-      toast.error("Please login to purchase a plan");
+      toast.error("Please sign in or create an account to recharge slots.");
       return;
     }
     const plan = plans.find((p) => p.id === planId);
@@ -171,15 +115,14 @@ const Pricing = () => {
     try {
       const res = await loadRazorpay();
       if (!res) {
-        toast.error("Razorpay SDK failed to load. Are you online?");
+        toast.error("Payment SDK failed to load. Please verify your connection.");
         setLoading(null);
         return;
       }
 
       const { data } = await createPaymentOrder({ planId });
-
       if (!data.success) {
-        toast.error(data.message || "Something went wrong");
+        toast.error(data.message || "Failed to initialize payment.");
         setLoading(null);
         return;
       }
@@ -191,27 +134,27 @@ const Pricing = () => {
         amount: order.amount,
         currency: order.currency,
         name: "NexTrack Location",
-        description: `Recharge for ${selectedPlan.slots} locations`,
+        description: `Recharge: ${selectedPlan.slots} tracking slots`,
         image: "/location.png",
         order_id: order.id,
         handler: async (response) => {
           try {
             const verifyRes = await verifyPayment(response);
             if (verifyRes.data.success) {
-              toast.success("Payment successful! Balance updated.");
+              toast.success("Payment verified! Slots added to your account balance.");
               window.location.href = "/dashboard";
             }
           } catch (err) {
             console.error("Verification error:", err);
-            toast.error(err.response?.data?.message || "Verification failed");
+            toast.error(err.response?.data?.message || "Payment verification failed.");
           }
         },
         prefill: {
-          name: user.name,
-          email: user.email,
+          name: user?.name || "",
+          email: user?.email || "",
         },
         theme: {
-          color: "#6366f1",
+          color: "#4f46e5",
         },
       };
 
@@ -219,7 +162,7 @@ const Pricing = () => {
       rzp.open();
     } catch (error) {
       console.error(error);
-      toast.error("Payment initialization failed");
+      toast.error("Payment checkout could not be started.");
     } finally {
       setLoading(null);
     }
@@ -245,433 +188,262 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-24 px-4 relative overflow-hidden bg-[#0a0a10]">
+    <>
       <Helmet>
-        <title>NexTrack Pricing | GPS Location Tracking Plans — From ₹10</title>
+        <title>NexTrack Pricing | One-Time GPS Tracking Slots — From ₹10</title>
         <meta
           name="description"
-          content="Choose the right NexTrack plan. From 5 to 25 secure GPS tracking slots. Instant activation, real-time WebSocket updates, bank-grade encryption. No subscriptions."
+          content="Simple, pay-as-you-go pricing for GPS tracking slots. 5 to 25 slots from ₹10. No monthly subscriptions, real-time WebSocket telemetry, bank-grade encryption."
         />
         <link rel="canonical" href="https://locationtracker.app/pricing" />
-        <meta property="og:title" content="NexTrack Pricing | GPS Tracking Plans Starting at ₹10" />
-        <meta property="og:description" content="Pick the perfect tracking plan. 5 to 25 slots, real-time GPS, encryption included. No hidden fees." />
+        <meta property="og:title" content="NexTrack Pricing | From ₹10, No Subscriptions" />
+        <meta property="og:description" content="One-time slot recharge for real-time GPS tracking. Instant activation, no lock-in." />
         <meta property="og:url" content="https://locationtracker.app/pricing" />
         <script type="application/ld+json">{JSON.stringify(schemaPricing)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
       </Helmet>
 
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto relative z-10 mb-4">
-        <ol className="flex items-center gap-2 text-xs text-slate-500">
-          <li><Link to="/" className="hover:text-indigo-400 transition-colors">Home</Link></li>
-          <li className="text-slate-700">/</li>
-          <li className="text-slate-400">Pricing</li>
-        </ol>
-      </nav>
+      <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <AmbientBackground />
 
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(50px, -50px) scale(1.1); }
-          66% { transform: translate(-40px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-        .bg-grid {
-          background-size: 40px 40px;
-          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-          mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-          -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-        }
-      `}} />
-      
-      {/* Animated Premium LED Grid & Orbs Background */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden flex justify-center">
-        <div className="absolute inset-0 bg-grid opacity-70"></div>
-        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-600/20 blur-[100px] mix-blend-screen animate-blob" />
-        <div className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-600/20 blur-[100px] mix-blend-screen animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-[10%] left-[20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-cyan-600/15 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
-      </div>
+        {/* Breadcrumb Hierarchy */}
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex items-center gap-2 text-xs text-slate-400">
+            <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+            <li className="text-slate-600">/</li>
+            <li className="text-indigo-300 font-medium">Pricing</li>
+          </ol>
+        </nav>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-indigo-400 text-[10px] font-bold uppercase tracking-widest mb-4 backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-            </span>
-            Flexible Plans — No Subscriptions
+        {/* Page Header (PRIMARY MESSAGE) */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 eyebrow-pill mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            <span>Pay Once — Use When Needed</span>
           </div>
-          <h1 className="text-4xl sm:text-6xl font-black text-white mb-6 tracking-tighter leading-tight">
-            NexTrack Pricing —{" "}<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 animate-gradient-x">
-              Choose Your Plan
+
+          <h1 className="display-title mb-4">
+            Transparent Pricing,{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-indigo-300">
+              Zero Subscriptions
             </span>
           </h1>
-          <p className="text-slate-400 max-w-xl mx-auto text-lg font-light leading-relaxed">
-            Every plan includes live GPS tracking, end-to-end encryption, and instant activation.
-            Buy a slot package once — use it when you need it.{" "}
-            <Link to="/about" className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2">Learn about our security practices →</Link>
+
+          <p className="subheading-lead text-slate-300 max-w-xl mx-auto">
+            Recharge your account with tracking slots. Each slot generates a secure tracking link that can be reused once expired or deleted.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center max-w-6xl mx-auto">
-          {plans.map((plan) => (
-            <SpotlightCard
-              key={plan.id}
-              glowColor={
-                plan.accent === "blue"
-                  ? "rgba(59, 130, 246, 0.15)"
-                  : plan.accent === "indigo"
-                    ? "rgba(99, 102, 241, 0.15)"
-                    : "rgba(16, 185, 129, 0.15)"
-              }
-              className={`group relative rounded-[2rem] border bg-white/[0.01] backdrop-blur-3xl transition-all duration-500 ${plan.border} ${plan.popular ? "lg:scale-105 z-20 shadow-2xl shadow-indigo-500/10" : "z-10"} hover:-translate-y-2`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30">
-                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-[0_10px_20px_rgba(99,102,241,0.3)] border border-white/20 animate-bounce-subtle">
-                    Most Selected
-                  </div>
-                </div>
-              )}
+        {/* ── PRICING CARDS HIERARCHY ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto mb-20">
+          {plans.map((plan) => {
+            const isFeatured = plan.isPopular;
 
-              <div className="p-8 flex flex-col h-full">
-                <div className="mb-8">
-                  <h3 className="text-white font-black text-2xl mb-2 tracking-tight group-hover:text-indigo-400 transition-colors">
-                    {plan.name}
-                  </h3>
-                  <p className="text-slate-500 text-xs font-medium leading-relaxed">
-                    {plan.desc}
-                  </p>
-                </div>
-
-                <div className="mb-8">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-4xl font-black text-white tracking-tighter">
-                      ₹{plan.price}
-                    </span>
-                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
-                      INR
+            return (
+              <div
+                key={plan.id}
+                className={`flex flex-col justify-between p-8 rounded-3xl transition-all duration-300 ${
+                  isFeatured
+                    ? "surface-elevated ring-1 ring-indigo-400/40 lg:-translate-y-2 relative"
+                    : "surface-card hover:border-white/20"
+                }`}
+              >
+                {/* Visual Badge for Primary Choice */}
+                {isFeatured && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md border border-white/20">
+                      Most Popular
                     </span>
                   </div>
-                  <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-lg bg-white/5 border border-white/5 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                    {plan.slots} High-Precision Slots
-                  </div>
-                </div>
+                )}
 
-                <div className="space-y-4 mb-10 flex-1">
-                  {plan.features.map((feat, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-3 text-slate-300 text-xs group/feat"
-                    >
-                      <div
-                        className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${plan.accent === "indigo" ? "bg-indigo-500/10 group-hover/feat:bg-indigo-500/20" : plan.accent === "blue" ? "bg-blue-500/10 group-hover/feat:bg-blue-500/20" : "bg-emerald-500/10 group-hover/feat:bg-emerald-500/20"}`}
-                      >
-                        <svg
-                          className={`w-2.5 h-2.5 ${plan.accent === "indigo" ? "text-indigo-400" : plan.accent === "blue" ? "text-blue-400" : "text-emerald-400"}`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={4}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <span className="group-hover/feat:text-white transition-colors leading-tight">
-                        {feat}
+                <div>
+                  {/* Tier Title & Tagline */}
+                  <div className="mb-6">
+                    <h3 className="card-title text-xl font-bold text-white mb-2">
+                      {plan.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed min-h-[40px]">
+                      {plan.tagline}
+                    </p>
+                  </div>
+
+                  {/* Price Block (STRONG VISUAL PROMINENCE) */}
+                  <div className="mb-8 pb-6 border-b border-white/[0.08]">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+                        ₹{plan.price}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        One-Time
                       </span>
                     </div>
-                  ))}
-                </div>
 
-                <button
-                  onClick={() => handlePaymentInitiate(plan.id)}
-                  disabled={loading !== null}
-                  className={`relative group/btn w-full py-4 rounded-xl font-black text-white overflow-hidden transition-all duration-300 active:scale-[0.97] disabled:opacity-50 ${plan.btnColor}`}
-                >
-                  <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover/btn:translate-y-0 transition-transform duration-300" />
-                  <div className="relative flex items-center justify-center gap-2">
-                    {loading === plan.id ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span className="text-[10px]">Initializing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="uppercase tracking-widest text-[10px]">
-                          Secure Purchase
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mt-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                      {plan.slots} High-Precision Slots
+                    </div>
+                  </div>
+
+                  {/* Features List */}
+                  <div className="space-y-3.5 mb-8">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-3">
+                      Included with plan:
+                    </span>
+                    {plan.features.map((feat, idx) => (
+                      <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-300">
+                        <span className="w-4 h-4 rounded-full bg-indigo-500/15 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
+                          ✓
                         </span>
-                        <svg
-                          className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M14 5l7 7m0 0l-7 7m7-7H3"
-                          />
-                        </svg>
-                      </>
+                        <span className="leading-snug">{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Card CTA (HERO CARD HAS PRIMARY ACTION, OTHERS HAVE SECONDARY) */}
+                <div className="pt-4 border-t border-white/[0.06]">
+                  <button
+                    onClick={() => handlePaymentInitiate(plan.id)}
+                    disabled={loading !== null}
+                    className={`w-full py-3.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      isFeatured
+                        ? "btn-cta-primary shadow-lg"
+                        : "btn-cta-secondary"
+                    }`}
+                  >
+                    {loading === plan.id ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Processing...
+                      </span>
+                    ) : (
+                      <span>Recharge {plan.name}</span>
                     )}
-                  </div>
-                </button>
+                  </button>
+                </div>
               </div>
-            </SpotlightCard>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Trust Badges */}
-        <div className="mt-24 pt-12 border-t border-white/5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              {
-                label: "Bank-Grade",
-                sub: "Security",
-                icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
-              },
-              {
-                label: "Global",
-                sub: "Coverage",
-                icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064",
-              },
-              {
-                label: "Instant",
-                sub: "Activation",
-                icon: "M13 10V3L4 14h7v7l9-11h-7z",
-              },
-              {
-                label: "Priority",
-                sub: "Support",
-                icon: "M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z",
-              },
-            ].map((item, i) => (
-              <div key={i} className="group">
-                <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/50 group-hover:bg-indigo-500/10 transition-all duration-300">
-                  <svg
-                    className="w-5 h-5 text-slate-500 group-hover:text-indigo-400 transition-colors"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d={item.icon}
-                    />
-                  </svg>
-                </div>
-                <h4 className="text-white font-bold text-xs tracking-tight">
-                  {item.label}
-                </h4>
-                <p className="text-slate-500 text-[10px] font-medium uppercase tracking-widest mt-1">
-                  {item.sub}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* FAQ Section Preview */}
-        <div className="mt-24 text-center">
-          <h2 className="text-2xl font-black text-white mb-8 tracking-tight uppercase">
-            Common Questions
-          </h2>
-          <div className="max-w-2xl mx-auto flex flex-col gap-3">
-            {faqs.map((faq, i) => (
-              <div
-                key={i}
-                onClick={() => setActiveFAQ(activeFAQ === i ? -1 : i)}
-                className={`p-1 rounded-2xl transition-all duration-300 cursor-pointer ${activeFAQ === i ? "bg-gradient-to-r from-indigo-500/20 to-purple-500/20" : "bg-white/[0.02] hover:bg-white/[0.04]"}`}
-              >
-                <div
-                  className={`p-5 rounded-[0.9rem] border transition-all duration-300 ${activeFAQ === i ? "bg-[#0a0a14] border-indigo-500/30" : "bg-transparent border-white/5"}`}
-                >
-                  <h4 className="text-white font-bold text-sm flex items-center justify-between">
-                    {faq.q}
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500 ${activeFAQ === i ? "bg-indigo-500 text-white rotate-180" : "bg-white/5 text-slate-500"}`}
-                    >
-                      <svg
-                        className="w-3 h-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </h4>
-                  <div
-                    className={`grid transition-all duration-500 ease-in-out ${activeFAQ === i ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0 mt-0"}`}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="text-slate-400 text-xs leading-relaxed text-left pb-2 pr-4 border-l-2 border-indigo-500/30 pl-4 ml-1">
-                        {faq.a}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Premium Confirmation Modal */}
-      {showModal && selectedPlan && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-          <div
-            className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-            onClick={() => setShowModal(false)}
-          />
-
-          <div
-            className="relative w-full max-w-md rounded-[2.5rem] p-1 shadow-[0_0_100px_rgba(99,102,241,0.2)] border border-white/10 overflow-hidden"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(20,20,30,0.9), rgba(10,10,20,0.95))",
-            }}
-          >
-            {/* Modal Inner Glow */}
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/20 blur-[100px] rounded-full" />
-
-            <div className="relative z-10 p-6 sm:p-10">
-              <div className="w-16 h-16 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 relative group">
-                <div className="absolute inset-0 bg-indigo-500/30 blur-xl opacity-50 group-hover:opacity-100 transition-opacity rounded-full" />
-                <svg
-                  className="w-8 h-8 text-indigo-400 relative z-10"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
-                </svg>
-              </div>
-
-              <h2 className="text-3xl font-black text-center text-white mb-2 tracking-tighter uppercase">
-                Order Summary
-              </h2>
-              <p className="text-slate-400 text-center mb-8 text-xs font-medium tracking-wide">
-                Review your order before proceeding to secure payment.
-              </p>
-
-              <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-6 mb-8">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-slate-500 font-bold uppercase tracking-widest text-[9px]">
-                    Package
-                  </span>
-                  <span className="text-white font-black tracking-tight text-sm">
-                    {selectedPlan.name} Plan
-                  </span>
-                </div>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-slate-500 font-bold uppercase tracking-widest text-[9px]">
-                    Total Credits
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black">
-                    +{selectedPlan.slots} Slots
-                  </span>
-                </div>
-                <div className="h-px bg-white/5 my-4" />
-                <div className="flex justify-between items-end">
-                  <div>
-                    <span className="block text-slate-500 font-bold uppercase tracking-widest text-[9px] mb-0.5">
-                      Final Amount
-                    </span>
-                    <span className="text-indigo-400 font-black text-2xl tracking-tighter">
-                      ₹{selectedPlan.price}
-                    </span>
-                  </div>
-                  <span className="text-slate-600 text-[9px] font-bold mb-1">
-                    GST INCLUDED
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={processCheckout}
-                  className="w-full py-4 rounded-xl font-black bg-white text-black hover:bg-indigo-50 transition-all duration-300 active:scale-[0.98] shadow-[0_15px_30px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 uppercase tracking-[0.2em] text-[11px]"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                    />
-                  </svg>
-                  Complete Payment
-                </button>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="w-full py-3 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-white/5 text-xs transition-all duration-300 uppercase tracking-widest"
-                >
-                  Cancel Order
-                </button>
-              </div>
-
-              <div className="mt-8 flex items-center justify-center gap-4 opacity-40">
-                <div className="h-px flex-1 bg-white/10" />
-                <p className="text-[8px] text-white uppercase tracking-[0.3em] font-black whitespace-nowrap">
-                  Protected by SSL
-                </p>
-                <div className="h-px flex-1 bg-white/10" />
-              </div>
+        {/* ── TRUST & INTEGRITY METRICS (BORDERLESS PROOF STRIP) ── */}
+        <div className="max-w-5xl mx-auto mb-20 pt-8 border-t border-white/[0.08]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+            <div className="p-3">
+              <div className="text-2xl mb-1">🔒</div>
+              <h4 className="text-sm font-semibold text-white mb-1">Bank-Grade Security</h4>
+              <p className="text-xs text-slate-400">256-bit TLS encrypted data streams</p>
+            </div>
+            <div className="p-3 pt-6 md:pt-3">
+              <div className="text-2xl mb-1">🌐</div>
+              <h4 className="text-sm font-semibold text-white mb-1">Global Coverage</h4>
+              <p className="text-xs text-slate-400">Works anywhere with mobile browser</p>
+            </div>
+            <div className="p-3 pt-6 md:pt-3">
+              <div className="text-2xl mb-1">⚡</div>
+              <h4 className="text-sm font-semibold text-white mb-1">Instant Activation</h4>
+              <p className="text-xs text-slate-400">Slots credited immediately upon pay</p>
+            </div>
+            <div className="p-3 pt-6 md:pt-3">
+              <div className="text-2xl mb-1">🛡️</div>
+              <h4 className="text-sm font-semibold text-white mb-1">Zero Lock-In</h4>
+              <p className="text-xs text-slate-400">No recurring auto-debit cards</p>
             </div>
           </div>
         </div>
-      )}
 
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        @keyframes gradient-x {
-          0%, 100% { background-size: 200% 200%; background-position: left center; }
-          50% { background-size: 200% 200%; background-position: right center; }
-        }
-        .animate-gradient-x {
-          animation: gradient-x 15s ease infinite;
-        }
-        @keyframes bounce-subtle {
-          0%, 100% { transform: translateY(0) translateX(-50%); }
-          50% { transform: translateY(-5px) translateX(-50%); }
-        }
-        .animate-bounce-subtle {
-          animation: bounce-subtle 3s ease-in-out infinite;
-        }
-      `,
-        }}
-      />
-    </div>
+        {/* ── FAQ SECTION ── */}
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="section-title">Pricing Questions Answered</h2>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <div
+                key={i}
+                className="surface-card rounded-xl border border-white/[0.08] overflow-hidden"
+              >
+                <button
+                  onClick={() => setActiveFAQ(activeFAQ === i ? null : i)}
+                  className="w-full px-6 py-4.5 text-left flex items-center justify-between text-white font-medium text-sm sm:text-base hover:text-indigo-300 transition-colors"
+                >
+                  <span>{faq.q}</span>
+                  <span className={`text-xl transition-transform duration-200 ${activeFAQ === i ? "rotate-45 text-indigo-400" : "text-slate-400"}`}>
+                    +
+                  </span>
+                </button>
+                {activeFAQ === i && (
+                  <div className="px-6 pb-5 text-sm text-slate-400 leading-relaxed border-t border-white/[0.04] pt-3">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── CONFIRMATION MODAL WITH CLEAR ACTION HIERARCHY ── */}
+        {showModal && selectedPlan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/80 backdrop-blur-md"
+              onClick={() => setShowModal(false)}
+            />
+
+            <div className="relative surface-elevated w-full max-w-md p-8 sm:p-10 rounded-3xl border-indigo-500/50 shadow-2xl z-10">
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 flex items-center justify-center text-xl mx-auto mb-3">
+                  💳
+                </div>
+                <h3 className="text-2xl font-bold text-white tracking-tight">Order Confirmation</h3>
+                <p className="text-xs text-slate-400 mt-1">Review your order before proceeding</p>
+              </div>
+
+              {/* Order summary box */}
+              <div className="surface-card p-5 rounded-2xl border-white/10 mb-6 space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Plan</span>
+                  <span className="text-white font-bold">{selectedPlan.name} Tier</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Credits Added</span>
+                  <span className="text-emerald-400 font-bold">+{selectedPlan.slots} Slots</span>
+                </div>
+                <div className="h-px bg-white/10 my-2" />
+                <div className="flex justify-between items-baseline">
+                  <span className="text-slate-300 font-medium text-sm">Total Due</span>
+                  <span className="text-2xl font-extrabold text-white">₹{selectedPlan.price}</span>
+                </div>
+              </div>
+
+              {/* Action Buttons: Primary vs Secondary */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={processCheckout}
+                  className="btn-cta-primary w-full py-3.5 text-sm font-semibold"
+                >
+                  Proceed to Secure Checkout →
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="btn-cta-secondary w-full py-3 text-xs font-medium text-slate-400"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="mt-6 text-center">
+                <span className="text-[11px] text-slate-500">
+                  🔒 Bank-grade 256-bit encrypted checkout via Razorpay
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
