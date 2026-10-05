@@ -198,7 +198,6 @@ const GhostLocation = () => {
           width: "100%",
           textAlign: "center",
           boxShadow: `0 0 60px ${cfg.glow}, 0 25px 50px rgba(0,0,0,0.5)`,
-          backdropFilter: "blur(20px)",
           transition: "border-color 0.8s ease, box-shadow 0.8s ease",
         }}
       >

@@ -29,6 +29,7 @@ import Navbar         from './components/layout/Navbar'
 import Footer         from './components/layout/Footer'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import ScrollToTop from './components/layout/ScrollToTop'
+import AmbientBackground from './components/common/AmbientBackground'
 
 // ── Lightweight inline fallback ───────────────────────────────────────────────
 const PageLoader = () => (
@@ -39,7 +40,7 @@ const PageLoader = () => (
 
 // ── Main layout with navbar and footer ────────────────────────────────────────
 const MainLayout = ({ children, hideFooter }) => (
-  <div className="min-h-screen flex flex-col">
+  <div className="min-h-screen flex flex-col relative">
     <Navbar />
     <main className="flex-1">
       {children}
@@ -50,7 +51,7 @@ const MainLayout = ({ children, hideFooter }) => (
 
 // ── Minimal layout for tracking links (no navbar/footer) ───────────────────────
 const MinimalLayout = ({ children }) => (
-  <div className="min-h-screen bg-slate-900">
+  <div className="min-h-screen relative">
     {children}
   </div>
 )
@@ -78,6 +79,7 @@ function App() {
   if (isTrackingRoute) {
     return (
       <MinimalLayout>
+        <AmbientBackground />
         <ScrollToTop />
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -90,10 +92,12 @@ function App() {
 
   // Otherwise, use the main layout with navbar and footer
   return (
-    <MainLayout hideFooter={isAuthRoute}>
-      <ScrollToTop />
-      <Suspense fallback={<PageLoader />}>
-        <Routes location={location}>
+    <>
+      <AmbientBackground />
+      <MainLayout hideFooter={isAuthRoute}>
+        <ScrollToTop />
+        <Suspense fallback={<PageLoader />}>
+          <Routes location={location}>
           {/* Public */}
           <Route path="/"         element={<Home />} />
           <Route path="/login"    element={<Login />} />
@@ -124,6 +128,7 @@ function App() {
         </Routes>
       </Suspense>
     </MainLayout>
+    </>
   )
 }
 

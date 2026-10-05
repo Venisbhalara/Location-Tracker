@@ -46,7 +46,7 @@ const Terms = () => {
           </div>
         </div>
 
-        <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 sm:p-10 backdrop-blur-md">
+        <div className="bg-[#0d101f] border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-xl">
 
           <Section title="1. Acceptance of Terms">
             <p>

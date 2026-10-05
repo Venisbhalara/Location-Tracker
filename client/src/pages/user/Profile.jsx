@@ -159,7 +159,7 @@ export default function Profile() {
           </button>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+        <div className="bg-[#0d101f] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
           {/* Sidebar Tabs */}
           <div className="w-full md:w-56 bg-slate-800/30 p-4 flex md:flex-col gap-1.5 overflow-x-auto border-b md:border-b-0 md:border-r border-slate-700/50">
             <TabButton

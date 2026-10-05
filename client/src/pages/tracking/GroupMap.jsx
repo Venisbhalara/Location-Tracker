@@ -238,7 +238,7 @@ const GroupMap = () => {
       <div className="flex flex-col h-full relative z-10 w-full">
       {/* ── TOP HEADER BAR ── */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.07] flex-shrink-0"
-        style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(16px)" }}>
+        style={{ background: "#090c17" }}>
         <div className="flex items-center gap-3">
           <Link to={`/groups/${groupId}`}
             className="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all text-sm">
@@ -352,7 +352,7 @@ const GroupMap = () => {
           {members.length > 0 && (
             <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:left-4 z-[1000]">
               <div className="flex flex-wrap items-center gap-2 px-3 py-2 rounded-xl border border-white/10"
-                style={{ background: "rgba(10,10,20,0.85)", backdropFilter: "blur(12px)" }}>
+                style={{ background: "#0c0f1d" }}>
                 {members.map((m) => (
                   <button
                     key={m.id}
@@ -387,7 +387,7 @@ const GroupMap = () => {
         {/* ── SIDEBAR ── */}
         {sidebarOpen && (
           <div className="w-72 flex-shrink-0 border-l border-white/[0.07] flex flex-col overflow-hidden"
-            style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(16px)" }}>
+            style={{ background: "#090c17" }}>
             <div className="px-4 py-3 border-b border-white/[0.07] flex-shrink-0">
               <p className="text-white font-semibold text-sm">Members</p>
               <p className="text-slate-500 text-xs">{onlineCount} of {members.length} online</p>

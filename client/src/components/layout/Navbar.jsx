@@ -32,14 +32,13 @@ const Navbar = () => {
 
   return (
     <header
-      className="sticky top-0 z-50 transition-all duration-200"
-      style={{
-        background: "rgba(9, 9, 18, 0.85)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-      }}
+      className="sticky top-0 z-50 transition-all duration-300 relative glassmorphism-navbar"
     >
+      {/* Specular glass reflection accent line on bottom edge */}
+      <div
+        className="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-400/35 to-transparent pointer-events-none"
+        aria-hidden="true"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18">
           
@@ -170,11 +169,7 @@ const Navbar = () => {
       {/* Mobile Menu Sheet */}
       {menuOpen && (
         <div
-          className="md:hidden px-4 pt-3 pb-6 flex flex-col gap-2 border-t border-white/[0.08]"
-          style={{
-            background: "rgba(9, 9, 18, 0.98)",
-            backdropFilter: "blur(25px)",
-          }}
+          className="md:hidden px-4 pt-3 pb-6 flex flex-col gap-2 relative glassmorphism-mobile-menu"
         >
           {isAuthenticated ? (
             <>

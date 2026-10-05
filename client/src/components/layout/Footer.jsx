@@ -23,12 +23,14 @@ const Footer = () => {
 
   return (
     <footer
-      className="relative border-t border-white/[0.08]"
-      style={{
-        background: "rgba(7, 7, 14, 0.95)",
-      }}
+      className="relative z-10 transition-all duration-300 overflow-hidden glassmorphism-footer"
       aria-label="Footer"
     >
+      {/* Specular glass reflection accent line on top edge */}
+      <div
+        className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent pointer-events-none"
+        aria-hidden="true"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12">
           

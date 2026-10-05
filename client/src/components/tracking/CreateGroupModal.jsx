@@ -42,7 +42,7 @@ const CreateGroupModal = ({ onClose, onCreated }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}>
+      style={{ background: "rgba(0,0,0,0.8)" }}>
       <div
         className="w-full max-w-md rounded-2xl border border-white/[0.1] shadow-2xl overflow-hidden"
         style={{ background: "rgba(13,13,23,0.98)" }}
