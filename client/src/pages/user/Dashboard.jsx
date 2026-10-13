@@ -8,24 +8,24 @@ import AmbientBackground from "../../components/common/AmbientBackground";
 const statusBadge = (status) => {
   const map = {
     active: {
-      bg: "bg-emerald-500/15",
-      text: "text-emerald-300",
-      border: "border-emerald-500/30",
-      dot: "bg-emerald-400 animate-pulse",
+      bg: "bg-[#edf7f1]",
+      text: "text-[#23684a]",
+      border: "border-[#c4e8d3]",
+      dot: "bg-[#2e7d5b] animate-pulse",
       label: "Active",
     },
     pending: {
-      bg: "bg-amber-500/15",
-      text: "text-amber-300",
-      border: "border-amber-500/30",
-      dot: "bg-amber-400",
+      bg: "bg-[#fdf6e9]",
+      text: "text-[#8f5a10]",
+      border: "border-[#f5dfb8]",
+      dot: "bg-[#a36814]",
       label: "Pending",
     },
     expired: {
-      bg: "bg-slate-500/15",
-      text: "text-slate-400",
-      border: "border-slate-500/25",
-      dot: "bg-slate-500",
+      bg: "bg-[#f2eee6]",
+      text: "text-[#7a766e]",
+      border: "border-[#dfd8cc]",
+      dot: "bg-[#9c978c]",
       label: "Expired",
     },
   };
@@ -33,7 +33,7 @@ const statusBadge = (status) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${s.bg} ${s.text} ${s.border}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${s.bg} ${s.text} ${s.border}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
       {s.label}
@@ -51,7 +51,9 @@ const Dashboard = () => {
     if (isRefresh) setRefreshing(true);
     try {
       const [tRes] = await Promise.all([getUserTrackings({ limit: 50 })]);
-      setTrackings(Array.isArray(tRes?.data?.trackings) ? tRes.data.trackings : []);
+      setTrackings(
+        Array.isArray(tRes?.data?.trackings) ? tRes.data.trackings : [],
+      );
     } catch {
       toast.error("Failed to load dashboard data.");
       setTrackings([]);
@@ -84,33 +86,38 @@ const Dashboard = () => {
 
   const safeTrackings = Array.isArray(trackings) ? trackings : [];
   const activeCount = safeTrackings.filter((t) => t.status === "active").length;
-  const pendingCount = safeTrackings.filter((t) => t.status === "pending").length;
-  const expiredCount = safeTrackings.filter((t) => t.status === "expired").length;
+  const pendingCount = safeTrackings.filter(
+    (t) => t.status === "pending",
+  ).length;
+  const expiredCount = safeTrackings.filter(
+    (t) => t.status === "expired",
+  ).length;
 
   if (loading)
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <AmbientBackground />
-        <div className="w-10 h-10 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
       </div>
     );
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div className="relative min-h-[calc(100vh-4rem)] py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <AmbientBackground />
 
       {/* ── HEADER & PRIMARY ACTIONS ── */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10 pb-8 border-b border-white/[0.08]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8 pb-6 border-b border-stone-200/80">
         <div>
-          <div className="inline-flex items-center gap-2 eyebrow-pill mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 eyebrow-pill mb-2.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>Telemetry Command Center</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight mb-1.5">
             Welcome back, {user?.name?.split(" ")[0]}
           </h1>
-          <p className="text-slate-400 text-sm">
-            Monitor real-time GPS connections, available slots, and tracking sessions.
+          <p className="text-stone-600 text-sm">
+            Monitor real-time GPS connections, available slots, and active
+            tracking sessions.
           </p>
         </div>
 
@@ -119,154 +126,169 @@ const Dashboard = () => {
           <button
             onClick={() => load(true)}
             disabled={refreshing}
-            className="p-3 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 hover:text-white hover:border-white/20 transition-all focus:outline-none"
+            className="p-2.5 rounded-xl border border-stone-200 bg-white text-stone-600 hover:text-stone-900 hover:border-stone-300 shadow-xs transition-all focus:outline-none"
             title="Refresh trackings"
             aria-label="Refresh dashboard data"
           >
-            <svg 
-              className={`w-4 h-4 ${refreshing ? "animate-spin text-indigo-400" : ""}`}
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              className={`w-4 h-4 ${refreshing ? "animate-spin text-indigo-600" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
             </svg>
           </button>
 
           <Link
             to="/tracking/create"
-            className="btn-cta-primary px-5 py-2.5 text-sm font-semibold shadow-md whitespace-nowrap"
+            className="btn-cta-primary px-5 py-2.5 text-sm font-semibold shadow-xs whitespace-nowrap"
           >
-            <span className="mr-1.5 text-base leading-none">+</span> New Tracking Link
+            <span className="mr-1.5 text-base leading-none">+</span> New
+            Tracking Link
           </Link>
         </div>
       </div>
 
       {/* ── METRICS HIERARCHY ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        
-        {/* Metric 1: Available Slots (PRIMARY HIGHLIGHT) */}
-        <div className="surface-elevated p-6 rounded-2xl border-indigo-500/40 relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        {/* Metric 1: Available Slots */}
+        <div className="surface-elevated p-5 sm:p-6 rounded-2xl border-stone-200/90 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
               Available Slots
             </span>
-            <span className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-sm font-bold">
+            <span className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">
               💳
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <div className="text-4xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight">
               {user?.trackingBalance || 0}
             </div>
             <Link
               to="/pricing"
-              className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
             >
               Recharge +
             </Link>
           </div>
         </div>
 
-        {/* Metric 2: Active Trackings (PRIMARY OPERATIONAL STATUS) */}
-        <div className="surface-card p-6 rounded-2xl border-emerald-500/30 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+        {/* Metric 2: Active Trackings */}
+        <div className="surface-card p-5 sm:p-6 rounded-2xl border-stone-200/90 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
               Active Sessions
             </span>
-            <span className="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-sm font-bold">
+            <span className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">
               📡
             </span>
           </div>
-          <div className="text-4xl font-extrabold text-emerald-400 tracking-tight">
+          <div className="text-3xl sm:text-4xl font-extrabold text-emerald-700 tracking-tight">
             {activeCount}
           </div>
         </div>
 
         {/* Metric 3: Pending Links */}
-        <div className="surface-card p-6 rounded-2xl border-white/[0.08] flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
+        <div className="surface-card p-5 sm:p-6 rounded-2xl border-stone-200/90 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
               Pending Permission
             </span>
-            <span className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-400 flex items-center justify-center text-sm font-bold">
+            <span className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold">
               ⏳
             </span>
           </div>
-          <div className="text-4xl font-extrabold text-slate-200 tracking-tight">
+          <div className="text-3xl sm:text-4xl font-extrabold text-stone-800 tracking-tight">
             {pendingCount}
           </div>
         </div>
 
         {/* Metric 4: Expired Links */}
-        <div className="surface-card p-6 rounded-2xl border-white/[0.08] flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        <div className="surface-card p-5 sm:p-6 rounded-2xl border-stone-200/90 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
               Expired History
             </span>
-            <span className="w-8 h-8 rounded-lg bg-white/[0.04] text-slate-400 flex items-center justify-center text-sm font-bold">
+            <span className="w-8 h-8 rounded-lg bg-stone-100 text-stone-600 flex items-center justify-center text-sm font-bold">
               🗂️
             </span>
           </div>
-          <div className="text-4xl font-extrabold text-slate-400 tracking-tight">
+          <div className="text-3xl sm:text-4xl font-extrabold text-stone-600 tracking-tight">
             {expiredCount}
           </div>
         </div>
-
       </div>
 
       {/* ── GROUP TRACKING PROMOTION CALLOUT ── */}
-      <div className="surface-card p-6 sm:p-7 rounded-2xl border-indigo-500/25 mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="surface-card p-5 sm:p-6 rounded-2xl border-stone-200/90 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white shadow-xs">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-2xl shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl shrink-0">
             👥
           </div>
           <div>
-            <h2 className="text-base font-bold text-white mb-1">Group Telemetry &amp; Multi-Person Mapping</h2>
-            <p className="text-xs sm:text-sm text-slate-400">
-              Track family members, sports groups, or field teams simultaneously on a single shared live map.
+            <h2 className="text-base font-bold text-stone-900 mb-0.5">
+              Group Telemetry &amp; Multi-Person Mapping
+            </h2>
+            <p className="text-xs sm:text-sm text-stone-600">
+              Track family members, sports groups, or field teams simultaneously
+              on a single shared live map.
             </p>
           </div>
         </div>
         <Link
           to="/groups"
-          className="btn-cta-secondary px-5 py-2.5 text-xs font-semibold whitespace-nowrap"
+          className="btn-cta-secondary px-4 py-2.5 text-xs font-semibold whitespace-nowrap shadow-xs"
         >
           Manage Groups →
         </Link>
       </div>
 
       {/* ── RECENT TRACKINGS TABLE HIERARCHY ── */}
-      <div className="surface-card rounded-2xl border-white/[0.08] overflow-hidden">
-        <div className="px-6 py-5 border-b border-white/[0.08] flex items-center justify-between bg-black/20">
+      <div className="surface-card rounded-2xl border-stone-200/90 overflow-hidden shadow-xs">
+        <div className="px-6 py-4.5 border-b border-stone-200 bg-stone-50/70 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-white">Tracking Sessions</h2>
-            <p className="text-xs text-slate-400">All links created by your account</p>
+            <h2 className="text-base font-bold text-stone-900">
+              Tracking Sessions
+            </h2>
+            <p className="text-xs text-stone-500">
+              All links created by your account
+            </p>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-white/[0.05] border border-white/10 text-slate-300">
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white border border-stone-200 text-stone-700 shadow-2xs">
             {safeTrackings.length} Total
           </span>
         </div>
 
         {safeTrackings.length === 0 ? (
           <div className="text-center py-16 px-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-2xl mb-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center text-2xl mb-3 shadow-xs">
               📭
             </div>
-            <h3 className="text-lg font-bold text-white mb-1">
+            <h3 className="text-lg font-bold text-stone-900 mb-1">
               No tracking links yet
             </h3>
-            <p className="text-xs sm:text-sm text-slate-400 mb-6 max-w-sm mx-auto">
-              Create your first secure tracking link and share it with your contact to view their live GPS position.
+            <p className="text-xs sm:text-sm text-stone-600 mb-5 max-w-sm mx-auto">
+              Create your first secure tracking link and share it with your
+              contact to view their live GPS position.
             </p>
-            <Link to="/tracking/create" className="btn-cta-primary px-6 py-2.5 text-xs font-semibold">
+            <Link
+              to="/tracking/create"
+              className="btn-cta-primary px-6 py-2.5 text-xs font-semibold shadow-xs"
+            >
               Generate Tracking Link
             </Link>
           </div>
         ) : (
           <div className="overflow-x-auto nice-scrollbar">
             <table className="w-full text-sm text-left">
-              <thead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-white/[0.06] bg-white/[0.01]">
+              <thead className="text-[11px] font-bold text-stone-500 uppercase tracking-wider border-b border-stone-200 bg-stone-50/40">
                 <tr>
                   <th className="px-6 py-3.5">Recipient / Label</th>
                   <th className="px-6 py-3.5">Status</th>
@@ -274,22 +296,24 @@ const Dashboard = () => {
                   <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.05]">
+              <tbody className="divide-y divide-stone-100">
                 {safeTrackings.map((t) => (
-                  <tr key={t.id} className="hover:bg-white/[0.02] transition-colors group">
-                    
+                  <tr
+                    key={t.id}
+                    className="hover:bg-stone-50/60 transition-colors group"
+                  >
                     {/* Recipient */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-300 font-bold text-xs">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
                           {t.label ? t.label.charAt(0).toUpperCase() : "#"}
                         </div>
                         <div>
-                          <div className="text-white font-medium text-sm">
+                          <div className="text-stone-900 font-semibold text-sm">
                             {t.label || "Direct Tracking Link"}
                           </div>
                           {t.phoneNumber && (
-                            <div className="text-slate-500 text-xs font-mono mt-0.5">
+                            <div className="text-stone-500 text-xs font-mono mt-0.5">
                               {t.phoneNumber}
                             </div>
                           )}
@@ -303,7 +327,7 @@ const Dashboard = () => {
                     </td>
 
                     {/* Expiration */}
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-400 hidden sm:table-cell text-xs">
+                    <td className="px-6 py-4 whitespace-nowrap text-stone-500 hidden sm:table-cell text-xs">
                       {new Date(t.expiresAt).toLocaleString(undefined, {
                         month: "short",
                         day: "numeric",
@@ -319,7 +343,7 @@ const Dashboard = () => {
                         {t.status !== "expired" && (
                           <button
                             onClick={() => copyShareLink(t.token)}
-                            className="px-2.5 py-1.5 rounded-lg border border-white/10 hover:border-white/20 text-xs font-medium text-slate-300 hover:text-white bg-white/[0.02] transition-colors"
+                            className="px-2.5 py-1.5 rounded-lg border border-stone-200 hover:border-stone-300 text-xs font-medium text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 shadow-2xs transition-colors"
                             title="Copy link"
                           >
                             Copy
@@ -330,14 +354,14 @@ const Dashboard = () => {
                         {t.status === "active" ? (
                           <Link
                             to={`/tracking/map/${t.token}`}
-                            className="btn-cta-primary px-3 py-1.5 text-xs font-semibold shadow-sm"
+                            className="btn-cta-primary px-3 py-1.5 text-xs font-semibold shadow-xs"
                           >
                             Live Map →
                           </Link>
                         ) : t.status === "pending" ? (
                           <Link
                             to={`/tracking/map/${t.token}`}
-                            className="px-3 py-1.5 rounded-lg border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10 text-xs font-medium transition-colors"
+                            className="px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 text-xs font-medium transition-colors"
                           >
                             Open Map
                           </Link>
@@ -346,14 +370,13 @@ const Dashboard = () => {
                         {/* Destructive Action */}
                         <button
                           onClick={() => handleDelete(t.id)}
-                          className="px-2 py-1.5 text-xs text-rose-400/80 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors"
+                          className="px-2 py-1.5 text-xs text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                           title="Delete session"
                         >
                           ✕
                         </button>
                       </div>
                     </td>
-
                   </tr>
                 ))}
               </tbody>
@@ -361,7 +384,6 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-
     </div>
   );
 };

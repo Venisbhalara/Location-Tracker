@@ -182,12 +182,12 @@ const CreateTracking = () => {
       return (
         <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
           <AmbientBackground />
-          <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl text-center border-amber-500/30">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-3xl mx-auto mb-4">
+          <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl text-center border-stone-200">
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-3xl mx-auto mb-4">
               ⏳
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Request Under Review</h1>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
+            <h1 className="text-2xl font-bold text-stone-900 mb-2">Request Under Review</h1>
+            <p className="text-stone-600 text-sm leading-relaxed mb-6">
               Your request for tracking link generation is currently being reviewed by an administrator. This page will update automatically upon approval.
             </p>
             <button
@@ -206,13 +206,13 @@ const CreateTracking = () => {
       return (
         <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
           <AmbientBackground />
-          <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl text-center border-rose-500/30">
-            <div className="w-16 h-16 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center text-3xl mx-auto mb-4">
+          <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl text-center border-stone-200">
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center text-3xl mx-auto mb-4">
               ✕
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Access Request Declined</h1>
-            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-4 rounded-xl text-left text-xs mb-6">
-              <strong className="block text-rose-200 uppercase font-semibold mb-1">Administrator Note:</strong>
+            <h1 className="text-2xl font-bold text-stone-900 mb-2">Access Request Declined</h1>
+            <div className="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl text-left text-xs mb-6">
+              <strong className="block text-rose-900 uppercase font-semibold mb-1">Administrator Note:</strong>
               {access.latestRequest.rejectionReason || "No specific reason was provided."}
             </div>
             <div className="flex gap-3 justify-center">
@@ -238,13 +238,13 @@ const CreateTracking = () => {
     return (
       <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
         <AmbientBackground />
-        <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl border-indigo-500/30 shadow-2xl">
+        <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl border-stone-200 shadow-md">
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-2xl mx-auto mb-3">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center text-2xl mx-auto mb-3">
               🔒
             </div>
-            <h1 className="text-2xl font-bold text-white mb-1">Approval Required</h1>
-            <p className="text-xs text-slate-400">
+            <h1 className="text-2xl font-bold text-stone-900 mb-1">Approval Required</h1>
+            <p className="text-xs text-stone-600">
               To protect recipient privacy and prevent misuse, tracking link creation requires one-time account approval.
             </p>
           </div>
@@ -252,7 +252,7 @@ const CreateTracking = () => {
           <form onSubmit={handleRequestSubmit} className="space-y-4">
             <div>
               <label className="label" htmlFor="access-reason">
-                Intended Use Case <span className="text-slate-500">(Optional)</span>
+                Intended Use Case <span className="text-stone-400 font-normal">(Optional)</span>
               </label>
               <textarea
                 id="access-reason"
@@ -285,21 +285,21 @@ const CreateTracking = () => {
       <AmbientBackground />
 
       <div
-        className={`relative z-10 max-w-xl w-full mx-auto transition-all duration-300 ${
-          isClosing ? "opacity-0 translate-y-3 scale-[0.98] pointer-events-none" : "opacity-100 translate-y-0 scale-100"
+        className={`relative z-10 max-w-xl w-full mx-auto transition-all duration-200 ${
+          isClosing ? "opacity-0 translate-y-2 scale-[0.98] pointer-events-none" : "opacity-100 translate-y-0 scale-100"
         }`}
       >
         {/* Header Bar */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 eyebrow-pill mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
               <span>Encrypted Link Generator</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
               Create Tracking Link
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
               Generate a unique tokenized link to request explicit GPS sharing.
             </p>
           </div>
@@ -307,7 +307,7 @@ const CreateTracking = () => {
             type="button"
             onClick={handleClose}
             aria-label="Close"
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all text-sm shrink-0"
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-500 hover:text-stone-800 hover:bg-stone-50 transition-all text-sm shrink-0 shadow-xs"
           >
             ✕
           </button>
@@ -315,7 +315,7 @@ const CreateTracking = () => {
 
         {!result ? (
           /* FORM STATE */
-          <div className="surface-elevated p-6 sm:p-8 rounded-3xl border-white/10 shadow-2xl">
+          <div className="surface-elevated p-6 sm:p-8 rounded-3xl border-stone-200/90 shadow-sm bg-white">
             <form onSubmit={handleSubmit} className="space-y-6">
               
               <PhoneInputSection 
@@ -323,11 +323,11 @@ const CreateTracking = () => {
               />
 
               {/* Consent Warning Box */}
-              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
-                <span className="text-amber-400 text-lg shrink-0 mt-0.5">ℹ️</span>
+              <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-3">
+                <span className="text-amber-600 text-lg shrink-0 mt-0.5">ℹ️</span>
                 <div>
-                  <h4 className="text-xs font-semibold text-amber-300 mb-0.5">100% Consent-Based</h4>
-                  <p className="text-xs text-amber-200/70 leading-relaxed">
+                  <h4 className="text-xs font-semibold text-amber-900 mb-0.5">100% Consent-Based</h4>
+                  <p className="text-xs text-amber-800 leading-relaxed">
                     The recipient must tap 'Allow Location' in their mobile browser. If they deny permission or close the tab, no coordinates are transmitted.
                   </p>
                 </div>
@@ -337,7 +337,7 @@ const CreateTracking = () => {
               <div>
                 <button 
                   type="submit" 
-                  className={`btn-cta-primary w-full py-4 text-sm font-bold shadow-lg ${
+                  className={`btn-cta-primary w-full py-3.5 text-sm font-bold shadow-xs ${
                     !form.isValid ? "opacity-50 cursor-not-allowed" : ""
                   }`} 
                   disabled={loading || !form.isValid}
@@ -356,37 +356,37 @@ const CreateTracking = () => {
           </div>
         ) : (
           /* RESULT STATE (LINK CREATED) */
-          <div className="surface-elevated p-8 sm:p-10 rounded-3xl border-emerald-500/40 shadow-2xl text-center">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-3xl mx-auto mb-4">
+          <div className="surface-elevated p-8 sm:p-10 rounded-3xl border-stone-200 shadow-md text-center bg-white">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center text-3xl mx-auto mb-4">
               ✓
             </div>
             
-            <h2 className="text-2xl font-bold text-white tracking-tight mb-1">
+            <h2 className="text-2xl font-bold text-stone-900 tracking-tight mb-1">
               Tracking Link Ready
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mb-6">
+            <p className="text-xs sm:text-sm text-stone-600 mb-6">
               Share this private link with your contact to request their live GPS location.
             </p>
 
-            {/* Generated URL Box (PRIMARY FOCAL ELEMENT) */}
-            <div className="surface-card p-4 rounded-2xl border-white/10 mb-6 text-left">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+            {/* Generated URL Box */}
+            <div className="surface-card p-4 rounded-2xl border-stone-200 mb-6 text-left bg-stone-50/70">
+              <div className="flex items-center justify-between text-xs text-stone-500 mb-1.5">
                 <span className="font-semibold uppercase tracking-wider text-[10px]">Secure Tracking URL</span>
-                <span className="text-emerald-400 font-semibold flex items-center gap-1 text-[11px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-emerald-700 font-semibold flex items-center gap-1 text-[11px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Active 24h
                 </span>
               </div>
-              <p className="text-indigo-300 font-mono text-xs sm:text-sm break-all select-all py-1">
+              <p className="text-indigo-800 font-mono text-xs sm:text-sm break-all select-all py-1 font-medium">
                 {result.trackingLink}
               </p>
             </div>
 
-            {/* ACTION HIERARCHY: Primary Copy, Secondary WhatsApp, Secondary Map */}
+            {/* ACTION HIERARCHY */}
             <div className="space-y-3 mb-6">
               <button
                 onClick={copyLink}
-                className="btn-cta-primary w-full py-3.5 text-sm font-bold shadow-lg"
+                className="btn-cta-primary w-full py-3.5 text-sm font-bold shadow-xs"
               >
                 📋 Copy Tracking Link
               </button>
@@ -394,13 +394,13 @@ const CreateTracking = () => {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={shareViaWhatsApp}
-                  className="btn-cta-secondary py-3 text-xs font-semibold text-emerald-400 border-emerald-500/30 hover:border-emerald-500/50"
+                  className="btn-cta-secondary py-2.5 text-xs font-semibold text-emerald-800 border-emerald-200 hover:bg-emerald-50"
                 >
                   💬 Share WhatsApp
                 </button>
                 <button
                   onClick={() => navigate(`/tracking/map/${result.token}`)}
-                  className="btn-cta-secondary py-3 text-xs font-semibold"
+                  className="btn-cta-secondary py-2.5 text-xs font-semibold"
                 >
                   🗺️ Preview Map
                 </button>
@@ -408,14 +408,14 @@ const CreateTracking = () => {
             </div>
 
             {/* Status note */}
-            <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-500">
+            <div className="pt-4 border-t border-stone-200/80 flex items-center justify-between text-xs text-stone-500">
               <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-ping" />
                 Listening for recipient response...
               </span>
               <button
                 onClick={() => setResult(null)}
-                className="text-indigo-400 hover:text-indigo-300 font-medium"
+                className="text-indigo-700 hover:text-indigo-900 font-medium"
               >
                 Create Another
               </button>

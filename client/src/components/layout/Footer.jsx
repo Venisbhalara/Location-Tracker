@@ -23,29 +23,24 @@ const Footer = () => {
 
   return (
     <footer
-      className="relative z-10 transition-all duration-300 overflow-hidden glassmorphism-footer"
+      className="relative z-10 transition-all duration-200 overflow-hidden glassmorphism-footer"
       aria-label="Footer"
     >
-      {/* Specular glass reflection accent line on top edge */}
-      <div
-        className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent pointer-events-none"
-        aria-hidden="true"
-      />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12">
           
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2.5 mb-4 group">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200/80 flex items-center justify-center shadow-xs">
                 <img src="/location.png" alt="NexTrack" className="w-5 h-5 object-contain" />
               </div>
-              <span className="font-bold text-lg text-white tracking-tight">
-                Nex<span className="text-indigo-400">Track</span>
+              <span className="font-bold text-lg text-stone-900 tracking-tight">
+                Nex<span className="text-indigo-600">Track</span>
               </span>
             </Link>
             
-            <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
+            <p className="text-stone-600 text-sm leading-relaxed max-w-sm">
               Real-time, consent-based GPS location sharing for families, friends,
               and teams. Instant activation in any browser with zero app downloads.
             </p>
@@ -54,7 +49,7 @@ const Footer = () => {
           {/* Navigation Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 mb-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-stone-800 mb-4">
                 {title}
               </h3>
               <ul className="space-y-2.5">
@@ -62,7 +57,7 @@ const Footer = () => {
                   <li key={link.label}>
                     <Link
                       to={link.to}
-                      className="text-sm text-slate-400 hover:text-white transition-colors duration-150 inline-block py-0.5"
+                      className="text-sm text-stone-600 hover:text-stone-900 transition-colors duration-150 inline-block py-0.5"
                     >
                       {link.label}
                     </Link>
@@ -74,15 +69,15 @@ const Footer = () => {
         </div>
 
         {/* Bottom Metadata Bar */}
-        <div className="mt-12 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="mt-12 pt-8 border-t border-stone-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
           <p>
             © {year}{" "}
-            <span className="text-slate-400 font-medium">NexTrack</span>. All rights reserved. Built with privacy in mind.
+            <span className="text-stone-800 font-semibold">NexTrack</span>. All rights reserved. Built with privacy in mind.
           </p>
           <div className="flex items-center gap-6">
-            <Link to="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy</Link>
-            <Link to="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
-            <Link to="/contact" className="hover:text-slate-300 transition-colors">Support</Link>
+            <Link to="/privacy-policy" className="hover:text-stone-800 transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-stone-800 transition-colors">Terms of Service</Link>
+            <Link to="/contact" className="hover:text-stone-800 transition-colors">Support</Link>
           </div>
         </div>
       </div>

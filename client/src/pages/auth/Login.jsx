@@ -79,23 +79,23 @@ const Login = () => {
         {/* Brand Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
               <img src="/location.png" alt="NexTrack" className="w-6 h-6 object-contain" />
             </div>
-            <span className="font-bold text-xl text-white tracking-tight">
-              Nex<span className="text-indigo-400">Track</span>
+            <span className="font-bold text-xl text-stone-900 tracking-tight">
+              Nex<span className="text-indigo-600">Track</span>
             </span>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight mb-1.5">
             Welcome Back
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-stone-600">
             Sign in to access your tracking command center
           </p>
         </div>
 
-        {/* Main Card (PRIMARY FORM FOCAL POINT) */}
-        <div className="surface-elevated p-8 sm:p-10 rounded-3xl border-white/10 shadow-2xl">
+        {/* Main Card */}
+        <div className="surface-elevated p-8 sm:p-10 rounded-3xl border-stone-200/90 shadow-sm bg-white">
           <form onSubmit={handleSubmit} className="space-y-5">
             
             {/* Email Field */}
@@ -116,11 +116,11 @@ const Login = () => {
 
             {/* Password Field */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1.5">
                 <label className="label !mb-0" htmlFor="login-password">Password</label>
                 <Link
                   to="/contact"
-                  className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                  className="text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
                 >
                   Need help?
                 </Link>
@@ -140,7 +140,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors p-1"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 transition-colors p-1"
                   aria-label={showPw ? "Hide password" : "Show password"}
                 >
                   {showPw ? (
@@ -164,9 +164,9 @@ const Login = () => {
                 id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-950 cursor-pointer"
+                className="w-4 h-4 rounded border-stone-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
               />
-              <label htmlFor="remember" className="text-xs text-slate-300 select-none cursor-pointer">
+              <label htmlFor="remember" className="text-xs text-stone-600 select-none cursor-pointer">
                 Remember my email on this browser
               </label>
             </div>
@@ -176,7 +176,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-cta-primary w-full py-3.5 text-sm font-semibold"
+                className="btn-cta-primary w-full py-3.5 text-sm font-semibold shadow-xs"
               >
                 {loading ? "Signing in..." : "Sign In to NexTrack →"}
               </button>
@@ -185,29 +185,29 @@ const Login = () => {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-white/[0.08]" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <div className="flex-1 h-px bg-stone-200" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
               Or continue with
             </span>
-            <div className="flex-1 h-px bg-white/[0.08]" />
+            <div className="flex-1 h-px bg-stone-200" />
           </div>
 
-          {/* SECONDARY ACTION: Google Sign In */}
+          {/* Google Sign In */}
           <button
             type="button"
             onClick={() => customGoogleLogin()}
             disabled={loading}
-            className="btn-cta-secondary w-full py-3 text-sm font-medium flex items-center justify-center gap-3"
+            className="btn-cta-secondary w-full py-2.5 text-sm font-medium flex items-center justify-center gap-3 shadow-xs"
           >
             <GoogleIcon />
             <span>Continue with Google</span>
           </button>
 
           {/* Bottom Switcher */}
-          <div className="mt-8 text-center pt-6 border-t border-white/[0.08]">
-            <p className="text-xs text-slate-400">
+          <div className="mt-8 text-center pt-6 border-t border-stone-100">
+            <p className="text-xs text-stone-600">
               Don't have an account yet?{" "}
-              <Link to="/register" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+              <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
                 Create one free →
               </Link>
             </p>

@@ -3,11 +3,11 @@ import AmbientBackground from "../../components/common/AmbientBackground";
 
 const Section = ({ title, children }) => (
   <div className="mb-10">
-    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-      <span className="w-1 h-6 rounded-full bg-indigo-500 inline-block" />
+    <h2 className="text-xl sm:text-2xl font-bold text-stone-900 mb-4 flex items-center gap-3 font-serif">
+      <span className="w-1.5 h-6 rounded-full bg-stone-800 inline-block" />
       {title}
     </h2>
-    <div className="text-slate-300 text-sm leading-relaxed space-y-3">{children}</div>
+    <div className="text-stone-700 text-sm sm:text-base leading-relaxed space-y-3">{children}</div>
   </div>
 );
 
@@ -26,35 +26,36 @@ const PrivacyPolicy = () => {
       <div className="relative z-10 max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-12 text-center">
-          <span className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-4 py-1.5 text-xs text-indigo-400 uppercase tracking-widest mb-5">
+          <span className="inline-flex items-center gap-2 bg-[#ece6da] border border-[#ded7ca] rounded-full px-4 py-1 text-xs text-stone-800 uppercase tracking-widest font-semibold mb-4">
             Legal Document
           </span>
-          <h1 className="text-4xl font-bold text-white mb-3">Privacy Policy — NexTrack</h1>
-          <p className="text-slate-500 text-sm">
-            Effective Date: <span className="text-slate-400">March 19, 2026</span> &nbsp;·&nbsp; Last Updated:{" "}
-            <span className="text-slate-400">March 19, 2026</span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 mb-3 font-serif">
+            Privacy Policy
+          </h1>
+          <p className="text-stone-500 text-xs sm:text-sm">
+            Effective Date: <span className="text-stone-700 font-medium">March 19, 2026</span> &nbsp;·&nbsp; Last Updated:{" "}
+            <span className="text-stone-700 font-medium">March 19, 2026</span>
           </p>
         </div>
 
         {/* Alert box */}
-        <div className="border border-emerald-500/30 bg-emerald-500/5 rounded-2xl p-5 mb-10 flex gap-4 items-start">
+        <div className="border border-emerald-200 bg-emerald-50 rounded-2xl p-6 mb-10 flex gap-4 items-start shadow-xs">
           <span className="text-2xl mt-0.5">🔒</span>
           <div>
-            <p className="text-emerald-400 font-semibold text-sm mb-1">Your Privacy Comes First</p>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              NexTrack <strong className="text-white">only accesses your location with your explicit, informed
-              consent.</strong> You are in full control at all times. We never track you silently or without permission.
+            <p className="text-emerald-900 font-bold text-sm mb-1 font-serif">Your Privacy Comes First</p>
+            <p className="text-emerald-800 text-xs sm:text-sm leading-relaxed">
+              NexTrack <strong className="text-emerald-950 font-bold">only accesses your location with your explicit, informed consent.</strong> You are in full control at all times. We never track you silently, persistently in the background, or without permission.
             </p>
           </div>
         </div>
 
-        <div className="bg-[#0d101f] border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-xl">
+        <div className="surface-card border border-[#ded7ca] rounded-3xl p-8 sm:p-12 shadow-xs">
 
           <Section title="1. Introduction">
             <p>
-              Welcome to <strong className="text-white">NexTrack</strong> ("we", "our", "us"). This Privacy
+              Welcome to <strong className="text-stone-900 font-bold">NexTrack</strong> ("we", "our", "us"). This Privacy
               Policy explains how we collect, use, store, and protect your information when you use our platform at{" "}
-              <span className="text-indigo-400">locationtracker.app</span> (the "Service").
+              <span className="text-stone-900 font-medium underline">locationtracker.app</span> (the "Service").
             </p>
             <p>
               By using our Service, you agree to the practices described in this Privacy Policy. If you do not agree,
@@ -63,27 +64,27 @@ const PrivacyPolicy = () => {
           </Section>
 
           <Section title="2. Information We Collect">
-            <p><strong className="text-slate-300">a) Account Information:</strong></p>
+            <p><strong className="text-stone-900 font-semibold">a) Account Information:</strong></p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Name and email address (when you register)</li>
               <li>Hashed password (never stored in plain text)</li>
             </ul>
-            <p className="mt-3"><strong className="text-slate-300">b) Location Data (CONSENT-BASED ONLY):</strong></p>
+            <p className="mt-4"><strong className="text-stone-900 font-semibold">b) Location Data (CONSENT-BASED ONLY):</strong></p>
             <p>
               This is the most sensitive data we handle. NexTrack accesses your geographic location{" "}
-              <strong className="text-white">ONLY when:</strong>
+              <strong className="text-stone-900 font-bold">ONLY when:</strong>
             </p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>You receive a tracking link and <strong className="text-white">voluntarily open it</strong></li>
-              <li>Your browser/device asks you to <strong className="text-white">"Allow" location access</strong> and you grant it</li>
+              <li>You receive a tracking link and <strong className="text-stone-900 font-semibold">voluntarily open it</strong></li>
+              <li>Your browser/device asks you to <strong className="text-stone-900 font-semibold">"Allow" location access</strong> and you grant it</li>
               <li>You are actively sharing — sharing stops the moment you close the page or deny permission</li>
             </ul>
-            <p className="mt-2 p-3 bg-slate-800/60 rounded-xl border border-slate-700 text-xs text-slate-400">
-              ⚠️ <strong className="text-white">We never access background location.</strong> Location is only streamed
+            <p className="mt-3 p-3.5 bg-[#f7f4ed] rounded-xl border border-[#e7e0d3] text-xs text-stone-700 leading-relaxed">
+              ⚠️ <strong className="text-stone-900">We never access background location.</strong> Location is only streamed
               in real time while the tracking page is open and permission is granted. We do not store precise location
               history.
             </p>
-            <p className="mt-3"><strong className="text-slate-300">c) Usage & Technical Data:</strong></p>
+            <p className="mt-4"><strong className="text-stone-900 font-semibold">c) Usage & Technical Data:</strong></p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Browser type, operating system, and device type</li>
               <li>IP address (for security and fraud prevention)</li>
@@ -101,14 +102,14 @@ const PrivacyPolicy = () => {
               <li>To improve and optimize our Service</li>
             </ul>
             <p>
-              We <strong className="text-white">do not sell, rent, or trade</strong> your personal information or
+              We <strong className="text-stone-900 font-bold">do not sell, rent, or trade</strong> your personal information or
               location data to any third party for commercial purposes.
             </p>
           </Section>
 
           <Section title="4. Consent & Location Tracking — In Detail">
             <p>
-              The core of our Service is <strong className="text-white">consent-first location sharing.</strong> Here is
+              The core of our Service is <strong className="text-stone-900 font-bold">consent-first location sharing.</strong> Here is
               exactly how it works:
             </p>
             <ol className="list-decimal pl-5 space-y-2">
@@ -121,14 +122,14 @@ const PrivacyPolicy = () => {
               </li>
               <li>
                 The browser natively prompts: <em>"Allow [site] to access your location?"</em> — you must click{" "}
-                <strong className="text-white">Allow</strong> for any sharing to begin.
+                <strong className="text-stone-900 font-semibold">Allow</strong> for any sharing to begin.
               </li>
               <li>
-                If you click <strong className="text-white">Block</strong> or close the page, no location is ever
+                If you click <strong className="text-stone-900 font-semibold">Block</strong> or close the page, no location is ever
                 transmitted. The process ends immediately.
               </li>
               <li>
-                Sharing is <strong className="text-white">real-time only</strong>. Once you close the tab or revoke
+                Sharing is <strong className="text-stone-900 font-semibold">real-time only</strong>. Once you close the tab or revoke
                 browser permission, tracking ends instantly.
               </li>
             </ol>
@@ -138,7 +139,7 @@ const PrivacyPolicy = () => {
             <ul className="list-disc pl-5 space-y-2">
               <li>Account data is retained until you delete your account.</li>
               <li>Tracking requests (links) auto-expire and are purged from our database after expiry.</li>
-              <li>Real-time location coordinates are <strong className="text-white">not permanently stored</strong> — they are only transmitted live via WebSocket.</li>
+              <li>Real-time location coordinates are <strong className="text-stone-900 font-bold">not permanently stored</strong> — they are only transmitted live via WebSocket.</li>
               <li>You may request deletion of your account and all associated data at any time by emailing us.</li>
             </ul>
           </Section>
@@ -150,7 +151,7 @@ const PrivacyPolicy = () => {
             <ul className="list-disc pl-5 space-y-1">
               <li>All data is transmitted over HTTPS (TLS encryption)</li>
               <li>Passwords are hashed using bcrypt before storage</li>
-              <li>Tracking tokens are UUID-based and unpredictable</li>
+              <li>Tracking tokens are UUID-based and cryptographically random</li>
               <li>WebSocket connections are authenticated and session-scoped</li>
             </ul>
           </Section>
@@ -158,51 +159,31 @@ const PrivacyPolicy = () => {
           <Section title="7. Your Rights">
             <p>You have the following rights regarding your data:</p>
             <ul className="list-disc pl-5 space-y-2">
-              <li><strong className="text-slate-300">Access:</strong> Request a copy of data we hold about you</li>
-              <li><strong className="text-slate-300">Correction:</strong> Ask us to correct inaccurate data</li>
-              <li><strong className="text-slate-300">Deletion:</strong> Request deletion of your account and all data</li>
-              <li><strong className="text-slate-300">Withdraw Consent:</strong> Stop location sharing at any time by closing the tracking page or revoking browser permission</li>
-              <li><strong className="text-slate-300">Portability:</strong> Request your data in a portable format</li>
+              <li><strong className="text-stone-900">Access:</strong> Request a copy of data we hold about you</li>
+              <li><strong className="text-stone-900">Correction:</strong> Ask us to correct inaccurate data</li>
+              <li><strong className="text-stone-900">Deletion:</strong> Request deletion of your account and all data</li>
+              <li><strong className="text-stone-900">Withdraw Consent:</strong> Stop location sharing at any time by closing the tracking page or revoking browser permission</li>
+              <li><strong className="text-stone-900">Portability:</strong> Request your data in a portable format</li>
             </ul>
           </Section>
 
           <Section title="8. Third-Party Services & Advertising">
             <p>We use the following trusted third-party services that may process limited data:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li><strong className="text-slate-300">Google AdSense:</strong> We display advertisements served by Google AdSense. Google uses cookies (including the DoubleClick cookie) to serve ads based on your prior visits to our site or other sites on the internet. These cookies allow Google and its partners to serve ads to you based on your visit to our site and/or other sites on the internet. You may opt out of personalised advertising by visiting <a href="https://www.google.com/settings/ads" className="text-indigo-400 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">Google Ad Settings</a>. Alternatively, you can opt out of third-party vendor use of cookies for personalised advertising by visiting <a href="http://www.aboutads.info/choices/" className="text-indigo-400 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>.</li>
-              <li><strong className="text-slate-300">Leaflet.js:</strong> Open-source mapping library (no data sent to Leaflet)</li>
-              <li><strong className="text-slate-300">OpenStreetMap:</strong> Map tile provider (your IP may be visible when loading tiles)</li>
-              <li><strong className="text-slate-300">Socket.IO:</strong> Real-time communication library</li>
+              <li><strong className="text-stone-900">Leaflet.js:</strong> Open-source mapping library (no data sent to Leaflet)</li>
+              <li><strong className="text-stone-900">OpenStreetMap:</strong> Map tile provider (your IP may be visible when loading tiles)</li>
+              <li><strong className="text-stone-900">Socket.IO:</strong> Real-time communication library</li>
             </ul>
-            <p className="mt-2 p-3 bg-slate-800/60 rounded-xl border border-slate-700 text-xs text-slate-400">
-              🍪 <strong className="text-white">Cookies:</strong> We and our advertising partners use cookies to personalise content and ads, to provide social media features, and to analyse our traffic. By using this site you consent to our use of cookies in accordance with this policy.
-            </p>
           </Section>
 
-          <Section title="9. Children's Privacy">
-            <p>
-              Our Service is not directed to children under the age of 13. We do not knowingly collect personal
-              information from children. If you believe a child has provided us with personal information, please
-              contact us immediately.
-            </p>
-          </Section>
-
-          <Section title="10. Changes to This Policy">
-            <p>
-              We may update this Privacy Policy from time to time. We will notify you of significant changes by updating
-              the "Last Updated" date at the top of this page. Continued use of the Service after changes constitutes
-              acceptance of the updated policy.
-            </p>
-          </Section>
-
-          <Section title="11. Contact Us">
+          <Section title="9. Contact Us">
             <p>
               If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at:
             </p>
-            <div className="mt-2 bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm">
-              <p className="text-white font-medium">NexTrack Support</p>
-              <p className="text-indigo-400 mt-1">📧 privacy@locationtracker.app</p>
-              <p className="text-slate-400 mt-1">We respond to all privacy requests within 72 hours.</p>
+            <div className="mt-3 bg-[#f7f4ed] border border-[#e7e0d3] rounded-2xl p-5 text-sm">
+              <p className="text-stone-900 font-bold font-serif">NexTrack Privacy Desk</p>
+              <p className="text-stone-800 font-mono mt-1">privacy@locationtracker.app</p>
+              <p className="text-stone-500 text-xs mt-1">We respond to all privacy disclosures and inquiries within 72 hours.</p>
             </div>
           </Section>
 

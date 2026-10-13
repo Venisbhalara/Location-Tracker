@@ -13,7 +13,7 @@ import { getAdminAnalytics } from "../../services/api";
 import {
   Users, Zap, Activity, Radio, ArrowUp, ArrowDown,
   X, Volume2, VolumeX, AlertTriangle, ChevronRight, BarChart2,
-  Calendar, Globe, GitMerge, RefreshCw,
+  Calendar, Globe, RefreshCw,
 } from "lucide-react";
 
 import { UserJourney } from "../../components/UserJourney";
@@ -24,8 +24,6 @@ const SOCKET_URL =
   (typeof window !== "undefined" ? window.location.origin : "http://localhost:5000");
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-
-
 
 // Map ISO2 → numeric id (subset for react-simple-maps world-atlas)
 const ISO2_TO_NUMERIC = {
@@ -38,7 +36,7 @@ const ISO2_TO_NUMERIC = {
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 const Skeleton = ({ className = "" }) => (
-  <div className={`animate-pulse bg-white/[0.06] rounded-xl ${className}`} />
+  <div className={`animate-pulse bg-[#f0eae1] rounded-2xl ${className}`} />
 );
 
 // ─── Animated Counter ─────────────────────────────────────────────────────────
@@ -63,7 +61,7 @@ const AnimCounter = memo(({ value }) => {
 });
 
 // ─── Sparkline ────────────────────────────────────────────────────────────────
-const Sparkline = ({ data = [], color = "#7C6FFF" }) => {
+const Sparkline = ({ data = [], color = "#1c1b18" }) => {
   const max = Math.max(...data, 1);
   const pts = data
     .map((v, i) => `${data.length > 1 ? (i / (data.length - 1)) * 60 : 30},${20 - (v / max) * 18}`)
@@ -84,65 +82,50 @@ const Sparkline = ({ data = [], color = "#7C6FFF" }) => {
 };
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
-const StatCard = ({ title, value, icon: Icon, color, change, sparkData, pulse }) => {
+const StatCard = ({ title, value, icon: Icon, change, sparkData, pulse }) => {
   const positive = change >= 0;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 22 }}
-      className="relative overflow-hidden rounded-xl p-4 flex flex-col gap-2.5"
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        backdropFilter: "blur(16px)",
-        border: `1px solid ${color}33`,
-        boxShadow: `0 0 20px ${color}18, inset 0 1px 0 rgba(255,255,255,0.06)`,
-      }}
+      transition={{ duration: 0.3 }}
+      className="bg-white border border-[#ded7ca] rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:border-[#b8afa0] transition-all relative overflow-hidden"
     >
-      {/* glow blob */}
-      <div
-        className="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-[50px] pointer-events-none"
-        style={{ background: `${color}25` }}
-      />
-
-      {/* header */}
+      {/* Header */}
       <div className="flex justify-between items-start relative z-10">
-        <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center"
-          style={{ background: `${color}22`, border: `1px solid ${color}44` }}
-        >
-          <Icon size={16} style={{ color }} />
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#f0eae1] border border-[#ded7ca]">
+          <Icon size={16} className="text-[#1c1b18]" />
         </div>
         {pulse && (
-          <span className="flex items-center gap-1.5">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#2d7a4f]/10 border border-[#2d7a4f]/20">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2d7a4f] opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#2d7a4f]" />
             </span>
-            <span className="text-[9px] font-bold text-emerald-400 tracking-wider">LIVE</span>
+            <span className="text-[9px] font-bold text-[#2d7a4f] tracking-wider font-mono">LIVE</span>
           </span>
         )}
       </div>
 
-      {/* value */}
+      {/* Value */}
       <div className="relative z-10">
-        <div className="text-2xl font-bold text-white tracking-tight">
+        <div className="text-2xl sm:text-3xl font-serif text-[#1c1b18] tracking-tight">
           <AnimCounter value={value} />
         </div>
-        <div className="text-[10px] text-white/40 mt-0.5 font-medium uppercase tracking-wider">{title}</div>
+        <div className="text-xs text-[#6e685f] mt-1 font-medium">{title}</div>
       </div>
 
-      {/* footer */}
-      <div className="flex items-center justify-between relative z-10">
+      {/* Footer */}
+      <div className="flex items-center justify-between relative z-10 pt-1 border-t border-[#f0eae1]">
         <div
-          className={`flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-            positive ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+          className={`flex items-center gap-1 text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full ${
+            positive ? "bg-[#2d7a4f]/10 text-[#2d7a4f]" : "bg-[#c84032]/10 text-[#c84032]"
           }`}
         >
-          {positive ? <ArrowUp size={8} /> : <ArrowDown size={8} />}
+          {positive ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
           {Math.abs(change)}%
         </div>
-        <Sparkline data={sparkData} color={color} />
+        <Sparkline data={sparkData} color="#1c1b18" />
       </div>
     </motion.div>
   );
@@ -154,24 +137,21 @@ const CustomTooltip = ({ active, payload, label }) => {
   const signups = payload.find(p => p.dataKey === "signups")?.value ?? 0;
   const tracking = payload.find(p => p.dataKey === "trackingRequests")?.value ?? 0;
   return (
-    <div
-      className="rounded-xl p-3 text-sm shadow-2xl border border-white/10"
-      style={{
-        background: "rgba(8,13,26,0.95)",
-        backdropFilter: "blur(20px)",
-        minWidth: 160,
-      }}
-    >
-      <div className="text-white/60 font-medium mb-2">{label}</div>
-      <div className="flex items-center gap-2 mb-1">
-        <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#7C6FFF" }} />
-        <span className="text-white/70">Signups:</span>
-        <span className="text-white font-bold">{signups}</span>
+    <div className="bg-white border border-[#ded7ca] rounded-xl p-3 shadow-xl text-xs font-sans min-w-[160px]">
+      <div className="text-[#6e685f] font-semibold mb-2">{label}</div>
+      <div className="flex items-center justify-between gap-3 mb-1">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-sm bg-[#1c1b18]" />
+          <span className="text-[#6e685f]">Signups:</span>
+        </div>
+        <span className="text-[#1c1b18] font-bold font-mono">{signups}</span>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#00F5C4" }} />
-        <span className="text-white/70">Tracking:</span>
-        <span className="text-white font-bold">{tracking}</span>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-sm bg-[#8c8273]" />
+          <span className="text-[#6e685f]">Tracking:</span>
+        </div>
+        <span className="text-[#1c1b18] font-bold font-mono">{tracking}</span>
       </div>
     </div>
   );
@@ -187,10 +167,10 @@ const relTime = (ts) => {
 };
 
 const typeConfig = {
-  signup:       { color: "#10B981", label: "New Signup",  dot: "#10B981" },
-  login:        { color: "#3B82F6", label: "Login",        dot: "#3B82F6" },
-  failed_login: { color: "#EF4444", label: "Failed Login", dot: "#EF4444" },
-  tracking:     { color: "#00F5C4", label: "Tracking",     dot: "#00F5C4" },
+  signup:       { color: "#2d7a4f", label: "New Signup",  dot: "#2d7a4f" },
+  login:        { color: "#1c1b18", label: "Login",        dot: "#1c1b18" },
+  failed_login: { color: "#c84032", label: "Failed Login", dot: "#c84032" },
+  tracking:     { color: "#8c8273", label: "Tracking",     dot: "#8c8273" },
 };
 
 const LiveRow = memo(({ event }) => {
@@ -203,23 +183,21 @@ const LiveRow = memo(({ event }) => {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: -12 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 12 }}
-      transition={{ type: "spring", stiffness: 300, damping: 28 }}
-      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.03] transition-colors group"
+      exit={{ opacity: 0, x: 10 }}
+      transition={{ duration: 0.2 }}
+      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#faf6f0] border-b border-[#f0eae1] transition-colors"
     >
-      <span className="relative flex h-2.5 w-2.5 shrink-0">
-        <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: cfg.dot }} />
+      <span className="relative flex h-2 w-2 shrink-0">
+        <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: cfg.dot }} />
       </span>
-      <span className="text-[10px] text-white/30 font-mono w-14 shrink-0">{ts}</span>
-      <span className="text-xs font-semibold text-white/80 w-20 shrink-0 truncate">{event.label || cfg.label}</span>
-      <span className="text-xs text-white/50 flex-1 truncate">{event.detail1 || "—"}</span>
+      <span className="text-[11px] text-[#9c9489] font-mono w-14 shrink-0">{ts}</span>
+      <span className="text-xs font-semibold text-[#1c1b18] w-24 shrink-0 truncate">{event.label || cfg.label}</span>
+      <span className="text-xs text-[#6e685f] flex-1 truncate">{event.detail1 || "—"}</span>
     </motion.div>
   );
 });
-
-
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const AdminActivity = () => {
@@ -247,7 +225,7 @@ const AdminActivity = () => {
           time: e.createdAt || e.time,
         }))
       );
-      if (isAuto) toast.success("Activity report updated", { id: 'activity-refresh', duration: 2000, position: 'top-right' });
+      if (isAuto) toast.success("Activity ledger synchronized", { id: 'activity-refresh', duration: 2000 });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load analytics");
     } finally {
@@ -258,10 +236,10 @@ const AdminActivity = () => {
   useEffect(() => { 
     fetchData(range); 
     
-    // Auto-refresh every 10 seconds in background
+    // Auto-refresh every 15 seconds in background
     const interval = setInterval(() => {
       fetchData(range, true);
-    }, 10000);
+    }, 15000);
     
     return () => clearInterval(interval);
   }, [range, fetchData]);
@@ -303,7 +281,7 @@ const AdminActivity = () => {
   const funnel      = data?.funnel       || [];
   const anomalies   = (data?.anomalies   || []).filter(a => !dismissed.includes(a.message));
 
-  const journeyColors = ["#7C6FFF", "#60a5fa", "#22d3ee", "#34d399"];
+  const journeyColors = ["#1c1b18", "#454035", "#6e685f", "#9c9489"];
   const journeyData = funnel.map((step, i) => {
     const prev = i > 0 ? funnel[i - 1].count : step.count;
     const drop = prev > 0 ? Math.round((1 - step.count / prev) * 100) : 0;
@@ -337,69 +315,67 @@ const AdminActivity = () => {
   const geoLookup = {};
   geoData.forEach(({ country, count }) => { geoLookup[ISO2_TO_NUMERIC[country] || ""] = count; });
   const maxGeo = Math.max(...geoData.map(g => g.count), 1);
-  const geoScale = scaleLinear().domain([0, maxGeo]).range(["#1a1f3a", "#7C6FFF"]);
+  const geoScale = scaleLinear().domain([0, maxGeo]).range(["#e7e0d3", "#1c1b18"]);
 
-  // Sparkline data from chartData (last N days signups)
+  // Sparkline data from chartData
   const mkSpark = (key) => chartData.slice(-7).map(d => d[key] || 0);
 
-  // Gradient config for chart bars
-  const SIGNUP_COLOR   = "#7C6FFF";
-  const TRACKING_COLOR = "#00F5C4";
+  // Chart bar colors
+  const SIGNUP_COLOR   = "#1c1b18";
+  const TRACKING_COLOR = "#8c8273";
 
-  // ────────────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen w-full bg-[#0a0f1e] overflow-x-hidden selection:bg-[#7C6FFF]/30">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+    <div className="min-h-screen w-full bg-[#fcfaf6] text-[#1c1b18]">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* ── HEADER ─────────────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: -18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
-        >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-0.5">
-              <div className="w-1 h-6 rounded-full" style={{ background: "linear-gradient(#7C6FFF,#00F5C4)" }} />
-              <h1 className="text-2xl font-bold text-white tracking-tight">Activity Report</h1>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium tracking-wide bg-[#f0eae1] text-[#6e685f] border border-[#ded7ca] mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2d7a4f] animate-pulse"></span>
+              Real-Time Platform Intelligence
             </div>
-            <p className="text-white/40 text-xs ml-4">
-              Real-time platform analytics &amp; intelligence
+            <h1 className="text-3xl sm:text-4xl font-normal tracking-tight text-[#1c1b18] font-serif">
+              Activity &amp; Diagnostics Report
+            </h1>
+            <p className="text-sm text-[#6e685f] mt-1">
+              Geospatial telemetry, system event volume, and conversion funnel analytics.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => fetchData(range)}
               disabled={loading}
-              className="flex items-center gap-1.5 text-xs text-[#00F5C4]/80 hover:text-[#00F5C4] transition-colors bg-[#00F5C4]/[0.04] hover:bg-[#00F5C4]/[0.1] px-3 py-1.5 rounded-lg border border-[#00F5C4]/[0.1] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-[#ded7ca] text-xs font-semibold uppercase tracking-wider text-[#1c1b18] hover:bg-[#faf6f0] rounded-xl transition-all shadow-sm disabled:opacity-50"
             >
-              <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
-              Refresh
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+              Sync Ledger
             </button>
             <Link
               to="/admin"
-              className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.07] px-3 py-1.5 rounded-lg border border-white/[0.06]"
+              className="flex items-center gap-1.5 px-4 py-2 bg-[#1c1b18] text-[#fcfaf6] text-xs font-semibold uppercase tracking-wider hover:bg-[#2b2a27] rounded-xl transition-all shadow-sm"
             >
-              <ChevronRight size={12} className="rotate-180" />
-              Back
+              <ChevronRight size={13} className="rotate-180" />
+              Control Center
             </Link>
           </div>
-        </motion.div>
+        </div>
 
         {/* ── ANOMALY BANNERS ─────────────────────────────────────────────── */}
         <AnimatePresence>
           {anomalies.map(a => (
             <motion.div
               key={a.message}
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-sm font-medium"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#b45309]/30 bg-[#fef3c7] text-[#92400e] text-sm font-medium shadow-sm"
             >
-              <AlertTriangle size={16} className="shrink-0 text-amber-400 animate-pulse" />
+              <AlertTriangle size={16} className="shrink-0 text-[#b45309] animate-pulse" />
               <span className="flex-1">{a.message}</span>
               <button
                 onClick={() => setDismissed(p => [...p, a.message])}
-                className="p-1 hover:bg-white/10 rounded-lg transition-colors text-amber-400 hover:text-white"
+                className="p-1 hover:bg-[#fde68a] rounded-lg transition-colors text-[#92400e]"
               >
                 <X size={14} />
               </button>
@@ -409,24 +385,22 @@ const AdminActivity = () => {
 
         {/* ── STAT CARDS ──────────────────────────────────────────────────── */}
         {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-36" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              title="Total Users"
+              title="Registered User Base"
               value={stats.totalUsers || 0}
               icon={Users}
-              color="#7C6FFF"
               change={stats.weeklyChange?.users || 0}
               sparkData={mkSpark("signups")}
             />
             <StatCard
-              title="Today's Signups"
+              title="Today's Onboarding"
               value={stats.todaySignups || 0}
               icon={Zap}
-              color="#3B82F6"
               change={stats.weeklyChange?.signups || 0}
               sparkData={mkSpark("signups")}
             />
@@ -434,15 +408,13 @@ const AdminActivity = () => {
               title="Tracking Requests Today"
               value={stats.todayTrackingRequests || 0}
               icon={Activity}
-              color="#00F5C4"
               change={stats.weeklyChange?.tracking || 0}
               sparkData={mkSpark("trackingRequests")}
             />
             <StatCard
-              title="Active Now"
+              title="Active Telemetry Nodes"
               value={stats.activeNow || 0}
               icon={Radio}
-              color="#10B981"
               change={stats.weeklyChange?.activeNow || 0}
               sparkData={[1,1,2,1,3,2,stats.activeNow || 1]}
               pulse
@@ -454,21 +426,14 @@ const AdminActivity = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
           {/* Chart */}
-          <div
-            className="xl:col-span-2 rounded-2xl p-4 flex flex-col gap-3"
-            style={{
-              background: "rgba(255,255,255,0.025)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
+          <div className="xl:col-span-2 bg-white border border-[#ded7ca] rounded-2xl p-6 shadow-sm flex flex-col gap-4">
             {/* Chart toolbar */}
-            <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div className="flex items-center gap-2">
-                <BarChart2 size={16} className="text-[#7C6FFF]" />
-                <span className="font-semibold text-white">Platform Activity</span>
+                <BarChart2 size={16} className="text-[#1c1b18]" />
+                <span className="font-serif text-lg text-[#1c1b18]">Platform Throughput</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-white/[0.04] p-1 rounded-xl border border-white/[0.06]">
+              <div className="flex items-center gap-1.5 bg-[#fcfaf6] p-1 rounded-xl border border-[#ded7ca]">
                 {[
                   { label: "7 Days", val: "7" },
                   { label: "30 Days", val: "30" },
@@ -479,8 +444,8 @@ const AdminActivity = () => {
                     onClick={() => { setRange(btn.val); setCustomRange(false); }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       range === btn.val && !customRange
-                        ? "bg-[#7C6FFF] text-white shadow-lg shadow-[#7C6FFF]/30"
-                        : "text-white/40 hover:text-white"
+                        ? "bg-[#1c1b18] text-[#fcfaf6] shadow-sm"
+                        : "text-[#6e685f] hover:text-[#1c1b18]"
                     }`}
                   >
                     {btn.label}
@@ -490,8 +455,8 @@ const AdminActivity = () => {
                   onClick={() => setCustomRange(v => !v)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
                     customRange
-                      ? "bg-[#00F5C4] text-[#0a0f1e] shadow-lg shadow-[#00F5C4]/30"
-                      : "text-white/40 hover:text-white"
+                      ? "bg-[#1c1b18] text-[#fcfaf6] shadow-sm"
+                      : "text-[#6e685f] hover:text-[#1c1b18]"
                   }`}
                 >
                   <Calendar size={11} />
@@ -507,18 +472,18 @@ const AdminActivity = () => {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="flex items-center gap-3 overflow-hidden"
+                  className="flex items-center gap-3 overflow-hidden py-1"
                 >
-                  <span className="text-xs text-white/40">Days:</span>
+                  <span className="text-xs text-[#6e685f]">Interval (Days):</span>
                   <input
                     type="number"
                     min={3} max={365} defaultValue={14}
-                    className="w-20 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm outline-none focus:ring-1 focus:ring-[#7C6FFF]"
+                    className="w-20 bg-[#fcfaf6] border border-[#ded7ca] rounded-lg px-3 py-1 text-[#1c1b18] text-sm outline-none focus:border-[#1c1b18]"
                     onBlur={e => { setRange(String(e.target.value)); }}
                   />
                   <button
                     onClick={() => fetchData(range)}
-                    className="px-3 py-1.5 bg-[#7C6FFF] text-white text-xs rounded-lg hover:bg-[#9b8fff] transition-colors"
+                    className="px-3 py-1 bg-[#1c1b18] text-[#fcfaf6] text-xs font-semibold rounded-lg hover:bg-[#2b2a27] transition-colors"
                   >
                     Apply
                   </button>
@@ -536,18 +501,18 @@ const AdminActivity = () => {
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
-                      stroke="rgba(255,255,255,0.04)"
+                      stroke="#f0eae1"
                     />
                     <XAxis
                       dataKey={chartData.length > 14 ? "date" : "day"}
-                      tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
-                      axisLine={false}
+                      tick={{ fill: "#6e685f", fontSize: 11 }}
+                      axisLine={{ stroke: "#ded7ca" }}
                       tickLine={false}
                       tickFormatter={v => chartData.length > 14 ? v.slice(5) : v}
                     />
                     <YAxis
                       yAxisId="left"
-                      tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
+                      tick={{ fill: "#6e685f", fontSize: 11 }}
                       axisLine={false}
                       tickLine={false}
                       width={28}
@@ -555,76 +520,69 @@ const AdminActivity = () => {
                     <YAxis
                       yAxisId="right"
                       orientation="right"
-                      tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
+                      tick={{ fill: "#6e685f", fontSize: 11 }}
                       axisLine={false}
                       tickLine={false}
                       width={28}
                     />
-                    <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+                    <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: "#faf6f0" }} />
                     <Legend
                       formatter={(v) => (
-                        <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 11 }}>
-                          {v === "signups" ? "Signups" : "Tracking Requests"}
+                        <span style={{ color: "#6e685f", fontSize: 11, fontWeight: 500 }}>
+                          {v === "signups" ? "User Signups" : "Tracking Requests"}
                         </span>
                       )}
                     />
-                    <Bar yAxisId="left"  dataKey="signups"          name="signups"          fill={SIGNUP_COLOR}   radius={[4,4,0,0]} maxBarSize={24} isAnimationActive={true} animationDuration={800} />
-                    <Bar yAxisId="right" dataKey="trackingRequests" name="trackingRequests"  fill={TRACKING_COLOR} radius={[4,4,0,0]} maxBarSize={24} isAnimationActive={true} animationDuration={800} />
+                    <Bar yAxisId="left"  dataKey="signups"          name="signups"          fill={SIGNUP_COLOR}   radius={[4,4,0,0]} maxBarSize={24} isAnimationActive={true} animationDuration={600} />
+                    <Bar yAxisId="right" dataKey="trackingRequests" name="trackingRequests"  fill={TRACKING_COLOR} radius={[4,4,0,0]} maxBarSize={24} isAnimationActive={true} animationDuration={600} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             )}
 
-            {/* Legend */}
-            <div className="flex items-center gap-6 justify-center pt-1">
-              <div className="flex items-center gap-2 text-xs text-white/40">
-                <div className="w-3 h-3 rounded-sm" style={{ background: SIGNUP_COLOR }} />
-                Signups <span className="text-white/20">(left axis)</span>
+            {/* Legend info */}
+            <div className="flex items-center gap-6 justify-center pt-2 border-t border-[#f0eae1]">
+              <div className="flex items-center gap-2 text-xs text-[#6e685f]">
+                <div className="w-3 h-3 rounded-sm bg-[#1c1b18]" />
+                User Signups <span className="text-[#9c9489] font-mono">(left axis)</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-white/40">
-                <div className="w-3 h-3 rounded-sm" style={{ background: TRACKING_COLOR }} />
-                Tracking Requests <span className="text-white/20">(right axis)</span>
+              <div className="flex items-center gap-2 text-xs text-[#6e685f]">
+                <div className="w-3 h-3 rounded-sm bg-[#8c8273]" />
+                Tracking Beacons <span className="text-[#9c9489] font-mono">(right axis)</span>
               </div>
             </div>
           </div>
 
           {/* Live Feed */}
-          <div
-            className="rounded-2xl flex flex-col overflow-hidden"
-            style={{
-              background: "rgba(255,255,255,0.025)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
+          <div className="bg-white border border-[#ded7ca] rounded-2xl overflow-hidden shadow-sm flex flex-col">
             {/* feed header */}
-            <div className="px-4 py-3 border-b border-white/[0.05] flex items-center justify-between shrink-0">
+            <div className="px-5 py-4 border-b border-[#ded7ca] bg-[#faf6f0] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isConnected ? "bg-emerald-400" : "bg-red-400"} opacity-75`} />
-                  <span className={`relative inline-flex rounded-full h-2 w-2 ${isConnected ? "bg-emerald-400" : "bg-red-400"}`} />
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isConnected ? "bg-[#2d7a4f]" : "bg-[#c84032]"} opacity-75`} />
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${isConnected ? "bg-[#2d7a4f]" : "bg-[#c84032]"}`} />
                 </span>
-                <span className={`text-[10px] font-bold tracking-wider ${isConnected ? "text-emerald-400" : "text-red-400"}`}>
-                  {isConnected ? "● LIVE" : "● CONNECTING"}
+                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1c1b18]">
+                  {isConnected ? "Live Socket Feed" : "Connecting Socket..."}
                 </span>
               </div>
               <button
                 onClick={() => setSoundOn(v => !v)}
-                className="p-1.5 rounded-lg hover:bg-white/[0.06] transition-colors text-white/30 hover:text-white"
-                title={soundOn ? "Mute" : "Enable sound"}
+                className="p-1.5 rounded-lg border border-[#ded7ca] bg-white hover:bg-[#f0eae1] transition-colors text-[#6e685f]"
+                title={soundOn ? "Mute telemetry chime" : "Enable telemetry chime"}
               >
-                {soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
+                {soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />}
               </button>
             </div>
 
             {/* event list */}
-            <div data-lenis-prevent className="flex-1 overflow-y-auto px-1 py-2 space-y-0.5" style={{ maxHeight: 340, scrollbarWidth: "none" }}>
+            <div className="flex-1 overflow-y-auto" style={{ maxHeight: 340 }}>
               {loading ? (
-                [...Array(6)].map((_, i) => <Skeleton key={i} className="h-9 mx-2 mb-1" />)
+                [...Array(6)].map((_, i) => <Skeleton key={i} className="h-9 mx-3 my-2" />)
               ) : (
                 <AnimatePresence initial={false}>
                   {liveEvents.length === 0 && (
-                    <div className="text-center text-white/25 text-xs py-8">Awaiting events…</div>
+                    <div className="text-center text-[#9c9489] text-xs py-12">Awaiting telemetry events…</div>
                   )}
                   {liveEvents.map((ev, i) => (
                     <LiveRow key={ev.id || i} event={ev} />
@@ -635,26 +593,19 @@ const AdminActivity = () => {
           </div>
         </div>
 
-
         {/* ── GEO MAP + FUNNEL ─────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
           {/* Geo Map */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="rounded-2xl p-5"
-            style={{
-              background: "rgba(255,255,255,0.025)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Globe size={15} className="text-[#00F5C4]" />
-              <span className="font-semibold text-white">Geographic Distribution</span>
+          <div className="bg-white border border-[#ded7ca] rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Globe size={16} className="text-[#1c1b18]" />
+                <span className="font-serif text-lg text-[#1c1b18]">Geographic Origin Distribution</span>
+              </div>
+              <span className="text-xs font-mono text-[#6e685f]">{geoData.length} Territories</span>
             </div>
+            
             {loading ? (
               <Skeleton className="h-60" />
             ) : (
@@ -673,13 +624,13 @@ const AdminActivity = () => {
                             <Geography
                               key={geo.rsmKey}
                               geography={geo}
-                              fill={cnt > 0 ? geoScale(cnt) : "#1a1f33"}
-                              stroke="rgba(255,255,255,0.06)"
-                              strokeWidth={0.4}
+                              fill={cnt > 0 ? geoScale(cnt) : "#f0eae1"}
+                              stroke="#ded7ca"
+                              strokeWidth={0.5}
                               style={{
                                 default: { outline: "none" },
                                 hover: {
-                                  fill: cnt > 0 ? "#00F5C4" : "#2a2f4a",
+                                  fill: cnt > 0 ? "#1c1b18" : "#ded7ca",
                                   outline: "none",
                                   cursor: cnt > 0 ? "pointer" : "default",
                                 },
@@ -694,25 +645,25 @@ const AdminActivity = () => {
                 </div>
                 {/* Country legend */}
                 {geoData.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap gap-2 pt-3 border-t border-[#f0eae1]">
                     {geoData.slice(0, 6).map(g => (
-                      <div key={g.country} className="flex items-center gap-1.5 bg-white/[0.04] rounded-lg px-2.5 py-1 text-xs">
-                        <span className="font-bold text-[#7C6FFF]">{g.country}</span>
-                        <span className="text-white/40">{g.count}</span>
+                      <div key={g.country} className="flex items-center gap-1.5 bg-[#fcfaf6] border border-[#ded7ca] rounded-lg px-2.5 py-1 text-xs">
+                        <span className="font-bold text-[#1c1b18]">{g.country}</span>
+                        <span className="text-[#6e685f] font-mono">({g.count})</span>
                       </div>
                     ))}
                   </div>
                 )}
                 {geoData.length === 0 && (
-                  <p className="text-center text-white/20 text-xs mt-3">No geo data yet — requires IP tracking requests</p>
+                  <p className="text-center text-[#9c9489] text-xs mt-3">Awaiting IP geolocation payloads</p>
                 )}
               </>
             )}
-          </motion.div>
+          </div>
 
           {/* User Journey Tracker */}
           {loading ? (
-            <div className="rounded-[16px] p-[28px] border border-white/[0.04] bg-[#0d1424] opacity-50 flex flex-col justify-between">
+            <div className="bg-white border border-[#ded7ca] rounded-2xl p-7 shadow-sm">
               <Skeleton className="w-full h-12 mb-4" />
               <div className="flex gap-4">
                 {[...Array(4)].map((_, i) => <Skeleton key={i} className="flex-1 h-16" />)}
@@ -725,8 +676,8 @@ const AdminActivity = () => {
 
         {/* ── ERROR ────────────────────────────────────────────────────────── */}
         {error && (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm px-4 py-3 flex items-center gap-2">
-            <AlertTriangle size={14} />
+          <div className="rounded-xl border border-[#c84032]/30 bg-[#fde8e7] text-[#c84032] text-sm px-4 py-3 flex items-center gap-2">
+            <AlertTriangle size={15} />
             {error}
           </div>
         )}
@@ -751,12 +702,15 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#0a0f1e] flex flex-col items-center justify-center p-8">
-          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 max-w-2xl text-center">
-            <h2 className="text-xl font-bold text-red-500 mb-2">Something went wrong</h2>
-            <p className="text-red-400/80 mb-4 text-sm font-mono whitespace-pre-wrap">{this.state.error?.toString()}</p>
-            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors">
-              Refresh Page
+        <div className="min-h-screen bg-[#fcfaf6] flex flex-col items-center justify-center p-8">
+          <div className="bg-white border border-[#c84032]/30 rounded-2xl p-8 max-w-lg text-center shadow-lg">
+            <h2 className="text-xl font-serif text-[#c84032] mb-2">Diagnostic Exception Detected</h2>
+            <p className="text-xs text-[#6e685f] font-mono whitespace-pre-wrap mb-4">{this.state.error?.toString()}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-[#1c1b18] hover:bg-[#2b2a27] text-[#fcfaf6] text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-sm"
+            >
+              Reload Interface
             </button>
           </div>
         </div>

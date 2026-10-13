@@ -41,7 +41,7 @@ const GroupDashboard = () => {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <AmbientBackground />
-        <div className="w-10 h-10 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-3 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
       </div>
     );
   }
@@ -62,17 +62,17 @@ const GroupDashboard = () => {
       )}
 
       {/* ── HEADER ── */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10 pb-8 border-b border-white/[0.08]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10 pb-8 border-b border-[#e7e0d3]">
         <div>
           <div className="inline-flex items-center gap-2 eyebrow-pill mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
             <span>Multi-Target Telemetry</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight mb-2 font-serif">
             Group Tracking
           </h1>
-          <p className="text-slate-400 text-sm">
-            Monitor family members, field staff, or meetups on a single shared map.
+          <p className="text-stone-600 text-sm max-w-xl">
+            Monitor family members, field dispatch, or logistics crews on a unified real-time map.
           </p>
         </div>
 
@@ -81,11 +81,11 @@ const GroupDashboard = () => {
             to="/dashboard"
             className="btn-cta-secondary px-4 py-2.5 text-xs font-semibold"
           >
-            ← Dashboard
+            ← Back to Cockpit
           </Link>
           <button
             onClick={() => setShowCreate(true)}
-            className="btn-cta-primary px-5 py-2.5 text-sm font-semibold shadow-md whitespace-nowrap"
+            className="btn-cta-primary px-5 py-2.5 text-xs font-semibold shadow-xs whitespace-nowrap"
           >
             <span className="mr-1.5 text-base leading-none">+</span> New Group
           </button>
@@ -95,19 +95,19 @@ const GroupDashboard = () => {
       {/* ── METRICS STRIP ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
         {[
-          { label: "Total Groups", value: groups.length, icon: "👥", color: "text-white" },
-          { label: "Active Groups", value: groups.filter(g => g.status === "active" && !isExpired(g.expiresAt)).length, icon: "🟢", color: "text-emerald-400" },
-          { label: "Online Members", value: groups.reduce((acc, g) => acc + (g.activeMembers || 0), 0), icon: "📡", color: "text-indigo-400" },
+          { label: "Total Groups", value: groups.length, icon: "👥", color: "text-stone-900" },
+          { label: "Active Groups", value: groups.filter(g => g.status === "active" && !isExpired(g.expiresAt)).length, icon: "🟢", color: "text-emerald-700" },
+          { label: "Online Members", value: groups.reduce((acc, g) => acc + (g.activeMembers || 0), 0), icon: "📡", color: "text-stone-800" },
         ].map((s) => (
           <div
             key={s.label}
-            className="surface-card p-6 rounded-2xl border-white/[0.08] flex items-center justify-between"
+            className="surface-card p-6 rounded-2xl border border-[#e7e0d3] flex items-center justify-between shadow-xs"
           >
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
+              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">{s.label}</p>
               <p className={`text-3xl font-extrabold tracking-tight ${s.color}`}>{s.value}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl">
+            <div className="w-12 h-12 rounded-xl bg-[#ece6da] border border-[#ded7ca] flex items-center justify-center text-2xl shadow-inner">
               {s.icon}
             </div>
           </div>
@@ -116,15 +116,18 @@ const GroupDashboard = () => {
 
       {/* ── GROUPS LIST ── */}
       {groups.length === 0 ? (
-        <div className="surface-card text-center py-20 px-4 rounded-3xl border-white/[0.08]">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-3xl mb-4">
+        <div className="surface-card text-center py-20 px-4 rounded-3xl border border-[#e7e0d3] shadow-xs">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#ece6da] border border-[#ded7ca] flex items-center justify-center text-3xl mb-4 shadow-inner">
             👥
           </div>
-          <h2 className="text-lg font-bold text-white mb-1">No groups created yet</h2>
-          <p className="text-xs sm:text-sm text-slate-400 mb-6 max-w-sm mx-auto">
-            Create a tracking group to send separate links to family or team members and view them together.
+          <h2 className="text-lg font-bold text-stone-900 mb-1 font-serif">No groups created yet</h2>
+          <p className="text-xs sm:text-sm text-stone-600 mb-6 max-w-sm mx-auto leading-relaxed">
+            Create a tracking group to send individualized links to family or team members and observe their live coordinates together.
           </p>
-          <button onClick={() => setShowCreate(true)} className="btn-cta-primary px-6 py-2.5 text-xs font-semibold">
+          <button
+            onClick={() => setShowCreate(true)}
+            className="btn-cta-primary px-6 py-2.5 text-xs font-semibold shadow-xs"
+          >
             Create First Group
           </button>
         </div>
@@ -136,27 +139,27 @@ const GroupDashboard = () => {
             return (
               <div
                 key={group.id}
-                className="surface-card p-6 rounded-3xl border-white/[0.08] hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between"
+                className="surface-card p-6 rounded-2xl border border-[#e7e0d3] hover:border-stone-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
                       expired
-                        ? "bg-slate-500/10 text-slate-400 border-slate-500/20"
-                        : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                        ? "bg-stone-100 text-stone-500 border-stone-200"
+                        : "bg-emerald-50 text-emerald-800 border-emerald-200"
                     }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${expired ? "bg-slate-400" : "bg-emerald-400 animate-pulse"}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${expired ? "bg-stone-400" : "bg-emerald-600 animate-pulse"}`} />
                       {expired ? "Expired" : "Active Group"}
                     </span>
 
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-stone-500 font-medium">
                       {group.memberCount} members
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-white mb-1 truncate">{group.name}</h3>
+                  <h3 className="text-lg font-bold text-stone-900 mb-1 truncate font-serif">{group.name}</h3>
                   {group.description && (
-                    <p className="text-xs text-slate-400 mb-4 line-clamp-2">{group.description}</p>
+                    <p className="text-xs text-stone-600 mb-4 line-clamp-2 leading-relaxed">{group.description}</p>
                   )}
 
                   {/* Member Color Dots */}
@@ -165,36 +168,36 @@ const GroupDashboard = () => {
                       <div
                         key={m.id}
                         title={m.label}
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white border border-black/30 shadow-sm"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-xs"
                         style={{ background: m.color }}
                       >
                         {m.label?.charAt(0).toUpperCase()}
                       </div>
                     ))}
                     {group.members.length === 0 && (
-                      <span className="text-xs text-slate-500">No members added yet</span>
+                      <span className="text-xs text-stone-400 italic">No members assigned yet</span>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-5 border-t border-white/[0.06] flex items-center gap-2">
+                <div className="pt-5 border-t border-[#e7e0d3] flex items-center gap-2">
                   {!expired && (
                     <Link
                       to={`/groups/${group.id}/map`}
-                      className="btn-cta-primary flex-1 py-2.5 text-xs font-semibold text-center"
+                      className="btn-cta-primary flex-1 py-2 text-xs font-semibold text-center justify-center shadow-xs"
                     >
                       Open Map →
                     </Link>
                   )}
                   <Link
                     to={`/groups/${group.id}`}
-                    className="btn-cta-secondary flex-1 py-2.5 text-xs font-semibold text-center"
+                    className="btn-cta-secondary flex-1 py-2 text-xs font-semibold text-center justify-center"
                   >
                     Manage
                   </Link>
                   <button
                     onClick={() => handleDelete(group.id, group.name)}
-                    className="p-2.5 rounded-xl border border-rose-500/20 text-rose-400 hover:bg-rose-500/10 text-xs transition-colors"
+                    className="p-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs transition-colors"
                     title="Delete group"
                   >
                     ✕

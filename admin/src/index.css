@@ -1,10 +1,10 @@
-@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Syne:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: 'Clash Display', 'Syne', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Newsreader', Georgia, Cambria, serif;
+  --font-display: 'Newsreader', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
@@ -16,16 +16,16 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply text-slate-100 antialiased;
+    @apply text-stone-800 antialiased;
     font-family: var(--font-sans);
-    background-color: #090912;
-    color: #e2e8f0;
+    background-color: #fcfaf6;
+    color: #1c1b18;
   }
   h1, h2, h3, h4, h5, h6,
   .display-title,
   .section-title {
     font-family: var(--font-display);
-    letter-spacing: -0.025em;
+    letter-spacing: -0.02em;
   }
   .font-display {
     font-family: var(--font-display);
@@ -41,141 +41,139 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #090912;
+    background: #f7f4ed;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(120, 113, 108, 0.25);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(120, 113, 108, 0.4);
   }
 }
 
 @layer components {
   /* ── Typography Scale & Hierarchy Tokens ── */
   .display-title {
-    @apply text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white;
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-stone-900;
     font-family: var(--font-display);
     line-height: 1.15;
     letter-spacing: -0.025em;
   }
 
   .section-title {
-    @apply text-xl sm:text-2xl font-bold tracking-tight text-white;
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-stone-900;
     font-family: var(--font-display);
     line-height: 1.2;
     letter-spacing: -0.02em;
   }
 
   .card-title {
-    @apply text-base sm:text-lg font-semibold tracking-tight text-white;
+    @apply text-base sm:text-lg font-bold tracking-tight text-stone-900;
     font-family: var(--font-display);
     line-height: 1.3;
   }
 
   .subheading-lead {
-    @apply text-sm sm:text-base text-slate-300 font-normal leading-relaxed;
+    @apply text-sm sm:text-base text-stone-600 font-normal leading-relaxed;
   }
 
   .body-primary {
-    @apply text-xs sm:text-sm text-slate-300 leading-relaxed font-normal;
+    @apply text-xs sm:text-sm text-stone-700 leading-relaxed font-normal;
   }
 
   .body-secondary {
-    @apply text-xs text-slate-400 leading-normal;
+    @apply text-xs text-stone-500 leading-normal;
   }
 
   .caption-metadata {
-    @apply text-[11px] text-slate-400/90 font-medium tracking-normal;
+    @apply text-[11px] text-stone-500 font-medium tracking-normal;
   }
 
   .eyebrow-pill {
-    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider
-           bg-white/[0.04] border border-white/10 text-indigo-300 backdrop-blur-md shadow-sm;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider
+           bg-[#ece6da] border border-[#ded7ca] text-stone-800 shadow-xs;
   }
 
-  /* ── Surfaces ── */
+  /* ── Light Luxury Surfaces ── */
   .surface-elevated {
     @apply relative rounded-2xl border transition-all duration-300;
-    background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
-    border-color: rgba(129, 140, 248, 0.35);
-    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(16px);
+    background: #ffffff;
+    border-color: #ded7ca;
+    box-shadow: 0 12px 30px -10px rgba(28, 27, 24, 0.08), 0 1px 3px rgba(28, 27, 24, 0.04);
   }
 
   .card,
   .glass-card,
   .surface-card {
-    @apply border border-white/[0.08] rounded-2xl shadow-xl;
-    background: rgba(255, 255, 255, 0.025);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: white;
+    @apply border border-[#e7e0d3] rounded-2xl shadow-xs transition-all duration-200;
+    background: #ffffff;
+    color: #1c1b18;
   }
 
   /* ── Action / CTA Hierarchy ── */
   .btn-cta-primary,
   .nextrack-btn-primary,
   .btn-primary {
-    @apply inline-flex items-center justify-center font-semibold rounded-xl text-white
+    @apply inline-flex items-center justify-center font-semibold rounded-xl text-[#fcfaf6]
            transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
-           focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-[#090912]
-           cursor-pointer;
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+           focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2 focus:ring-offset-[#fcfaf6]
+           cursor-pointer shadow-xs;
+    background: #1c1b18;
+    color: #fcfaf6;
   }
   .btn-cta-primary:hover,
-  .nextrack-btn-primary:hover {
-    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+  .nextrack-btn-primary:hover,
+  .btn-primary:hover {
+    background: #2b2a27;
     transform: translateY(-1px);
-    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+    box-shadow: 0 4px 12px rgba(28, 27, 24, 0.12);
   }
 
   .btn-cta-secondary,
   .btn-secondary {
-    @apply inline-flex items-center justify-center font-medium px-4 py-2 rounded-xl border border-white/10
-           transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-white/20
-           text-slate-200 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 hover:text-white cursor-pointer;
+    @apply inline-flex items-center justify-center font-medium px-4 py-2 rounded-xl border border-[#ded7ca]
+           transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-stone-300
+           text-stone-700 bg-white hover:bg-[#f7f4ed] hover:border-stone-400 hover:text-stone-900 cursor-pointer shadow-xs;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center font-semibold px-4 py-2 rounded-xl text-white
-           transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500
-           bg-rose-500/15 border border-rose-500/30 text-rose-300 hover:bg-rose-500/25 hover:text-white cursor-pointer;
+    @apply inline-flex items-center justify-center font-semibold px-4 py-2 rounded-xl
+           transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-rose-400
+           bg-rose-50 border border-rose-200 text-rose-800 hover:bg-rose-100 hover:text-rose-950 cursor-pointer shadow-xs;
   }
 
   .input {
-    @apply w-full border text-white placeholder-slate-500
-           rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60
-           focus:border-indigo-500/70 transition-all duration-200;
-    background: rgba(13, 13, 23, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
+    @apply w-full border text-stone-900 placeholder-stone-400
+           rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-400/50
+           focus:border-stone-500 transition-all duration-200;
+    background: #ffffff;
+    border-color: #ded7ca;
   }
 
   .label {
-    @apply block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1;
+    @apply block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1;
   }
 
   .badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium;
   }
   .badge-green {
-    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/25;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200;
   }
   .badge-yellow {
-    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 border border-amber-500/25;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200;
   }
   .badge-red {
-    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/15 text-rose-400 border border-rose-500/25;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200;
   }
   .badge-blue {
-    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-400 border border-indigo-500/25;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-800 border border-stone-300;
   }
 
   .nice-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+    scrollbar-color: rgba(120, 113, 108, 0.25) transparent;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
   }

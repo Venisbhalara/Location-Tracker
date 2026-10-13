@@ -420,6 +420,17 @@ const start = async () => {
     }
 
     // 5. Start listening
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.error(`\n❌ PORT CONFLICT: Port ${PORT} is already in use.`);
+        console.error(`   👉 Your server is already running in another terminal window (or root 'npm run dev').`);
+        console.error(`   👉 To free port ${PORT}, run in terminal: npx kill-port ${PORT}\n`);
+      } else {
+        console.error("\n❌ Server error:", err.message);
+      }
+      process.exit(1);
+    });
+
     server.listen(PORT, "0.0.0.0", () => {
       console.log(`\n🚀 Server live at http://localhost:${PORT}`);
       console.log(`   DB     : ${process.env.DB_NAME}@${process.env.DB_HOST}:${process.env.DB_PORT}`);

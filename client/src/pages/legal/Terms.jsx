@@ -3,11 +3,11 @@ import AmbientBackground from "../../components/common/AmbientBackground";
 
 const Section = ({ title, children }) => (
   <div className="mb-10">
-    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-      <span className="w-1 h-6 rounded-full bg-indigo-500 inline-block" />
+    <h2 className="text-xl sm:text-2xl font-bold text-stone-900 mb-4 flex items-center gap-3 font-serif">
+      <span className="w-1.5 h-6 rounded-full bg-stone-800 inline-block" />
       {title}
     </h2>
-    <div className="text-slate-300 text-sm leading-relaxed space-y-3">{children}</div>
+    <div className="text-stone-700 text-sm sm:text-base leading-relaxed space-y-3">{children}</div>
   </div>
 );
 
@@ -25,28 +25,30 @@ const Terms = () => {
 
       <div className="relative z-10 max-w-3xl mx-auto">
         <div className="mb-12 text-center">
-          <span className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 text-xs text-purple-400 uppercase tracking-widest mb-5">
-            Legal Document
+          <span className="inline-flex items-center gap-2 bg-[#ece6da] border border-[#ded7ca] rounded-full px-4 py-1 text-xs text-stone-800 uppercase tracking-widest font-semibold mb-4">
+            Legal Agreement
           </span>
-          <h1 className="text-4xl font-bold text-white mb-3">Terms &amp; Conditions — NexTrack</h1>
-          <p className="text-slate-500 text-sm">
-            Effective Date: <span className="text-slate-400">March 19, 2026</span> &nbsp;·&nbsp; Last Updated:{" "}
-            <span className="text-slate-400">March 19, 2026</span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 mb-3 font-serif">
+            Terms &amp; Conditions
+          </h1>
+          <p className="text-stone-500 text-xs sm:text-sm">
+            Effective Date: <span className="text-stone-700 font-medium">March 19, 2026</span> &nbsp;·&nbsp; Last Updated:{" "}
+            <span className="text-stone-700 font-medium">March 19, 2026</span>
           </p>
         </div>
 
-        <div className="border border-amber-500/30 bg-amber-500/5 rounded-2xl p-5 mb-10 flex gap-4 items-start">
+        <div className="border border-amber-200 bg-amber-50/70 rounded-2xl p-6 mb-10 flex gap-4 items-start shadow-xs">
           <span className="text-2xl mt-0.5">⚖️</span>
           <div>
-            <p className="text-amber-400 font-semibold text-sm mb-1">Please Read Carefully</p>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <p className="text-amber-950 font-bold text-sm mb-1 font-serif">Please Read Carefully</p>
+            <p className="text-amber-900 text-xs sm:text-sm leading-relaxed">
               By accessing or using NexTrack, you agree to be bound by these Terms & Conditions. If you do not
               agree, do not use the Service.
             </p>
           </div>
         </div>
 
-        <div className="bg-[#0d101f] border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-xl">
+        <div className="surface-card border border-[#ded7ca] rounded-3xl p-8 sm:p-12 shadow-xs">
 
           <Section title="1. Acceptance of Terms">
             <p>
@@ -70,7 +72,7 @@ const Terms = () => {
 
           <Section title="3. User Accounts">
             <ul className="list-disc pl-5 space-y-2">
-              <li>You must be at least <strong className="text-white">13 years of age</strong> to create an account.</li>
+              <li>You must be at least <strong className="text-stone-900">13 years of age</strong> to create an account.</li>
               <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
               <li>You are responsible for all activity that occurs under your account.</li>
               <li>You must provide accurate and truthful information when registering.</li>
@@ -85,7 +87,7 @@ const Terms = () => {
             </p>
             <ol className="list-decimal pl-5 space-y-2">
               <li>
-                <strong className="text-white">You MUST obtain informed consent</strong> from any person whose location
+                <strong className="text-stone-900 font-semibold">You MUST obtain informed consent</strong> from any person whose location
                 you wish to track before sending them a tracking link.
               </li>
               <li>
@@ -94,18 +96,18 @@ const Terms = () => {
               </li>
               <li>
                 You acknowledge that the browser natively requests location permission — the person must click "Allow"
-                for any tracking to begin. <strong className="text-white">We cannot and do not override browser
+                for any tracking to begin. <strong className="text-stone-900 font-semibold">We cannot and do not override browser
                 permissions.</strong>
               </li>
               <li>
                 Sending tracking links to people without their knowledge or for surveillance, stalking, or harassment
-                purposes is a <strong className="text-white">violation of these Terms and may be illegal</strong> in
+                purposes is a <strong className="text-stone-900 font-bold">violation of these Terms and may be illegal</strong> in
                 your jurisdiction.
               </li>
             </ol>
-            <div className="mt-3 border border-red-500/30 bg-red-500/5 rounded-xl p-4 text-xs text-red-400">
-              ❌ <strong>Prohibited:</strong> Using NexTrack to track anyone without their explicit consent.
-              Violations may result in immediate account termination and may be reported to relevant authorities.
+            <div className="mt-4 border border-rose-200 bg-rose-50/70 rounded-xl p-4 text-xs text-rose-900 leading-relaxed">
+              ❌ <strong className="font-bold">Prohibited:</strong> Using NexTrack to track anyone without their explicit consent.
+              Violations result in immediate account termination and may be reported to relevant law enforcement authorities.
             </div>
           </Section>
 
@@ -132,12 +134,12 @@ const Terms = () => {
 
           <Section title="7. Disclaimer of Warranties">
             <p>
-              The Service is provided on an <strong className="text-white">"as is" and "as available" basis</strong>{" "}
+              The Service is provided on an <strong className="text-stone-900">"as is" and "as available" basis</strong>{" "}
               without warranties of any kind, either express or implied. We do not warrant that:
             </p>
             <ul className="list-disc pl-5 space-y-1">
               <li>The Service will be uninterrupted, error-free, or secure</li>
-              <li>Location data will be 100% accurate at all times (GPS accuracy depends on device)</li>
+              <li>Location data will be 100% accurate at all times (GPS accuracy depends on recipient device)</li>
               <li>The Service will meet your specific requirements</li>
             </ul>
           </Section>
@@ -162,25 +164,17 @@ const Terms = () => {
             </p>
           </Section>
 
-          <Section title="10. Changes to These Terms">
-            <p>
-              We may update these Terms from time to time. Material changes will be communicated via email or a
-              prominent notice on the Service. Continued use after changes go into effect constitutes acceptance of the
-              updated Terms.
-            </p>
-          </Section>
-
-          <Section title="11. Governing Law">
+          <Section title="10. Governing Law">
             <p>
               These Terms are governed by and construed in accordance with the laws of India. Any disputes arising
               from these Terms shall be subject to the exclusive jurisdiction of the courts of India.
             </p>
           </Section>
 
-          <Section title="12. Contact">
-            <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm">
-              <p className="text-white font-medium">NexTrack Legal Team</p>
-              <p className="text-indigo-400 mt-1">📧 legal@locationtracker.app</p>
+          <Section title="11. Contact">
+            <div className="bg-[#f7f4ed] border border-[#e7e0d3] rounded-2xl p-5 text-sm">
+              <p className="text-stone-900 font-bold font-serif">NexTrack Legal Desk</p>
+              <p className="text-stone-800 font-mono mt-1">legal@locationtracker.app</p>
             </div>
           </Section>
 

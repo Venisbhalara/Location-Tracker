@@ -171,9 +171,9 @@ const TrackingLink = () => {
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
         <AmbientBackground />
-        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center">
-          <div className="w-10 h-10 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center bg-white border-stone-200">
+          <div className="w-10 h-10 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
             Verifying Link Security...
           </p>
         </div>
@@ -189,19 +189,19 @@ const TrackingLink = () => {
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
         <AmbientBackground />
-        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-rose-500/30">
-          <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center text-2xl mx-auto mb-4">
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-2xl mx-auto mb-4">
             ⚠️
           </div>
-          <h1 className="text-xl font-bold text-white mb-2">Tracking Link Expired</h1>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <h1 className="text-xl font-bold text-stone-900 mb-2">Tracking Link Expired</h1>
+          <p className="text-xs text-stone-600 leading-relaxed">
             {error || "This tracking session is no longer active. Please request a new link from the sender."}
           </p>
         </div>
       </div>
     );
 
-  /* ══ 3. IDLE (CONSENT SCREEN - HIGHEST VISUAL PRIORITY) ════════════ */
+  /* ══ 3. IDLE (CONSENT SCREEN) ══════════════════════════════════════ */
   if (consent === "idle")
     return (
       <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6">
@@ -211,53 +211,53 @@ const TrackingLink = () => {
         </Helmet>
         <AmbientBackground />
 
-        <div className="relative z-10 surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-white/10 shadow-2xl text-center">
+        <div className="relative z-10 surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-stone-200/90 shadow-md text-center bg-white">
           
           {/* Identity Icon */}
-          <div className="w-16 h-16 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center mx-auto mb-5 shadow-inner">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-5 shadow-2xs">
             <img src="/location.png" alt="NexTrack" className="w-8 h-8 object-contain" />
           </div>
 
           {/* Heading */}
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight mb-2">
             Location Request
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+          <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mb-6">
             A contact has requested to view your live GPS position on a secure private map.
           </p>
 
           {/* Reassurance & Terms Summary */}
-          <div className="surface-card p-4 rounded-2xl border-indigo-500/20 text-left mb-6 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-semibold text-indigo-300">
+          <div className="surface-card p-4 rounded-2xl border-stone-200 text-left mb-6 space-y-2 bg-stone-50/70">
+            <div className="flex items-center gap-2 text-xs font-semibold text-stone-900">
               <span>🔒</span>
               <span>100% Consent-Based &amp; Encrypted</span>
             </div>
-            <ul className="text-xs text-slate-400 space-y-1.5 pl-5 list-disc leading-relaxed">
+            <ul className="text-xs text-stone-600 space-y-1.5 pl-5 list-disc leading-relaxed">
               <li>Requires your explicit browser permission.</li>
-              <li>Coordinates are streamed live and never stored permanently.</li>
-              <li>You can end sharing at any time simply by closing this tab.</li>
+              <li>Coordinates stream live and are never permanently stored.</li>
+              <li>You can end sharing at any moment by closing this browser tab.</li>
             </ul>
           </div>
 
-          {/* ACTION HIERARCHY: ALLOW (PRIMARY) vs DENY (SECONDARY) */}
+          {/* ACTION HIERARCHY */}
           <div className="space-y-3">
             <button
               onClick={handleAllow}
-              className="btn-cta-primary w-full py-4 text-base font-bold shadow-lg"
+              className="btn-cta-primary w-full py-3.5 text-sm font-bold shadow-xs"
             >
               ✓ Allow Location Sharing
             </button>
             <button
               onClick={handleDeny}
-              className="btn-cta-secondary w-full py-3 text-xs font-semibold text-slate-400"
+              className="btn-cta-secondary w-full py-2.5 text-xs font-semibold text-stone-600"
             >
               Decline / Cancel
             </button>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/[0.06]">
-            <p className="text-[11px] text-slate-500">
-              NexTrack cannot access your location without your device approval.
+          <div className="mt-6 pt-4 border-t border-stone-100">
+            <p className="text-[11px] text-stone-400">
+              NexTrack cannot access your location without your explicit hardware approval.
             </p>
           </div>
         </div>
@@ -274,42 +274,42 @@ const TrackingLink = () => {
         </Helmet>
         <AmbientBackground />
 
-        <div className="surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-emerald-500/40 shadow-2xl text-center">
+        <div className="surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-stone-200 shadow-md text-center bg-white">
           {!position ? (
             /* GPS ACQUIRING */
             <div className="py-6">
-              <div className="w-16 h-16 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-4 animate-pulse">
                 <span className="text-2xl">📡</span>
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">Acquiring GPS Signal...</h2>
-              <p className="text-xs text-slate-400 max-w-xs mx-auto">
-                Connecting to satellites and initializing WebSocket telemetry. Please keep this tab open.
+              <h2 className="text-xl font-bold text-stone-900 mb-2">Acquiring GPS Signal...</h2>
+              <p className="text-xs text-stone-600 max-w-xs mx-auto">
+                Connecting to satellites and initializing telemetry. Please keep this browser tab open.
               </p>
             </div>
           ) : (
             /* ACTIVE STREAMING */
             <div className="py-4">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm">
                 ✓
               </div>
-              <h2 className="text-2xl font-bold text-white mb-1">
+              <h2 className="text-2xl font-bold text-stone-900 mb-1">
                 Location Sharing Active
               </h2>
-              <p className="text-xs text-slate-400 mb-6">
+              <p className="text-xs text-stone-600 mb-6">
                 Your coordinates are streaming in real-time to the requester.
               </p>
 
-              <div className="surface-card p-4 rounded-2xl border-white/10 mb-6 text-xs text-slate-300 space-y-2 text-left">
+              <div className="surface-card p-4 rounded-2xl border-stone-200 mb-6 text-xs text-stone-700 space-y-2 text-left bg-stone-50/70">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Status</span>
-                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-stone-500">Status</span>
+                  <span className="text-emerald-700 font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Transmitting Live
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">GPS Precision</span>
-                  <span className="text-white font-medium">±{Math.round(position.accuracy || 10)}m</span>
+                  <span className="text-stone-500">GPS Precision</span>
+                  <span className="text-stone-900 font-medium">±{Math.round(position.accuracy || 10)}m</span>
                 </div>
               </div>
 
@@ -330,12 +330,12 @@ const TrackingLink = () => {
     return (
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <AmbientBackground />
-        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-white/10">
-          <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/10 text-slate-400 flex items-center justify-center text-2xl mx-auto mb-4">
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
+          <div className="w-14 h-14 rounded-2xl bg-stone-100 border border-stone-200 text-stone-500 flex items-center justify-center text-2xl mx-auto mb-4">
             🛑
           </div>
-          <h1 className="text-xl font-bold text-white mb-2">Sharing Stopped</h1>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <h1 className="text-xl font-bold text-stone-900 mb-2">Sharing Stopped</h1>
+          <p className="text-xs text-stone-600 leading-relaxed">
             Location telemetry has been terminated. You can safely close this browser window.
           </p>
         </div>
@@ -347,12 +347,12 @@ const TrackingLink = () => {
     return (
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <AmbientBackground />
-        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-amber-500/30">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mx-auto mb-4">
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-2xl mx-auto mb-4">
             🚫
           </div>
-          <h1 className="text-xl font-bold text-white mb-2">Permission Declined</h1>
-          <p className="text-xs text-slate-400 leading-relaxed mb-6">
+          <h1 className="text-xl font-bold text-stone-900 mb-2">Permission Declined</h1>
+          <p className="text-xs text-stone-600 leading-relaxed mb-6">
             You chose not to share your location. No coordinates were transmitted to the requester.
           </p>
           <button
@@ -370,12 +370,12 @@ const TrackingLink = () => {
     return (
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <AmbientBackground />
-        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-rose-500/30">
-          <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center text-2xl mx-auto mb-4">
+        <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
+          <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-4">
             ⚠️
           </div>
-          <h1 className="text-xl font-bold text-white mb-2">Location Sensor Error</h1>
-          <p className="text-xs text-slate-400 leading-relaxed mb-6">
+          <h1 className="text-xl font-bold text-stone-900 mb-2">Location Sensor Error</h1>
+          <p className="text-xs text-stone-600 leading-relaxed mb-6">
             {error || "Unable to acquire GPS coordinates from your device."}
           </p>
           <button

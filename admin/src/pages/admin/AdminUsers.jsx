@@ -23,7 +23,7 @@ const AdminUsers = () => {
     try {
       const res = await getAdminUsers();
       setUsers(res.data);
-    } catch (err) {
+    } catch {
       toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
@@ -95,71 +95,78 @@ const AdminUsers = () => {
   if (loading) return <LoadingScreen />;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-stone-900">
       <BackButton />
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white border-l-4 border-indigo-500 pl-3">
-          Manage Users
+      
+      <div className="mb-8 pb-4 border-b border-[#e7e0d3]">
+        <div className="inline-flex items-center gap-2 eyebrow-pill mb-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
+          <span>Identity &amp; Access Directory</span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 font-serif tracking-tight">
+          Manage Enrolled Users
         </h1>
-        <p className="text-slate-400 mt-1 text-sm">
-          View, modify, and control access for all user accounts.
+        <p className="text-stone-500 mt-1 text-xs sm:text-sm">
+          Inspect, modify system permissions, adjust session quotas, and manage user lifecycles.
         </p>
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-xl p-3 mb-6 flex flex-col md:flex-row gap-3 justify-between items-center shadow-sm">
-        <input
-          type="text"
-          placeholder="🔍 Search name or email..."
-          className="w-full md:w-1/3 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <div className="surface-card border border-[#ded7ca] rounded-2xl p-4 mb-6 flex flex-col md:flex-row gap-3 justify-between items-center shadow-xs bg-white">
+        <div className="relative w-full md:w-1/3">
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            className="w-full bg-[#fcfaf6] border border-[#ded7ca] rounded-xl px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:bg-white transition-all"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-        <div className="flex w-full md:w-auto gap-4">
+        <div className="flex w-full md:w-auto gap-3">
           <select
-            className="w-full md:w-auto bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
+            className="w-full md:w-auto bg-[#fcfaf6] border border-[#ded7ca] rounded-xl px-4 py-2.5 text-xs sm:text-sm text-stone-800 font-medium focus:outline-none focus:ring-2 focus:ring-stone-400 cursor-pointer"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
             <option value="all">All Roles</option>
-            <option value="user">Users</option>
-            <option value="admin">Admins</option>
+            <option value="user">Standard Users</option>
+            <option value="admin">Administrators</option>
           </select>
 
           <select
-            className="w-full md:w-auto bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
+            className="w-full md:w-auto bg-[#fcfaf6] border border-[#ded7ca] rounded-xl px-4 py-2.5 text-xs sm:text-sm text-stone-800 font-medium focus:outline-none focus:ring-2 focus:ring-stone-400 cursor-pointer"
             value={accessFilter}
             onChange={(e) => setAccessFilter(e.target.value)}
           >
-            <option value="all">All Access</option>
-            <option value="approved">Approved</option>
-            <option value="revoked">Revoked</option>
+            <option value="all">All Access Statuses</option>
+            <option value="approved">Active / Approved</option>
+            <option value="revoked">Revoked / Suspended</option>
           </select>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl shadow-sm border border-slate-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      <div className="surface-card rounded-2xl shadow-xs border border-[#ded7ca] overflow-hidden bg-white">
+        <div className="overflow-x-auto nice-scrollbar">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
-              <tr className="bg-slate-800/50 border-b border-slate-800 text-slate-400 text-[11px] uppercase tracking-wider">
-                <th className="px-4 py-3 font-semibold">User</th>
-                <th className="px-4 py-3 font-semibold">Sessions</th>
-                <th className="px-4 py-3 font-semibold">Role</th>
-                <th className="px-4 py-3 font-semibold">Access Status</th>
-                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              <tr className="bg-[#f7f4ed] border-b border-[#e7e0d3] text-stone-600 text-[11px] uppercase tracking-wider font-semibold">
+                <th className="px-5 py-3.5">User Identity</th>
+                <th className="px-5 py-3.5">Active Telemetry</th>
+                <th className="px-5 py-3.5">Assigned Role</th>
+                <th className="px-5 py-3.5">Tracking Clearance</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-[#e7e0d3]">
               {filteredUsers.length === 0 ? (
                 <tr>
                   <td
                     colSpan="5"
-                    className="px-6 py-12 text-center text-slate-500"
+                    className="px-6 py-12 text-center text-stone-500 text-xs sm:text-sm italic"
                   >
-                    No users found matching your filters.
+                    No user accounts found matching your search filter.
                   </td>
                 </tr>
               ) : (
@@ -168,71 +175,83 @@ const AdminUsers = () => {
                   return (
                     <tr
                       key={u.id}
-                      className="hover:bg-slate-800/20 transition-colors"
+                      className="hover:bg-[#fcfaf6] transition-colors"
                     >
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-sm text-white">
+                      <td className="px-5 py-3.5">
+                        <div className="font-bold text-stone-900">
                           {u.name}
                         </div>
-                        <div className="text-[11px] text-slate-400">
+                        <div className="text-[11px] text-stone-500 font-mono">
                           {u.email}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                      <td className="px-5 py-3.5">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#ece6da] text-stone-800 border border-[#ded7ca]">
                           {u.sessionCount} Sessions
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <select
                           disabled={isMasterAdmin}
                           value={u.role || "user"}
                           onChange={(e) => handleRoleChange(u, e.target.value)}
-                          className={`text-xs rounded-lg px-2 py-1 outline-none border ${isMasterAdmin ? "bg-transparent border-transparent text-slate-500 appearance-none pointer-events-none" : "bg-slate-800 border-slate-700 text-slate-300 focus:border-indigo-500"}`}
+                          className={`text-xs rounded-xl px-2.5 py-1 outline-none border transition-all ${
+                            isMasterAdmin
+                              ? "bg-transparent border-transparent text-stone-500 font-semibold appearance-none pointer-events-none"
+                              : "bg-[#fcfaf6] border-[#ded7ca] text-stone-800 focus:ring-1 focus:ring-stone-400 cursor-pointer font-medium"
+                          }`}
                         >
                           <option value="user">User</option>
                           <option value="admin">Admin</option>
                         </select>
                       </td>
-                      <td className="px-4 py-3">
-                        <button
-                          disabled={isMasterAdmin}
-                          onClick={() =>
-                            handleAccessChange(
-                              u,
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <button
+                            disabled={isMasterAdmin}
+                            onClick={() =>
+                              handleAccessChange(
+                                u,
+                                u.accessStatus === "approved"
+                                  ? "revoked"
+                                  : "approved",
+                              )
+                            }
+                            className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
                               u.accessStatus === "approved"
-                                ? "revoked"
-                                : "approved",
-                            )
-                          }
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            u.accessStatus === "approved"
-                              ? "bg-indigo-500"
-                              : "bg-slate-700"
-                          } ${isMasterAdmin ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                        >
+                                ? "bg-stone-900"
+                                : "bg-stone-300"
+                            } ${isMasterAdmin ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                          >
+                            <span
+                              className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-xs transition-transform ${
+                                u.accessStatus === "approved"
+                                  ? "translate-x-5"
+                                  : "translate-x-1"
+                              }`}
+                            />
+                          </button>
                           <span
-                            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                            className={`text-xs font-semibold ${
                               u.accessStatus === "approved"
-                                ? "translate-x-5"
-                                : "translate-x-1"
+                                ? "text-emerald-800"
+                                : "text-stone-500"
                             }`}
-                          />
-                        </button>
-                        <span
-                          className={`ml-2 text-xs ${u.accessStatus === "approved" ? "text-indigo-400" : "text-slate-500"}`}
-                        >
-                          {u.accessStatus === "approved" ? "Active" : "Revoked"}
-                        </span>
+                          >
+                            {u.accessStatus === "approved" ? "Active" : "Revoked"}
+                          </span>
+                        </div>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-5 py-3.5 text-right">
                         <button
                           disabled={isMasterAdmin}
                           onClick={() => confirmDelete(u)}
-                          className={`text-red-400 hover:text-red-300 transition-colors p-1.5 rounded-lg hover:bg-red-400/10 text-xs ${isMasterAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+                          className={`text-rose-700 hover:text-rose-900 transition-colors px-2.5 py-1 rounded-lg hover:bg-rose-50 border border-transparent hover:border-rose-200 text-xs font-semibold ${
+                            isMasterAdmin ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
+                          }`}
                           title={
                             isMasterAdmin
-                              ? "Cannot delete master admin"
+                              ? "Cannot delete master administrator"
                               : "Delete User Permanently"
                           }
                         >
@@ -250,18 +269,18 @@ const AdminUsers = () => {
 
       {/* Delete Modal */}
       {userToDelete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/40 backdrop-blur-xs animate-fade-in">
           <div
-            className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0"
             onClick={() => setUserToDelete(null)}
-          ></div>
-          <div className="relative bg-slate-900 border border-slate-700/50 rounded-2xl p-6 sm:p-8 shadow-2xl max-w-md w-full transform transition-all text-center animate-in zoom-in-95 duration-200">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 mb-6 border border-red-500/20 shadow-inner shadow-red-500/20">
+          />
+          <div className="relative bg-white border border-[#ded7ca] rounded-2xl p-6 sm:p-8 shadow-2xl max-w-md w-full text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 mb-5 border border-rose-200">
               <svg
-                className="h-8 w-8 text-red-500 opacity-90 drop-shadow-md"
+                className="h-7 w-7 text-rose-700"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="1.5"
+                strokeWidth="1.8"
                 stroke="currentColor"
               >
                 <path
@@ -271,31 +290,30 @@ const AdminUsers = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
-              Delete User Record
+            <h3 className="text-xl font-bold text-stone-900 font-serif mb-2">
+              Erase User Account
             </h3>
-            <p className="text-slate-400 mb-8 leading-relaxed text-sm">
-              Are you absolutely sure you want to delete{" "}
-              <span className="text-red-400 font-semibold">
+            <p className="text-stone-600 mb-6 text-xs sm:text-sm leading-relaxed">
+              Are you certain you want to permanently erase{" "}
+              <strong className="text-stone-950">
                 {userToDelete.name}
-              </span>
-              ? This action cannot be undone and will permanently erase all
-              associated data and tracking history.
+              </strong>
+              ? All session records, group memberships, and balance slots will be deleted.
             </p>
-            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-center">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 justify-center">
               <button
                 type="button"
-                className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500 transition-colors border border-slate-700/50"
+                className="btn-cta-secondary w-full sm:w-auto px-5 py-2.5 text-xs font-semibold"
                 onClick={() => setUserToDelete(null)}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-red-500 transition-all shadow-lg shadow-red-500/25 border border-red-500/20"
+                className="btn-danger w-full sm:w-auto px-5 py-2.5 text-xs font-semibold"
                 onClick={executeDelete}
               >
-                Permanently Delete
+                Permanently Delete Record
               </button>
             </div>
           </div>

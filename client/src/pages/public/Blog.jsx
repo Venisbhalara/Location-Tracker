@@ -79,59 +79,59 @@ const Blog = () => {
 
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-6">
-          <ol className="flex items-center gap-2 text-xs text-slate-400">
-            <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-            <li className="text-slate-600">/</li>
-            <li className="text-indigo-300 font-medium">Blog</li>
+          <ol className="flex items-center gap-2 text-xs text-stone-500">
+            <li><Link to="/" className="hover:text-stone-900 transition-colors">Home</Link></li>
+            <li className="text-stone-300">/</li>
+            <li className="text-stone-900 font-medium">Journal</li>
           </ol>
         </nav>
 
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="eyebrow-pill mb-4">Engineering &amp; Insights</span>
-          <h1 className="display-title mb-4">
+          <span className="eyebrow-pill mb-4">Engineering Notes &amp; Architectural Insights</span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-stone-900 mb-4 font-serif">
             The NexTrack{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-indigo-300">
+            <span className="italic font-normal text-stone-600">
               Journal
             </span>
           </h1>
-          <p className="subheading-lead text-slate-300">
+          <p className="text-base sm:text-lg text-stone-600 max-w-xl mx-auto leading-relaxed">
             In-depth guides on geolocation telemetry, privacy architecture, and practical real-time tracking techniques.
           </p>
         </div>
 
-        {/* ── FEATURED ARTICLE (DOMINANT VISUAL HIERARCHY) ── */}
+        {/* ── FEATURED ARTICLE ── */}
         {featured && (
-          <div className="mb-14">
+          <div className="mb-12">
             <Link
               to={`/blog/${featured.slug}`}
-              className="group block surface-elevated p-8 sm:p-10 rounded-3xl border-indigo-500/40 hover:border-indigo-400/60 transition-all duration-300"
+              className="group block surface-card p-8 sm:p-10 rounded-3xl border border-[#ded7ca] hover:border-stone-400 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#ece6da] text-stone-800 border border-[#ded7ca]">
                       Featured Guide
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">
+                    <span className="text-xs text-stone-500 font-medium">
                       {featured.readTime}
                     </span>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 group-hover:text-indigo-300 transition-colors leading-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-3 group-hover:text-stone-700 transition-colors leading-tight font-serif">
                     {featured.title}
                   </h2>
 
-                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-6">
+                  <p className="text-sm sm:text-base text-stone-600 leading-relaxed mb-6">
                     {featured.excerpt}
                   </p>
 
-                  <div className="flex items-center gap-4 text-xs text-slate-400">
-                    <span className="font-medium text-slate-300">By {featured.author}</span>
+                  <div className="flex items-center gap-4 text-xs text-stone-500 pt-4 border-t border-[#e7e0d3]">
+                    <span className="font-semibold text-stone-800">By {featured.author}</span>
                     <span>•</span>
                     <span>{featured.date}</span>
-                    <span className="ml-auto font-semibold text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                      Read Article →
+                    <span className="ml-auto font-semibold text-stone-900 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                      Read Complete Article →
                     </span>
                   </div>
                 </div>
@@ -146,31 +146,31 @@ const Blog = () => {
             <Link
               key={article.slug}
               to={`/blog/${article.slug}`}
-              className="group surface-card p-7 rounded-2xl hover:border-indigo-500/30 transition-all duration-200 flex flex-col justify-between"
+              className="group surface-card p-7 rounded-2xl border border-[#e7e0d3] hover:border-stone-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-white/[0.05] border border-white/10 text-slate-300">
+                  <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#f7f4ed] border border-[#e7e0d3] text-stone-700">
                     {article.category}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-stone-500">
                     {article.readTime}
                   </span>
                 </div>
 
-                <h3 className="card-title font-bold text-white mb-3 group-hover:text-indigo-300 transition-colors">
+                <h3 className="text-lg font-bold text-stone-900 mb-3 group-hover:text-stone-700 transition-colors font-serif leading-snug">
                   {article.title}
                 </h3>
 
-                <p className="body-secondary text-slate-400 leading-relaxed mb-6">
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mb-6">
                   {article.excerpt}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
+              <div className="pt-4 border-t border-[#e7e0d3] flex items-center justify-between text-xs text-stone-500">
                 <span>{article.date}</span>
-                <span className="font-semibold text-indigo-400 group-hover:translate-x-1 transition-transform">
-                  Read →
+                <span className="font-semibold text-stone-900 group-hover:translate-x-1 transition-transform">
+                  Read Article →
                 </span>
               </div>
             </Link>

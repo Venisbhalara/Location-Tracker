@@ -12,10 +12,9 @@ const AdminAccess = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [filter, setFilter] = useState("all"); // 'all', 'pending', 'approved', 'rejected'
+  const [filter, setFilter] = useState("all");
 
-  // Rejection Modal State
-  const [rejecting, setRejecting] = useState(null); // stores the request object to reject
+  const [rejecting, setRejecting] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
   const fetchRequests = async (showToast = false) => {
@@ -23,8 +22,8 @@ const AdminAccess = () => {
     try {
       const res = await getAdminAccessRequests();
       setRequests(res.data);
-      if (showToast) toast.success("Queue updated successfully");
-    } catch (err) {
+      if (showToast) toast.success("Queue refreshed");
+    } catch {
       toast.error("Failed to load access requests queue.");
     } finally {
       setLoading(false);
@@ -43,9 +42,9 @@ const AdminAccess = () => {
       );
       await updateAdminAccessRequest(id, { status: "approved" });
       toast.success("User access approved. Notification email dispatched!");
-    } catch (err) {
+    } catch {
       toast.error("Failed to approve access.");
-      fetchRequests(); // revert
+      fetchRequests();
     }
   };
 
@@ -65,9 +64,9 @@ const AdminAccess = () => {
       toast.success("User access rejected. Notification email dispatched!");
       setRejecting(null);
       setRejectionReason("");
-    } catch (err) {
+    } catch {
       toast.error("Failed to reject access.");
-      fetchRequests(); // revert
+      fetchRequests();
     }
   };
 
@@ -77,7 +76,6 @@ const AdminAccess = () => {
     (r) => filter === "all" || r.status === filter,
   );
 
-  // Sort pending first, then by date
   filteredRequests.sort((a, b) => {
     if (a.status === "pending" && b.status !== "pending") return -1;
     if (b.status === "pending" && a.status !== "pending") return 1;
@@ -85,31 +83,38 @@ const AdminAccess = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-stone-900">
       <BackButton />
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white border-l-4 border-indigo-500 pl-3">
-          Access Approval Requests
+      <div className="mb-8 pb-4 border-b border-[#e7e0d3]">
+        <div className="inline-flex items-center gap-2 eyebrow-pill mb-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
+          <span>Gateway Authorizations</span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 font-serif tracking-tight">
+          Access Approval Queue
         </h1>
-        <p className="text-slate-400 mt-1 text-sm">
-          Manage the gateway restricting user tracking link generation
-          capabilities.
+        <p className="text-stone-500 mt-1 text-xs sm:text-sm">
+          Review operator clearance requests for generating real-time location tracking links.
         </p>
       </div>
 
-      <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-xl p-3 mb-6 flex flex-col sm:flex-row gap-3 justify-between items-center shadow-sm">
-        <div className="flex bg-slate-800 p-1 rounded-lg w-full sm:w-auto overflow-x-auto">
+      <div className="surface-card border border-[#ded7ca] rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-3 justify-between items-center shadow-xs bg-white">
+        <div className="flex bg-[#ece6da] p-1 rounded-xl w-full sm:w-auto overflow-x-auto border border-[#ded7ca]">
           {["all", "pending", "approved", "rejected"].map((state) => (
             <button
               key={state}
               onClick={() => setFilter(state)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${filter === state ? "bg-indigo-500 text-white shadow" : "text-slate-400 hover:text-white"}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                filter === state
+                  ? "bg-white text-stone-900 shadow-xs border border-[#ded7ca]"
+                  : "text-stone-600 hover:text-stone-900"
+              }`}
             >
               {state.charAt(0).toUpperCase() + state.slice(1)}
               {state === "pending" &&
                 requests.some((r) => r.status === "pending") && (
-                  <span className="ml-2 bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full font-bold">
+                  <span className="ml-2 bg-amber-200 text-amber-900 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
                     {requests.filter((r) => r.status === "pending").length}
                   </span>
                 )}
@@ -120,83 +125,83 @@ const AdminAccess = () => {
         <button
           onClick={() => fetchRequests(true)}
           disabled={isRefreshing}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed group border border-white/10 w-full sm:w-auto justify-center"
+          className="btn-cta-secondary flex items-center gap-2 px-4 py-2 text-xs font-semibold w-full sm:w-auto justify-center"
         >
           <RefreshCw
-            size={16}
+            size={14}
             className={
               isRefreshing
-                ? "animate-spin text-indigo-400"
-                : "text-slate-400 group-hover:text-white transition-colors"
+                ? "animate-spin text-stone-900"
+                : "text-stone-500 group-hover:text-stone-900 transition-colors"
             }
           />
-          {isRefreshing ? "Refreshing..." : "Refresh Queue"}
+          <span>{isRefreshing ? "Refreshing..." : "Refresh Queue"}</span>
         </button>
       </div>
 
       {filteredRequests.length === 0 ? (
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-12 text-center">
-          <div className="text-4xl mb-4">📭</div>
-          <p className="text-slate-400">
-            No requests found matching your filter.
+        <div className="surface-card border border-[#ded7ca] rounded-2xl p-16 text-center bg-white shadow-xs">
+          <div className="text-3xl mb-3">📭</div>
+          <p className="text-stone-600 text-sm font-medium">
+            No access requests matching your filter.
           </p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3.5">
           {filteredRequests.map((r) => (
             <div
               key={r.id}
-              className="bg-slate-900/80 backdrop-blur-md rounded-xl p-4 border border-slate-800 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between shadow-sm hover:border-slate-700 transition-colors"
+              className="surface-card rounded-2xl p-5 border border-[#ded7ca] flex flex-col md:flex-row gap-4 items-start md:items-center justify-between shadow-xs hover:border-stone-400 transition-all bg-white"
             >
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="font-semibold text-white text-base">
+                <div className="flex items-center gap-3 mb-1.5 flex-wrap">
+                  <h3 className="font-bold text-stone-900 text-base font-serif">
                     {r.user?.name}
                   </h3>
-                  <span className="text-sm text-slate-500 font-mono">
+                  <span className="text-xs text-stone-500 font-mono">
                     {r.user?.email}
                   </span>
                   {r.status === "pending" && (
-                    <span className="bg-yellow-500/10 text-yellow-400 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-yellow-500/20">
-                      Pending
+                    <span className="bg-amber-50 text-amber-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border border-amber-200">
+                      Pending Approval
                     </span>
                   )}
                   {r.status === "approved" && (
-                    <span className="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-emerald-500/20">
+                    <span className="bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border border-emerald-200">
                       Approved
                     </span>
                   )}
                   {r.status === "rejected" && (
-                    <span className="bg-red-500/10 text-red-400 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-red-500/20">
+                    <span className="bg-rose-50 text-rose-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border border-rose-200">
                       Rejected
                     </span>
                   )}
                 </div>
 
-                <div className="bg-slate-800/50 p-2.5 rounded-lg border border-slate-800 mt-2 inline-block min-w-[200px]">
-                  <p className="text-slate-400 text-xs mb-0.5 italic">
-                    "{r.reason || "No reason provided."}"
+                <div className="bg-[#f7f4ed] p-3 rounded-xl border border-[#e7e0d3] mt-2 inline-block max-w-xl">
+                  <p className="text-stone-700 text-xs leading-relaxed italic">
+                    "{r.reason || "No operational context specified."}"
                   </p>
                 </div>
 
-                <div className="text-xs text-slate-500 mt-3">
-                  Submitted: {new Date(r.createdAt).toLocaleString()}
+                <div className="text-[11px] text-stone-500 mt-2.5 font-mono">
+                  Requested: {new Date(r.createdAt).toLocaleString()}
                 </div>
               </div>
 
               {r.status === "pending" && (
-                <div className="flex md:flex-col gap-2 w-full md:w-auto">
+                <div className="flex md:flex-col gap-2 w-full md:w-auto shrink-0">
                   <button
                     onClick={() => handleApprove(r.id)}
-                    className="btn-primary py-1.5 px-4 flex-1 text-xs bg-emerald-600 hover:bg-emerald-500"
+                    className="btn-cta-primary py-2 px-5 flex-1 text-xs font-semibold justify-center shadow-xs"
                   >
-                    Approve
+                    Grant Access
                   </button>
                   <button
                     onClick={() => setRejecting(r)}
-                    className="btn-secondary py-1.5 px-4 flex-1 text-xs border-red-500/30 text-red-400 hover:bg-red-500/10"
+                    className="btn-danger py-2 px-5 flex-1 text-xs font-semibold justify-center"
                   >
-                    Reject
+                    Decline
                   </button>
                 </div>
               )}
@@ -207,21 +212,20 @@ const AdminAccess = () => {
 
       {/* Rejection Modal */}
       {rejecting && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4">
-              Reject Access Request
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/40 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white border border-[#ded7ca] rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-bold text-stone-900 font-serif mb-2">
+              Decline Access Request
             </h2>
-            <p className="text-sm text-slate-400 mb-4">
-              Provide a reason for rejecting{" "}
-              <strong>{rejecting.user?.name}</strong>. This will be shown to
-              them on their tracking screen.
+            <p className="text-xs sm:text-sm text-stone-600 mb-4 leading-relaxed">
+              Specify reason for declining{" "}
+              <strong className="text-stone-900">{rejecting.user?.name}</strong>. This explanation will be provided in their portal notification.
             </p>
             <form onSubmit={handleRejectSubmit}>
               <textarea
                 required
-                className="input min-h-[100px] resize-y bg-slate-800 border-slate-600 mb-4 w-full"
-                placeholder="E.g., Missing verification details..."
+                className="w-full bg-[#fcfaf6] border border-[#ded7ca] rounded-xl p-3 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:bg-white transition-all min-h-[110px] resize-y mb-4"
+                placeholder="E.g., Incomplete verification details or organizational quota reached..."
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
               />
@@ -229,15 +233,15 @@ const AdminAccess = () => {
                 <button
                   type="button"
                   onClick={() => setRejecting(null)}
-                  className="btn-secondary flex-1 py-2"
+                  className="btn-cta-secondary flex-1 py-2 text-xs font-semibold justify-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary flex-1 py-2 bg-red-600 hover:bg-red-500 shadow-lg shadow-red-600/20 border-red-500"
+                  className="btn-danger flex-1 py-2 text-xs font-semibold justify-center"
                 >
-                  Confirm Reject
+                  Confirm Decline
                 </button>
               </div>
             </form>

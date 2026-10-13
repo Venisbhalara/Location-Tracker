@@ -2,9 +2,8 @@ import { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useLenis } from "./hooks/useLenis";
 
-// ── Lazy-loaded pages (each becomes its own JS chunk) ────────────────────────
+// ── Lazy-loaded pages ─────────────────────────────────────────────────────────
 const Login = lazy(() => import("./pages/auth/Login"));
-
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminAccess = lazy(() => import("./pages/admin/AdminAccess"));
@@ -15,35 +14,29 @@ const AdminSecurity = lazy(() => import("./pages/admin/AdminSecurity"));
 const AdminActivity = lazy(() => import("./pages/admin/AdminActivity"));
 import AdminMonetization from "./pages/admin/AdminMonetization";
 
-// ── Components (always needed, kept eager) ────────────────────────────────────
+// ── Components ─────────────────────────────────────────────────────────────────
 import Navbar from "./components/layout/Navbar";
 import AdminProtectedRoute from "./components/auth/AdminProtectedRoute";
 import ScrollToTop from "./components/layout/ScrollToTop";
 
-// ── Lightweight inline fallback ───────────────────────────────────────────────
+// ── Lightweight inline fallback ────────────────────────────────────────────────
 const PageLoader = () => (
-  <div className="flex items-center justify-center py-24">
-    <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+  <div className="flex items-center justify-center py-24 min-h-[50vh]">
+    <div className="w-10 h-10 border-3 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
   </div>
 );
 
 // ── Main layout with navbar ───────────────────────────────────────────────────
 const MainLayout = ({ children }) => (
-  <div className="min-h-screen flex flex-col">
+  <div className="min-h-screen flex flex-col bg-[#fcfaf6] text-stone-900">
     <Navbar />
     <main className="flex-1">{children}</main>
   </div>
 );
 
-// ── Minimal layout for tracking links (no navbar) ──────────────────────────────
-const MinimalLayout = ({ children }) => (
-  <div className="min-h-screen bg-slate-900">{children}</div>
-);
-
 function App() {
   useLenis();
 
-  // Otherwise, use the main layout with navbar
   return (
     <MainLayout>
       <ScrollToTop />

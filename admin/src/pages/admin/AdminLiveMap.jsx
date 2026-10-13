@@ -25,13 +25,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-// Admin pin style
+// Admin pin style - refined light luxury marker
 const activeIcon = new L.divIcon({
   className: "",
   html: `<div style="
     width:22px;height:22px;border-radius:50%;
-    background:#eab308;border:3px solid #1e293b;
-    box-shadow:0 0 0 3px rgba(234,179,8,0.3);
+    background:#1c1b18;border:3px solid #ffffff;
+    box-shadow:0 0 0 3px rgba(28,27,24,0.25), 0 3px 8px rgba(0,0,0,0.15);
     animation:pulse 2s ease-in-out infinite;
   "></div>`,
   iconSize: [22, 22],
@@ -123,23 +123,41 @@ const AdminLiveMap = () => {
     : (activeTargets.length > 0 ? activeTargets[0] : { latitude: 20, longitude: 0 }); // Fallback to equator
 
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-64px)] flex flex-col">
-      <BackButton />
-      <div className="mb-4">
-        <h1 className="text-3xl font-bold text-white border-l-4 border-yellow-500 pl-3">
-          Global Live Recon
-        </h1>
-        <p className="text-slate-400 mt-1">Real-time geospatial plotting of all active device handshakes.</p>
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-64px)] flex flex-col space-y-6">
+      <BackButton to="/admin" label="Back to Control Center" />
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium tracking-wide bg-[#f0eae1] text-[#6e685f] border border-[#ded7ca] mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2d7a4f] animate-pulse"></span>
+            Geospatial Telemetry Engine
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-normal tracking-tight text-[#1c1b18] font-serif">
+            Global Live Recon
+          </h1>
+          <p className="text-sm text-[#6e685f] mt-1">Real-time geospatial plotting of all active device handshakes.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 rounded-xl bg-white border border-[#ded7ca] text-xs font-mono font-medium text-[#1c1b18] shadow-sm flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#2d7a4f]"></span>
+            <span>{activeTargets.length} ACTIVE SESSIONS</span>
+          </div>
+        </div>
       </div>
 
       {/* Main Map Rig */}
-      <div className="flex-1 bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl relative min-h-[400px]">
+      <div className="flex-1 bg-white border border-[#ded7ca] rounded-2xl overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.04)] relative min-h-[460px]">
         {activeTargets.length === 0 && (
-          <div className="absolute inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-            <div className="text-center">
-              <div className="text-5xl mb-4">💤</div>
-              <p className="text-white font-semibold text-lg">No active tracking sessions</p>
-              <p className="text-slate-400 mt-2">Waiting for new remote connections...</p>
+          <div className="absolute inset-0 z-50 bg-[#fcfaf6]/90 backdrop-blur-sm flex items-center justify-center pointer-events-none p-6">
+            <div className="text-center max-w-sm">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-[#f0eae1] border border-[#ded7ca] flex items-center justify-center text-2xl">
+                📡
+              </div>
+              <p className="text-[#1c1b18] font-serif text-xl font-normal">No active tracking sessions</p>
+              <p className="text-xs text-[#6e685f] mt-1.5 leading-relaxed">
+                Waiting for client beacons or mobile sessions to initialize real-time transmission.
+              </p>
             </div>
           </div>
         )}
@@ -158,17 +176,17 @@ const AdminLiveMap = () => {
             <div key={target.token}>
               <Marker position={[target.latitude, target.longitude]} icon={activeIcon}>
                 <Popup className="admin-map-popup">
-                  <div className="font-sans">
-                    <div className="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
-                       <p className="font-bold text-indigo-600">📱 {target.phoneNumber}</p>
-                       <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">Live</span>
+                  <div className="font-sans p-1">
+                    <div className="flex justify-between items-center border-b border-[#ded7ca] pb-2 mb-2">
+                      <p className="font-bold text-[#1c1b18]">📱 {target.phoneNumber}</p>
+                      <span className="bg-[#2d7a4f]/10 text-[#2d7a4f] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse">Live</span>
                     </div>
-                    <p className="text-xs text-slate-500 font-medium mb-0.5">Owner: <span className="text-slate-700">{target.user?.name}</span></p>
-                    <p className="text-xs text-slate-500 font-medium mb-3">Ping: {new Date(target.updatedAt).toLocaleTimeString()}</p>
+                    <p className="text-xs text-[#6e685f] font-medium mb-0.5">Owner: <span className="text-[#1c1b18] font-semibold">{target.user?.name || "Unassigned"}</span></p>
+                    <p className="text-xs text-[#6e685f] font-medium mb-2.5">Ping: <span className="font-mono text-[#1c1b18]">{new Date(target.updatedAt).toLocaleTimeString()}</span></p>
                     
-                    <div className="bg-slate-100 rounded p-2">
-                      <p className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-wider">Coordinates</p>
-                      <p className="font-mono text-xs text-slate-700">{target.latitude.toFixed(6)}, {target.longitude.toFixed(6)}</p>
+                    <div className="bg-[#fcfaf6] border border-[#ded7ca] rounded-lg p-2">
+                      <p className="text-[10px] uppercase font-bold text-[#6e685f] mb-0.5 tracking-wider">Coordinates</p>
+                      <p className="font-mono text-xs text-[#1c1b18] font-semibold">{target.latitude.toFixed(6)}, {target.longitude.toFixed(6)}</p>
                     </div>
                   </div>
                 </Popup>
@@ -178,9 +196,9 @@ const AdminLiveMap = () => {
               {target.history && target.history.length > 1 && (
                 <Polyline 
                   positions={target.history.map(p => [p.latitude, p.longitude])} 
-                  color={focusedToken === target.token ? "#eab308" : "#475569"} 
+                  color={focusedToken === target.token ? "#1c1b18" : "#8c8273"} 
                   weight={focusedToken === target.token ? 4 : 2}
-                  opacity={focusedToken === target.token ? 0.8 : 0.4}
+                  opacity={focusedToken === target.token ? 0.85 : 0.45}
                 />
               )}
             </div>
@@ -191,43 +209,60 @@ const AdminLiveMap = () => {
       </div>
 
       {/* Ground Control Target Selection */}
-      <div className="mt-6">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">Live Intercepts ({activeTargets.length})</h2>
+      <div className="mt-2">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-[#6e685f]">
+            Active Telemetry Feeds ({activeTargets.length})
+          </h2>
+          <span className="text-xs text-[#9c9489]">Click a target to auto-pan map</span>
+        </div>
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
-          {activeTargets.map(target => {
-            const isFocused = focusedToken === target.token;
-            return (
-              <div 
-                key={target.token} 
-                onClick={() => setFocusedToken(target.token)}
-                className={`snap-start min-w-[280px] cursor-pointer transition-all duration-300 rounded-xl p-4 bg-slate-900 shadow-lg border-2 ${isFocused ? 'border-yellow-500 ring-4 ring-yellow-500/20 shadow-yellow-500/10' : 'border-slate-800 hover:border-slate-600'}`}
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">🎯</span>
-                    <div>
-                      <h3 className={`font-bold ${isFocused ? 'text-yellow-400' : 'text-white'}`}>{target.phoneNumber}</h3>
-                      <p className="text-xs text-slate-500">Node ID: {target.token.slice(0,8)}</p>
+          {activeTargets.length === 0 ? (
+            <div className="w-full py-6 text-center text-xs text-[#9c9489] bg-white border border-[#ded7ca] rounded-xl">
+              No live telemetry targets connected at this time.
+            </div>
+          ) : (
+            activeTargets.map(target => {
+              const isFocused = focusedToken === target.token;
+              return (
+                <div 
+                  key={target.token} 
+                  onClick={() => setFocusedToken(target.token)}
+                  className={`snap-start min-w-[300px] cursor-pointer transition-all duration-200 rounded-xl p-4 bg-white shadow-sm border ${isFocused ? 'border-[#1c1b18] ring-2 ring-[#1c1b18]/10 shadow-[0_8px_20px_rgba(0,0,0,0.06)]' : 'border-[#ded7ca] hover:border-[#b8afa0]'}`}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#f0eae1] border border-[#ded7ca] flex items-center justify-center text-sm">
+                        🎯
+                      </div>
+                      <div>
+                        <h3 className={`font-semibold text-sm ${isFocused ? 'text-[#1c1b18]' : 'text-[#2b2a27]'}`}>{target.phoneNumber}</h3>
+                        <p className="text-[11px] font-mono text-[#9c9489]">ID: {target.token.slice(0,8)}</p>
+                      </div>
+                    </div>
+                    {isFocused && (
+                      <span className="bg-[#1c1b18] text-[#fcfaf6] text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold tracking-wider">
+                        FOCUSED
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5 p-2.5 rounded-lg bg-[#fcfaf6] border border-[#ded7ca]">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-[#6e685f]">User</span>
+                      <span className="text-[#1c1b18] font-medium truncate max-w-[140px]">{target.user?.email || "Unknown"}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-[#6e685f]">Latency</span>
+                      <span className="text-[#2b2a27] font-mono font-medium">
+                        {Math.max(0, Math.floor((new Date() - new Date(target.updatedAt))/1000))}s ago
+                      </span>
                     </div>
                   </div>
-                  {isFocused && <span className="bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">TRACKING</span>}
                 </div>
-                
-                <div className="flex flex-col gap-1.5 p-2 rounded-lg bg-slate-800/50">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Provider</span>
-                    <span className="text-slate-300 font-medium truncate max-w-[120px]">{target.user?.email}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Latency</span>
-                    <span className="text-indigo-400 font-mono">
-                      {Math.max(0, Math.floor((new Date() - new Date(target.updatedAt))/1000))}s ago
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 

@@ -28,7 +28,7 @@ const timeAgo = (date) => {
 const AdminTracking = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all"); // 'all', 'active', 'pending'
+  const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
 
   const fetchSessions = async (isAuto = false) => {
@@ -37,12 +37,12 @@ const AdminTracking = () => {
       const res = await getAdminTrackingSessions();
       setSessions(res.data);
       if (isAuto)
-        toast.success("Live sessions updated", {
+        toast.success("Live telemetry updated", {
           id: "tracking-refresh",
           duration: 2000,
           position: "top-right",
         });
-    } catch (err) {
+    } catch {
       toast.error("Failed to fetch tracking sessions.");
     } finally {
       setLoading(false);
@@ -52,7 +52,6 @@ const AdminTracking = () => {
   useEffect(() => {
     fetchSessions();
 
-    // Poll every 10 seconds to keep updated location times fresh in background
     const interval = setInterval(() => {
       fetchSessions(true);
     }, 10000);
@@ -62,7 +61,7 @@ const AdminTracking = () => {
   const handleDelete = async (id) => {
     if (
       !window.confirm(
-        "WARNING: Are you sure you want to forcibly terminate this active live map session? The payload connection will be dropped for all clients.",
+        "WARNING: Forcibly terminate this live telemetry session? The connection will be dropped immediately.",
       )
     ) {
       return;
@@ -70,8 +69,8 @@ const AdminTracking = () => {
     try {
       await deleteAdminTrackingSession(id);
       setSessions(sessions.filter((s) => s.id !== id));
-      toast.success("Session proactively terminated.");
-    } catch (err) {
+      toast.success("Session terminated.");
+    } catch {
       toast.error("Failed to delete tracking session.");
     }
   };
@@ -87,30 +86,38 @@ const AdminTracking = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-stone-900">
       <BackButton />
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white border-l-4 border-indigo-500 pl-3">
-          Global Tracking Sessions
+      
+      <div className="mb-8 pb-4 border-b border-[#e7e0d3]">
+        <div className="inline-flex items-center gap-2 eyebrow-pill mb-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
+          <span>Active Telemetry Matrix</span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 font-serif tracking-tight">
+          Global Telemetry Sessions
         </h1>
-        <p className="text-slate-400 mt-1 text-sm">
-          Monitor array of live geocoordinate payloads traversing through the
-          platform.
+        <p className="text-stone-500 mt-1 text-xs sm:text-sm">
+          Real-time oversight of geocoordinate payloads streamed through active WebSocket pipelines.
         </p>
       </div>
 
-      <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-xl p-3 mb-6 flex justify-between items-center shadow-sm">
-        <div className="flex bg-slate-800 p-1 rounded-lg">
+      <div className="surface-card border border-[#ded7ca] rounded-2xl p-4 mb-6 flex justify-between items-center shadow-xs bg-white">
+        <div className="flex bg-[#ece6da] p-1 rounded-xl border border-[#ded7ca]">
           {["all", "active", "pending"].map((state) => (
             <button
               key={state}
               onClick={() => setFilter(state)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filter === state ? "bg-indigo-500 text-white shadow" : "text-slate-400 hover:text-white"}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                filter === state
+                  ? "bg-white text-stone-900 shadow-xs border border-[#ded7ca]"
+                  : "text-stone-600 hover:text-stone-900"
+              }`}
             >
               {state.charAt(0).toUpperCase() + state.slice(1)}
               {state === "active" &&
                 sessions.some((s) => s.status === "active") && (
-                  <span className="ml-2 bg-emerald-500 text-black text-[10px] px-2 py-0.5 rounded-full font-bold">
+                  <span className="ml-2 bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
                     {sessions.filter((s) => s.status === "active").length}
                   </span>
                 )}
@@ -119,125 +126,114 @@ const AdminTracking = () => {
         </div>
       </div>
 
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl shadow-sm border border-slate-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+      <div className="surface-card rounded-2xl shadow-xs border border-[#ded7ca] overflow-hidden bg-white">
+        <div className="overflow-x-auto nice-scrollbar">
+          <table className="w-full text-left border-collapse min-w-[800px] text-xs sm:text-sm">
             <thead>
-              <tr className="bg-slate-800/50 border-b border-slate-800 text-slate-400 text-[11px] uppercase tracking-wider">
-                <th className="px-4 py-3 font-semibold">User (Owner)</th>
-                <th className="px-4 py-3 font-semibold">Label / Name</th>
-                <th className="px-4 py-3 font-semibold">Target Contact</th>
-                <th className="px-4 py-3 font-semibold">Status / Metrics</th>
-                <th className="px-4 py-3 font-semibold">Live State</th>
-                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              <tr className="bg-[#f7f4ed] border-b border-[#e7e0d3] text-stone-600 text-[11px] uppercase tracking-wider font-semibold">
+                <th className="px-5 py-3.5">Broadcaster / Owner</th>
+                <th className="px-5 py-3.5">Session Descriptor</th>
+                <th className="px-5 py-3.5">Target Contact</th>
+                <th className="px-5 py-3.5">Telemetry Coordinates</th>
+                <th className="px-5 py-3.5">Latest Sync</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-[#e7e0d3]">
               {filteredSessions.length === 0 ? (
                 <tr>
                   <td
                     colSpan="6"
-                    className="px-6 py-12 text-center text-slate-500"
+                    className="px-6 py-14 text-center text-stone-500 italic"
                   >
-                    <div className="text-4xl mb-3">📡</div>
-                    No isolated payloads matching current filter schema.
+                    <div className="text-3xl mb-2">📡</div>
+                    No active telemetry sessions matching this filter.
                   </td>
                 </tr>
               ) : (
                 filteredSessions.map((session) => (
                   <tr
                     key={session.id}
-                    className="hover:bg-slate-800/30 transition-colors"
+                    className="hover:bg-[#fcfaf6] transition-colors"
                   >
                     {/* User */}
-                    <td className="px-4 py-3 border-r border-slate-800/50">
-                      <div className="font-semibold text-sm text-slate-200">
+                    <td className="px-5 py-3.5">
+                      <div className="font-bold text-stone-900">
                         {session.user?.name}
                       </div>
-                      <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+                      <div className="text-[11px] text-stone-500 font-mono">
                         {session.user?.email}
                       </div>
                     </td>
 
                     {/* Label */}
-                    <td className="px-4 py-3 border-r border-slate-800/50">
-                      <div className="font-semibold text-sm text-white">
+                    <td className="px-5 py-3.5">
+                      <div className="font-semibold text-stone-800">
                         {session.label || (
-                          <span className="text-slate-600 font-normal text-xs italic">
-                            No Label
+                          <span className="text-stone-400 font-normal italic text-xs">
+                            Unlabeled Session
                           </span>
                         )}
                       </div>
                     </td>
 
                     {/* Target Contact */}
-                    <td className="px-4 py-3 border-r border-slate-800/50">
-                      <div className="font-medium text-slate-300 flex items-center gap-1.5 font-mono text-xs">
-                        <span className="text-slate-500">📱</span>{" "}
-                        {session.phoneNumber}
-                      </div>
-                      <div className="text-[10px] text-indigo-400/50 mt-0.5 font-mono">
-                        {session.trackingType} mode
+                    <td className="px-5 py-3.5 font-mono text-xs text-stone-700">
+                      <div>📱 {session.phoneNumber}</div>
+                      <div className="text-[10px] text-stone-500 uppercase tracking-wider mt-0.5">
+                        {session.trackingType} Mode
                       </div>
                     </td>
 
                     {/* Status & Metrics */}
-                    <td className="px-4 py-3 border-r border-slate-800/50">
+                    <td className="px-5 py-3.5">
                       {session.status === "active" ? (
                         <div className="flex items-center gap-1.5">
-                          <span className="relative flex h-1.5 w-1.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
                           </span>
-                          <span className="text-xs font-semibold text-emerald-400">
-                            Active Handshake
+                          <span className="text-xs font-bold text-emerald-800">
+                            Active Stream
                           </span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-yellow-500"></span>
-                          <span className="text-xs font-medium text-yellow-400">
-                            Awaiting Target
+                          <span className="h-2 w-2 rounded-full bg-amber-400"></span>
+                          <span className="text-xs font-medium text-amber-800">
+                            Awaiting Consent
                           </span>
                         </div>
                       )}
 
                       {session.status === "active" && session.latitude && (
-                        <div className="mt-1.5 text-[10px] font-mono text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded inline-block">
-                          Lat: {parseFloat(session.latitude).toFixed(4)} / Lng:{" "}
-                          {parseFloat(session.longitude).toFixed(4)}
+                        <div className="mt-1 text-[11px] font-mono text-stone-600 bg-[#f7f4ed] border border-[#e7e0d3] px-2 py-0.5 rounded-lg inline-block">
+                          {parseFloat(session.latitude).toFixed(4)}, {parseFloat(session.longitude).toFixed(4)}
                         </div>
                       )}
                     </td>
 
                     {/* Live State (Time) */}
-                    <td className="px-4 py-3 border-r border-slate-800/50">
-                      <div className="text-[11px] text-slate-300 mb-0.5">
-                        {session.status === "active" ? "Last Pings:" : "Idle:"}
-                      </div>
-                      <div
-                        className={`text-[10px] font-semibold ${session.status === "active" ? "text-indigo-400" : "text-slate-500"}`}
-                      >
-                        {timeAgo(session.updatedAt)}
-                      </div>
+                    <td className="px-5 py-3.5 text-xs text-stone-600 font-mono">
+                      {timeAgo(session.updatedAt)}
                     </td>
 
                     {/* Actions */}
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2 flex-col sm:flex-row">
+                    <td className="px-5 py-3.5 text-right">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => openMap(session.token)}
-                          className="text-xs text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/30 px-2 py-1 rounded-lg transition-colors flex items-center gap-1"
+                          className="btn-cta-secondary px-3 py-1 text-xs font-semibold"
                           title="Open Live Tracker UI"
                         >
                           🗺️ Map
                         </button>
                         <button
                           onClick={() => handleDelete(session.id)}
-                          className="text-xs text-red-400 hover:text-red-300 bg-red-400/10 hover:bg-red-400/20 px-2 py-1 rounded-lg transition-colors flex items-center gap-1"
-                          title="Erase DB Payload"
+                          className="btn-danger px-3 py-1 text-xs font-semibold"
+                          title="Terminate Session"
                         >
-                          🗑️ Wipe
+                          ✕ Terminate
                         </button>
                       </div>
                     </td>

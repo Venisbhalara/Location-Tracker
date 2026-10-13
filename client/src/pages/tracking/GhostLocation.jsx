@@ -11,7 +11,7 @@
  *   → Server emits 'gps-restored' to viewer's Socket.IO room
  *   → This page closes itself (or redirects to track page if close fails)
  *
- * Design: Minimal, ultra-fast, no-friction. Built to open and close in ~2 seconds.
+ * Design: Minimal, ultra-fast, calm luxury light theme.
  */
 
 import { useEffect, useState } from "react";
@@ -72,7 +72,6 @@ const GhostLocation = () => {
         autoClose(2000);
       },
       (err) => {
-        // GPS is off or denied — this tab opened before GPS came on properly
         if (err.code === err.PERMISSION_DENIED) {
           setStatus(STATUS.ERROR);
         } else {
@@ -95,11 +94,7 @@ const GhostLocation = () => {
 
   const autoClose = (delay) => {
     setTimeout(() => {
-      // Attempt 1: window.close() — works if opened by SW clients.openWindow()
       window.close();
-
-      // Attempt 2: If window.close() didn't work, redirect to the tracking page
-      // (This is the fullback for browsers where close() is blocked)
       setTimeout(() => {
         if (!window.closed) {
           window.location.replace(`/track/${token}`);
@@ -113,49 +108,59 @@ const GhostLocation = () => {
       case STATUS.ACQUIRING:
         return {
           icon: "🛰️",
-          title: "Acquiring GPS...",
-          subtitle: "Getting your precise location",
-          color: "#6366f1",
-          glow: "rgba(99,102,241,0.3)",
+          title: "Acquiring GPS Signal",
+          subtitle: "Sampling high-precision satellite coordinates...",
+          color: "#292524",
+          badgeBg: "#ece6da",
+          badgeBorder: "#ded7ca",
+          badgeText: "#44403c",
           showSpinner: true,
         };
       case STATUS.REPORTING:
         return {
           icon: "📡",
-          title: "Sending Location...",
-          subtitle: "Reporting to the server",
-          color: "#f59e0b",
-          glow: "rgba(245,158,11,0.3)",
+          title: "Transmitting Telemetry",
+          subtitle: "Relaying encrypted coordinates to server...",
+          color: "#854d0e",
+          badgeBg: "#fef3c7",
+          badgeBorder: "#fde68a",
+          badgeText: "#92400e",
           showSpinner: true,
         };
       case STATUS.SUCCESS:
         return {
           icon: "✅",
-          title: "Location Shared!",
+          title: "Telemetry Synchronized",
           subtitle: coords
             ? `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)} · ±${Math.round(coords.accuracy)}m`
-            : "Precise GPS coordinates sent to requester",
-          color: "#10b981",
-          glow: "rgba(16,185,129,0.3)",
+            : "Precise coordinates delivered to active session.",
+          color: "#166534",
+          badgeBg: "#dcfce7",
+          badgeBorder: "#bbf7d0",
+          badgeText: "#15803d",
           showSpinner: false,
         };
       case STATUS.GPS_OFF:
         return {
           icon: "📴",
           title: "GPS Unavailable",
-          subtitle: "Location services may still be off. Closing...",
-          color: "#f97316",
-          glow: "rgba(249,115,22,0.2)",
+          subtitle: "Location services may be inactive. Dismissing window...",
+          color: "#c2410c",
+          badgeBg: "#ffedd5",
+          badgeBorder: "#fed7aa",
+          badgeText: "#9a3412",
           showSpinner: false,
         };
       case STATUS.ERROR:
       default:
         return {
           icon: "⚠️",
-          title: "Could Not Get Location",
-          subtitle: "Please ensure location permission is granted.",
-          color: "#ef4444",
-          glow: "rgba(239,68,68,0.2)",
+          title: "Position Inaccessible",
+          subtitle: "Please verify mobile location permissions are granted.",
+          color: "#b91c1c",
+          badgeBg: "#fee2e2",
+          badgeBorder: "#fecaca",
+          badgeText: "#991b1b",
           showSpinner: false,
         };
     }
@@ -167,22 +172,21 @@ const GhostLocation = () => {
     <div
       style={{
         minHeight: "100vh",
-        background: "#020617",
+        background: "#fcfaf6",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily: "'Inter', system-ui, sans-serif",
-        padding: 20,
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+        padding: 24,
       }}
     >
-      {/* Background radial glow */}
+      {/* Background warm subtle ambient radial */}
       <div
         style={{
           position: "fixed",
           inset: 0,
-          background: `radial-gradient(ellipse 60% 60% at 50% 50%, ${cfg.glow}, transparent)`,
+          background: "radial-gradient(ellipse 60% 60% at 50% 40%, rgba(236,230,218,0.7), transparent 70%)",
           pointerEvents: "none",
-          transition: "background 0.8s ease",
         }}
       />
 
@@ -190,51 +194,49 @@ const GhostLocation = () => {
       <div
         style={{
           position: "relative",
-          background: "rgba(15,23,42,0.95)",
-          border: `1px solid ${cfg.color}33`,
+          background: "#ffffff",
+          border: "1px solid #ded7ca",
           borderRadius: 24,
-          padding: "40px 36px",
-          maxWidth: 360,
+          padding: "44px 36px",
+          maxWidth: 380,
           width: "100%",
           textAlign: "center",
-          boxShadow: `0 0 60px ${cfg.glow}, 0 25px 50px rgba(0,0,0,0.5)`,
-          transition: "border-color 0.8s ease, box-shadow 0.8s ease",
+          boxShadow: "0 20px 40px -15px rgba(28,27,24,0.07), 0 0 1px rgba(28,27,24,0.1)",
         }}
       >
-        {/* App name */}
+        {/* Brand eyebrow */}
         <p
           style={{
             fontSize: 11,
-            letterSpacing: 3,
-            color: "rgba(148,163,184,0.5)",
+            letterSpacing: 2.5,
+            color: "#78716c",
             textTransform: "uppercase",
-            margin: "0 0 28px",
+            fontWeight: 700,
+            margin: "0 0 24px",
           }}
         >
-          Location Tracker
+          NexTrack Telemetry
         </p>
 
         {/* Icon */}
         <div
           style={{
-            fontSize: 52,
+            fontSize: 48,
             marginBottom: 20,
             lineHeight: 1,
-            filter: `drop-shadow(0 0 20px ${cfg.glow})`,
-            animation: status === STATUS.ACQUIRING ? "float 2s ease-in-out infinite" : "none",
           }}
         >
           {cfg.icon}
         </div>
 
-        {/* Spinner (shown while working) */}
+        {/* Spinner */}
         {cfg.showSpinner && (
           <div
             style={{
-              width: 36,
-              height: 36,
-              border: `3px solid ${cfg.color}22`,
-              borderTop: `3px solid ${cfg.color}`,
+              width: 32,
+              height: 32,
+              border: "3px solid #e7e0d3",
+              borderTop: "3px solid #1c1b18",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",
               margin: "0 auto 20px",
@@ -249,8 +251,8 @@ const GhostLocation = () => {
             fontWeight: 700,
             color: cfg.color,
             margin: "0 0 8px",
-            letterSpacing: -0.5,
-            transition: "color 0.8s ease",
+            letterSpacing: -0.3,
+            fontFamily: "'Newsreader', Georgia, serif",
           }}
         >
           {cfg.title}
@@ -260,7 +262,7 @@ const GhostLocation = () => {
         <p
           style={{
             fontSize: 12,
-            color: "rgba(148,163,184,0.65)",
+            color: "#57534e",
             margin: "0 0 24px",
             lineHeight: 1.6,
             fontFamily: "monospace",
@@ -269,39 +271,21 @@ const GhostLocation = () => {
           {cfg.subtitle}
         </p>
 
-        {/* Progress dots */}
-        {cfg.showSpinner && (
-          <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 20 }}>
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: cfg.color,
-                  opacity: 0.3,
-                  animation: `blink 1.2s ${i * 0.2}s ease-in-out infinite`,
-                }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Countdown / auto-close indicator */}
+        {/* Countdown / auto-close badge */}
         {(status === STATUS.SUCCESS || status === STATUS.GPS_OFF) && (
           <div
             style={{
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              padding: "8px 16px",
-              background: `${cfg.color}11`,
-              border: `1px solid ${cfg.color}22`,
+              padding: "6px 16px",
+              background: cfg.badgeBg,
+              border: `1px solid ${cfg.badgeBorder}`,
               borderRadius: 100,
               fontSize: 11,
-              color: `${cfg.color}99`,
+              fontWeight: 600,
+              color: cfg.badgeText,
             }}
           >
             <div
@@ -309,11 +293,10 @@ const GhostLocation = () => {
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                background: cfg.color,
-                opacity: 0.6,
+                background: cfg.badgeText,
               }}
             />
-            Closing in {countdown}s...
+            Dismissing in {countdown}s...
           </div>
         )}
 
@@ -323,33 +306,22 @@ const GhostLocation = () => {
             style={{
               marginTop: 16,
               padding: "6px 12px",
-              background: "rgba(16,185,129,0.08)",
-              border: "1px solid rgba(16,185,129,0.15)",
+              background: "#f7f4ed",
+              border: "1px solid #e7e0d3",
               borderRadius: 8,
               fontSize: 11,
-              color: "rgba(52,211,153,0.7)",
+              color: "#44403c",
               fontFamily: "monospace",
             }}
           >
-            GPS Accuracy: ±{Math.round(coords.accuracy)}m
+            Precision: ±{Math.round(coords.accuracy)} meters
           </div>
         )}
       </div>
 
-      {/* CSS animations */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
         @keyframes spin {
           to { transform: rotate(360deg); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 1; }
         }
       `}</style>
     </div>

@@ -8,7 +8,7 @@ import {
 import AmbientBackground from "../../components/common/AmbientBackground";
 import toast from "react-hot-toast";
 
-const MEMBER_COLORS = ["#22c55e","#38bdf8","#f59e0b","#fb7185","#a78bfa"];
+const MEMBER_COLORS = ["#22c55e", "#38bdf8", "#f59e0b", "#fb7185", "#a78bfa"];
 
 const GroupDetail = () => {
   const { groupId } = useParams();
@@ -83,78 +83,98 @@ const GroupDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center" style={{ background: "#0d0d17" }}>
-        <div className="w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+        <AmbientBackground />
+        <div className="w-10 h-10 border-3 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!group) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center" style={{ background: "#0d0d17" }}>
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+        <AmbientBackground />
         <div className="text-center">
-          <p className="text-slate-400 mb-4">Group not found.</p>
-          <Link to="/groups" className="nextrack-btn-primary px-4 py-2 text-sm">← Back to Groups</Link>
+          <p className="text-stone-600 mb-4">Group not found.</p>
+          <Link to="/groups" className="btn-cta-primary px-4 py-2 text-xs">
+            ← Back to Groups
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden py-10 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       <AmbientBackground />
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-slate-400 mb-8">
-          <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
-          <span className="text-slate-600">/</span>
-          <Link to="/groups" className="hover:text-white transition-colors">Groups</Link>
-          <span className="text-slate-600">/</span>
-          <span className="text-white font-medium truncate">{group.name}</span>
-        </div>
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex items-center gap-2 text-xs text-stone-500">
+            <li>
+              <Link to="/dashboard" className="hover:text-stone-900 transition-colors">
+                Cockpit
+              </Link>
+            </li>
+            <li className="text-stone-300">/</li>
+            <li>
+              <Link to="/groups" className="hover:text-stone-900 transition-colors">
+                Groups
+              </Link>
+            </li>
+            <li className="text-stone-300">/</li>
+            <li className="text-stone-900 font-medium truncate max-w-xs">{group.name}</li>
+          </ol>
+        </nav>
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5 mb-8 pb-6 border-b border-[#e7e0d3]">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="display-title text-2xl sm:text-3xl font-bold text-white tracking-tight">{group.name}</h1>
-              <span className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1 rounded-full border ${
+              <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight font-serif">
+                {group.name}
+              </h1>
+              <span className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-0.5 rounded-full border ${
                 isExpired
-                  ? "bg-red-500/10 text-red-400 border-red-500/25"
-                  : "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+                  ? "bg-stone-100 text-stone-600 border-stone-200"
+                  : "bg-emerald-50 text-emerald-800 border-emerald-200"
               }`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${isExpired ? "bg-red-400" : "bg-emerald-400 animate-pulse"}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${isExpired ? "bg-stone-400" : "bg-emerald-600 animate-pulse"}`} />
                 {isExpired ? "Expired" : "Active Group"}
               </span>
             </div>
-            {group.description && <p className="body-secondary text-slate-400 text-sm mb-1">{group.description}</p>}
-            <p className="caption-metadata text-slate-500 text-xs">
-              ⏰ Session Expiry: {new Date(group.expiresAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+            {group.description && <p className="text-stone-600 text-sm mb-1 leading-relaxed">{group.description}</p>}
+            <p className="text-stone-500 text-xs font-mono">
+              ⏰ Lifetime: {new Date(group.expiresAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
             </p>
           </div>
           {!isExpired && (
-            <Link to={`/groups/${groupId}/map`}
-              className="btn-cta-primary px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 whitespace-nowrap shadow-lg shadow-indigo-500/20">
-              🗺️ Open Group Live Map
+            <Link
+              to={`/groups/${groupId}/map`}
+              className="btn-cta-primary px-6 py-2.5 text-xs font-semibold flex items-center gap-2 whitespace-nowrap shadow-xs"
+            >
+              🗺️ Open Group Map
             </Link>
           )}
         </div>
 
         {/* Members Section */}
-        <div className="surface-card rounded-2xl overflow-hidden shadow-2xl mb-6">
-          <div className="px-6 py-4 border-b border-white/[0.07] flex items-center justify-between bg-black/20">
+        <div className="surface-card rounded-2xl overflow-hidden border border-[#e7e0d3] shadow-xs mb-6">
+          <div className="px-6 py-4 border-b border-[#e7e0d3] flex items-center justify-between bg-[#f7f4ed]">
             <div>
-              <h2 className="card-title text-base font-semibold text-white">Active Members</h2>
-              <p className="caption-metadata text-slate-400 text-xs mt-0.5">{group.members.length}/5 member slots active • 1 credit per member</p>
+              <h2 className="text-sm font-bold text-stone-900 font-serif">Registered Group Members</h2>
+              <p className="text-stone-500 text-xs mt-0.5">{group.members.length}/5 capacity utilized • 1 slot per member</p>
             </div>
             {!isExpired && group.members.length < 5 && (
-              <button onClick={() => setShowAddForm(!showAddForm)}
-                className={`text-xs px-3.5 py-2 rounded-lg font-medium transition-all ${
+              <button
+                onClick={() => setShowAddForm(!showAddForm)}
+                className={`text-xs px-3.5 py-1.5 rounded-xl font-medium transition-all ${
                   showAddForm
-                    ? "bg-slate-700 text-slate-300"
+                    ? "bg-[#ece6da] text-stone-800 border border-[#ded7ca]"
                     : "btn-cta-secondary"
-                }`}>
+                }`}
+              >
                 {showAddForm ? "✕ Close Form" : "+ Add Member"}
               </button>
             )}
@@ -162,50 +182,53 @@ const GroupDetail = () => {
 
           {/* Add Member Form */}
           {showAddForm && (
-            <form onSubmit={handleAddMember}
-              className="px-6 py-5 border-b border-white/[0.07]"
-              style={{ background: "rgba(99,102,241,0.04)" }}>
-              <p className="text-indigo-400 text-sm font-semibold mb-4">➕ Add New Member</p>
+            <form onSubmit={handleAddMember} className="px-6 py-5 border-b border-[#e7e0d3] bg-[#fcfaf6]">
+              <p className="text-stone-900 text-sm font-bold mb-4 font-serif">➕ Add Member to Tracking Cohort</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Phone Number *</label>
+                  <label className="block text-stone-700 text-xs font-semibold mb-1">Phone Number *</label>
                   <input
                     type="tel"
                     value={form.phoneNumber}
                     onChange={(e) => setForm((p) => ({ ...p, phoneNumber: e.target.value }))}
                     placeholder="+91 98765 43210"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                    className="w-full bg-white border border-[#ded7ca] rounded-xl px-3.5 py-2 text-stone-900 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 transition-all"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Display Name</label>
+                  <label className="block text-stone-700 text-xs font-semibold mb-1">Display Label</label>
                   <input
                     type="text"
                     value={form.label}
                     onChange={(e) => setForm((p) => ({ ...p, label: e.target.value }))}
-                    placeholder='e.g. "Dad", "Alice", "Truck 3"'
+                    placeholder='e.g. "Dad", "Field Lead 1", "Courier"'
                     maxLength={50}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                    className="w-full bg-white border border-[#ded7ca] rounded-xl px-3.5 py-2 text-stone-900 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 transition-all"
                   />
                 </div>
               </div>
               {/* Color preview */}
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-slate-500 text-xs">Auto-assigned color:</span>
+                <span className="text-stone-500 text-xs">Auto-assigned color identifier:</span>
                 {MEMBER_COLORS.map((c, i) => {
                   const used = group.members.map((m) => m.color);
                   const isUsed = used.includes(c);
                   return (
-                    <div key={c}
-                      className={`w-5 h-5 rounded-full border-2 ${!isUsed && i === group.members.length ? "border-white scale-110" : "border-transparent opacity-40"}`}
-                      style={{ background: c }} />
+                    <div
+                      key={c}
+                      className={`w-5 h-5 rounded-full border-2 ${!isUsed && i === group.members.length ? "border-stone-900 scale-110 shadow-xs" : "border-transparent opacity-40"}`}
+                      style={{ background: c }}
+                    />
                   );
                 })}
               </div>
-              <button type="submit" disabled={adding}
-                className="nextrack-btn-primary px-6 py-2.5 text-sm disabled:opacity-50">
-                {adding ? "Adding..." : "Add Member (1 credit)"}
+              <button
+                type="submit"
+                disabled={adding}
+                className="btn-cta-primary px-5 py-2 text-xs font-semibold shadow-xs disabled:opacity-50"
+              >
+                {adding ? "Adding..." : "Add Member (1 slot)"}
               </button>
             </form>
           )}
@@ -214,39 +237,42 @@ const GroupDetail = () => {
           {group.members.length === 0 ? (
             <div className="text-center py-12 px-4">
               <div className="text-3xl mb-3">👥</div>
-              <p className="text-slate-400 text-sm font-medium mb-1">No members yet</p>
-              <p className="text-slate-600 text-xs">Click "+ Add Member" to start tracking people in this group.</p>
+              <p className="text-stone-800 text-sm font-semibold mb-1">No members added yet</p>
+              <p className="text-stone-500 text-xs">Click "+ Add Member" to begin tracking participants in this group.</p>
             </div>
           ) : (
-            <div className="divide-y divide-white/[0.04]">
-              {group.members.map((member, idx) => {
+            <div className="divide-y divide-[#e7e0d3]">
+              {group.members.map((member) => {
                 const online = member.sharerOnline;
-                const trackingLink = `${window.location.origin}/track/${member.token}`;
 
                 return (
-                  <div key={member.id}
-                    className="px-6 py-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors group">
+                  <div
+                    key={member.id}
+                    className="px-6 py-4 flex items-center gap-4 hover:bg-[#f7f4ed]/50 transition-colors group"
+                  >
                     {/* Color avatar */}
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg flex-shrink-0 border-2 border-black/20"
-                      style={{ background: member.color }}>
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-xs shrink-0 border-2 border-white"
+                      style={{ background: member.color }}
+                    >
                       {member.label?.charAt(0).toUpperCase()}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-white font-semibold text-sm">{member.label}</span>
+                        <span className="text-stone-900 font-semibold text-sm">{member.label}</span>
                         {online ? (
-                          <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
-                            <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" /> Live
+                          <span className="flex items-center gap-1 text-[10px] text-emerald-700 font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" /> Live
                           </span>
                         ) : (
-                          <span className="text-[10px] text-slate-600">Offline</span>
+                          <span className="text-[10px] text-stone-400">Offline</span>
                         )}
                       </div>
-                      <p className="text-slate-500 text-xs font-mono">{member.phoneNumber}</p>
+                      <p className="text-stone-500 text-xs font-mono">{member.phoneNumber}</p>
                       {member.lastUpdatedAt && (
-                        <p className="text-slate-700 text-xs mt-0.5">
+                        <p className="text-stone-400 text-xs mt-0.5">
                           Last seen: {new Date(member.lastUpdatedAt).toLocaleTimeString()}
                         </p>
                       )}
@@ -255,26 +281,34 @@ const GroupDetail = () => {
                     {/* Location mode badge */}
                     <div className="hidden sm:block">
                       {member.locationMode === "gps" && online ? (
-                        <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">GPS</span>
+                        <span className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold">
+                          GPS Satellite
+                        </span>
                       ) : member.locationMode === "ip" ? (
-                        <span className="text-xs bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full">IP</span>
+                        <span className="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-semibold">
+                          IP Approx
+                        </span>
                       ) : (
-                        <span className="text-xs bg-slate-500/10 text-slate-500 border border-slate-500/20 px-2 py-0.5 rounded-full">Offline</span>
+                        <span className="text-xs bg-stone-100 text-stone-500 border border-stone-200 px-2 py-0.5 rounded-full">
+                          Inactive
+                        </span>
                       )}
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => copyLink(member.token, member.id)}
                         title="Copy tracking link"
-                        className="text-xs px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 transition-all">
+                        className="text-xs px-3 py-1.5 rounded-xl bg-white border border-[#ded7ca] text-stone-800 hover:bg-[#ece6da] font-medium transition-all shadow-xs"
+                      >
                         {copiedToken === member.id ? "✓ Copied" : "🔗 Link"}
                       </button>
                       <button
                         onClick={() => handleRemove(member.id, member.label)}
                         title="Remove member"
-                        className="text-xs px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all">
+                        className="text-xs px-3 py-1.5 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 transition-all font-medium"
+                      >
                         Remove
                       </button>
                     </div>
@@ -286,14 +320,13 @@ const GroupDetail = () => {
         </div>
 
         {/* Info box */}
-        <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4">
-          <p className="text-indigo-400 text-sm font-semibold mb-1">💡 How Group Tracking Works</p>
-          <ul className="text-slate-400 text-xs space-y-1 list-disc list-inside">
-            <li>Each member gets a unique tracking link — share it with them.</li>
-            <li>They open the link on their phone and allow location access.</li>
-            <li>You watch everyone live on the Group Map simultaneously.</li>
-            <li>Adding a member costs 1 tracking credit.</li>
-            <li>Maximum 5 members per group.</li>
+        <div className="rounded-2xl border border-[#e7e0d3] bg-[#f7f4ed] p-5">
+          <p className="text-stone-900 text-sm font-semibold mb-2 font-serif">💡 Multi-Target Telemetry Workflow</p>
+          <ul className="text-stone-600 text-xs space-y-1.5 list-disc list-inside leading-relaxed">
+            <li>Each participant receives an individual tracking link — deliver it via SMS or WhatsApp.</li>
+            <li>Once they tap "Allow Location" on mobile, real-time GPS telemetry streams automatically.</li>
+            <li>Observe all cohort members simultaneously on the unified Group Map.</li>
+            <li>Adding an individual member allocates 1 tracking slot from your balance.</li>
           </ul>
         </div>
       </div>

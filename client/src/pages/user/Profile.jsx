@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import {
   getUserProfile,
@@ -15,7 +15,6 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("general");
-  // Per-form independent loading & saved states
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
@@ -69,7 +68,6 @@ export default function Profile() {
     setProfileSaved(false);
     try {
       const res = await updateUserProfile(profileData);
-      // Instantly propagate updated fields across the entire app (Navbar, etc.)
       updateUser(res.data);
       setProfileSaved(true);
       toast.success("Profile saved!");
@@ -134,88 +132,92 @@ export default function Profile() {
     }
   };
 
-  // Determine Initials for Avatar
   const initial = profileData.name
     ? profileData.name.charAt(0).toUpperCase()
     : user?.name?.charAt(0).toUpperCase() || "U";
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] py-10 px-4 sm:px-6 lg:px-8 text-white max-w-4xl mx-auto">
+    <div className="relative min-h-[calc(100vh-4rem)] py-10 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       <AmbientBackground />
 
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-          <h1 className="text-2xl font-bold flex items-center gap-3">
-            Profile Settings
-          </h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 font-serif">
+              Profile Settings
+            </h1>
+            <p className="text-xs sm:text-sm text-stone-500 mt-1">
+              Manage your personal credentials, telemetry preferences, and security.
+            </p>
+          </div>
           <button
-            onClick={() => navigate('/dashboard')}
-            className="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2 bg-slate-800/50 px-3.5 py-2 rounded-lg border border-slate-700/50 hover:bg-slate-700/80 w-fit"
+            onClick={() => navigate("/dashboard")}
+            className="text-xs sm:text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors flex items-center gap-2 bg-white/80 border border-[#ded7ca] px-3.5 py-2 rounded-xl shadow-xs hover:bg-[#f7f4ed] w-fit"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Dashboard
+            Back to Cockpit
           </button>
         </div>
 
-        <div className="bg-[#0d101f] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+        <div className="bg-white/90 backdrop-blur-md border border-[#e7e0d3] rounded-2xl overflow-hidden shadow-xs flex flex-col md:flex-row">
           {/* Sidebar Tabs */}
-          <div className="w-full md:w-56 bg-slate-800/30 p-4 flex md:flex-col gap-1.5 overflow-x-auto border-b md:border-b-0 md:border-r border-slate-700/50">
+          <div className="w-full md:w-56 bg-[#f7f4ed] p-4 flex md:flex-col gap-1.5 overflow-x-auto border-b md:border-b-0 md:border-r border-[#e7e0d3]">
             <TabButton
               active={activeTab === "general"}
               onClick={() => setActiveTab("general")}
               label="General Info"
+              icon="👤"
             />
             <TabButton
               active={activeTab === "security"}
               onClick={() => setActiveTab("security")}
               label="Security"
+              icon="🔒"
             />
             <TabButton
               active={activeTab === "preferences"}
               onClick={() => setActiveTab("preferences")}
               label="Tracking Prefs"
+              icon="⏱️"
             />
             <TabButton
               active={activeTab === "danger"}
               onClick={() => setActiveTab("danger")}
               label="Danger Zone"
+              icon="⚠️"
               danger
             />
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 p-5 md:p-6">
+          <div className="flex-1 p-6 sm:p-8">
             {/* GENERAL TAB */}
             {activeTab === "general" && (
               <div className="animate-fade-in">
-                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-white/10">
+                <h2 className="text-lg font-bold text-stone-900 mb-4 pb-2 border-b border-[#e7e0d3] font-serif">
                   Personal Details
                 </h2>
 
                 {/* Initial Avatar */}
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="relative">
-                    {/* Ring for decoration */}
-                    <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full blur opacity-30"></div>
-                    <div className="relative w-16 h-16 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-2xl font-bold text-white shadow-xl shadow-indigo-500/20">
-                      {initial}
-                    </div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-[#ece6da] border border-[#ded7ca] flex items-center justify-center text-2xl font-bold text-stone-800 shadow-inner">
+                    {initial}
                   </div>
                   <div>
-                    <h3 className="text-base font-semibold">
+                    <h3 className="text-base font-bold text-stone-900">
                       {profileData.name || "User"}
                     </h3>
-                    <p className="text-slate-400 text-xs">
-                      Update your basic information below.
+                    <p className="text-stone-500 text-xs mt-0.5">
+                      {profileData.email || "Active Member"}
                     </p>
                   </div>
                 </div>
 
-                <form onSubmit={handleUpdateProfile} className="space-y-3.5">
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
                       Full Name
                     </label>
                     <input
@@ -224,11 +226,11 @@ export default function Profile() {
                       value={profileData.name}
                       onChange={handleProfileChange}
                       required
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="w-full bg-white border border-[#ded7ca] rounded-xl px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
                       Email Address
                     </label>
                     <input
@@ -237,13 +239,13 @@ export default function Profile() {
                       value={profileData.email}
                       onChange={handleProfileChange}
                       required
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300 cursor-not-allowed"
+                      className="w-full bg-[#f7f4ed] border border-[#e7e0d3] rounded-xl px-3.5 py-2.5 text-sm text-stone-500 cursor-not-allowed"
                       disabled
                       title="Email cannot be changed directly"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
+                    <label className="block text-xs font-semibold text-stone-700 mb-1">
                       Phone Number
                     </label>
                     <input
@@ -251,11 +253,11 @@ export default function Profile() {
                       name="phoneNumber"
                       value={profileData.phoneNumber}
                       onChange={handleProfileChange}
-                      placeholder="Add phone number"
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      placeholder="+91 98765 43210"
+                      className="w-full bg-white border border-[#ded7ca] rounded-xl px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 transition-all"
                     />
                   </div>
-                  <div className="pt-2.5">
+                  <div className="pt-3">
                     <SaveButton
                       loading={profileLoading}
                       saved={profileSaved}
@@ -268,81 +270,89 @@ export default function Profile() {
 
             {/* SECURITY TAB */}
             {activeTab === "security" && (
-              <div className="animate-fade-in">
-                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-white/10">
-                  Security Settings
-                </h2>
+              <div className="animate-fade-in space-y-6">
+                <div>
+                  <h2 className="text-lg font-bold text-stone-900 mb-4 pb-2 border-b border-[#e7e0d3] font-serif">
+                    Security Credentials
+                  </h2>
 
-                <form
-                  onSubmit={handleUpdatePassword}
-                  className="space-y-3.5 bg-slate-900/30 p-4 rounded-xl border border-slate-700/50 mb-5"
-                >
-                  <h3 className="font-semibold text-indigo-400 mb-2.5 text-sm">
-                    Change Password
-                  </h3>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
-                      Current Password
-                    </label>
-                    <input
-                      type="password"
-                      name="currentPassword"
-                      value={passwordData.currentPassword}
-                      onChange={handlePasswordChange}
-                      required
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
-                      New Password
-                    </label>
-                    <input
-                      type="password"
-                      name="newPassword"
-                      value={passwordData.newPassword}
-                      onChange={handlePasswordChange}
-                      required
-                      minLength={6}
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-0.5">
-                      Confirm New Password
-                    </label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={passwordData.confirmPassword}
-                      onChange={handlePasswordChange}
-                      required
-                      minLength={6}
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                  <div className="pt-2">
-                    <SaveButton
-                      loading={passwordLoading}
-                      saved={passwordSaved}
-                      label="Update Password"
-                      variant="secondary"
-                    />
-                  </div>
-                </form>
-
-                <div className="bg-slate-900/30 p-4 rounded-xl border border-slate-700/50">
-                  <h3 className="font-semibold text-indigo-400 mb-1 text-sm">
-                    Active Sessions
-                  </h3>
-                  <p className="text-sm text-slate-400 mb-4">
-                    You are currently logged into the following devices.
-                  </p>
-                  <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-700">
+                  <form
+                    onSubmit={handleUpdatePassword}
+                    className="space-y-4 surface-card p-5 rounded-2xl border border-[#e7e0d3]"
+                  >
+                    <h3 className="font-semibold text-stone-900 text-sm">
+                      Change Account Password
+                    </h3>
                     <div>
-                      <p className="font-medium">Current Session (Browser)</p>
-                      <p className="text-xs text-green-400">Active now</p>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        required
+                        className="w-full bg-white border border-[#ded7ca] rounded-xl px-3.5 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400"
+                      />
                     </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        required
+                        minLength={6}
+                        className="w-full bg-white border border-[#ded7ca] rounded-xl px-3.5 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        required
+                        minLength={6}
+                        className="w-full bg-white border border-[#ded7ca] rounded-xl px-3.5 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400"
+                      />
+                    </div>
+                    <div className="pt-2">
+                      <SaveButton
+                        loading={passwordLoading}
+                        saved={passwordSaved}
+                        label="Update Password"
+                        variant="primary"
+                      />
+                    </div>
+                  </form>
+                </div>
+
+                <div className="surface-card p-5 rounded-2xl border border-[#e7e0d3]">
+                  <h3 className="font-semibold text-stone-900 mb-1 text-sm">
+                    Active Session
+                  </h3>
+                  <p className="text-xs text-stone-500 mb-4">
+                    Devices currently authenticated to your NexTrack account.
+                  </p>
+                  <div className="flex items-center justify-between p-3.5 bg-[#fcfaf6] rounded-xl border border-[#e7e0d3]">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">💻</span>
+                      <div>
+                        <p className="font-medium text-xs sm:text-sm text-stone-900">Current Web Session</p>
+                        <p className="text-[11px] text-emerald-700 font-medium">● Active now</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-stone-500 bg-[#ece6da] px-2.5 py-1 rounded-full font-mono">
+                      TLS Verified
+                    </span>
                   </div>
                 </div>
               </div>
@@ -351,18 +361,17 @@ export default function Profile() {
             {/* PREFERENCES TAB */}
             {activeTab === "preferences" && (
               <div className="animate-fade-in">
-                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-white/10">
-                  App Settings
+                <h2 className="text-lg font-bold text-stone-900 mb-4 pb-2 border-b border-[#e7e0d3] font-serif">
+                  Telemetry Preferences
                 </h2>
 
-                <form onSubmit={handleUpdateProfile} className="space-y-4">
-                  <div className="bg-slate-900/30 p-4 rounded-xl border border-slate-700/50">
-                    <h3 className="font-semibold text-indigo-400 mb-0.5 text-sm">
-                      Default Tracking Link Expiration
+                <form onSubmit={handleUpdateProfile} className="space-y-5">
+                  <div className="surface-card p-5 rounded-2xl border border-[#e7e0d3]">
+                    <h3 className="font-semibold text-stone-900 mb-1 text-sm">
+                      Default Tracking Link Lifetime
                     </h3>
-                    <p className="text-xs text-slate-400 mb-4">
-                      Set the standard duration before your sharing links
-                      automatically expire.
+                    <p className="text-xs text-stone-500 mb-4 leading-relaxed">
+                      Pre-select the validity period applied when generating new location sharing invitations.
                     </p>
 
                     <ExpirationPicker
@@ -388,43 +397,41 @@ export default function Profile() {
             {/* DANGER ZONE TAB */}
             {activeTab === "danger" && (
               <div className="animate-fade-in">
-                <h2 className="text-lg font-semibold mb-4 pb-1.5 border-b border-red-500/30 text-red-500">
+                <h2 className="text-lg font-bold text-rose-800 mb-4 pb-2 border-b border-rose-200 font-serif">
                   Danger Zone
                 </h2>
 
-                <div className="bg-red-950/20 p-4 rounded-xl border border-red-900/50">
-                  <h3 className="font-semibold text-red-400 mb-1 text-sm">
-                    Delete Account
+                <div className="bg-rose-50/70 p-5 rounded-2xl border border-rose-200/80">
+                  <h3 className="font-semibold text-rose-900 mb-1 text-sm">
+                    Permanently Delete Account
                   </h3>
-                  <p className="text-xs text-slate-400 mb-4">
-                    Once you delete your account, there is no going back. Please
-                    be certain. All your tracking data and settings will be
-                    permanently erased.
+                  <p className="text-xs text-stone-600 mb-4 leading-relaxed">
+                    Once you delete your account, there is no recovery. All active tracking links, group associations, telemetry history, and slot balances will be immediately removed.
                   </p>
 
                   <form
                     onSubmit={handleDeleteAccount}
-                    className="space-y-3 max-w-sm"
+                    className="space-y-3.5 max-w-sm"
                   >
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-0.5">
-                        Confirm Identity
+                      <label className="block text-xs font-semibold text-stone-700 mb-1">
+                        Confirm Identity Password
                       </label>
                       <input
                         type="password"
-                        placeholder="Enter your password"
+                        placeholder="Enter your current password"
                         value={deleteData.password}
                         onChange={(e) =>
                           setDeleteData({ password: e.target.value })
                         }
                         required
-                        className="w-full bg-slate-900/80 border border-red-900/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                        className="w-full bg-white border border-rose-200 rounded-xl px-3.5 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-rose-400"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={deleteLoading}
-                      className="w-full px-5 py-2 bg-red-600/80 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 border border-red-500/50 flex items-center justify-center gap-2 text-sm"
+                      className="w-full px-5 py-2.5 bg-rose-700 hover:bg-rose-800 text-white rounded-xl font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm shadow-xs"
                     >
                       {deleteLoading ? (
                         <>
@@ -432,7 +439,7 @@ export default function Profile() {
                           Processing...
                         </>
                       ) : (
-                        "Permanently Delete Account"
+                        "Permanently Erase Account"
                       )}
                     </button>
                   </form>
@@ -442,62 +449,30 @@ export default function Profile() {
           </div>
         </div>
       </div>
-
-      {/* Global styling for fade-in animation */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(5px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `,
-        }}
-      />
     </div>
   );
 }
 
-// ─── Premium Save Button with spinner + green check ───────────────────────────
-const SaveButton = ({ loading, saved, label, variant = "primary" }) => {
-  const base =
-    "inline-flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-60 focus:outline-none";
-  const styles = {
-    primary: `${base} bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30`,
-    secondary: `${base} bg-slate-700 hover:bg-slate-600 text-white`,
-  };
+const SaveButton = ({ loading, saved, label }) => {
   return (
     <button
       type="submit"
       disabled={loading || saved}
-      className={
+      className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-60 focus:outline-none shadow-xs ${
         saved
-          ? `${styles[variant]} !bg-green-600 !shadow-green-500/30`
-          : styles[variant]
-      }
+          ? "bg-emerald-700 text-white"
+          : "btn-cta-primary"
+      }`}
     >
       {loading ? (
         <>
-          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
           {label}
         </>
       ) : saved ? (
         <>
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={3}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 13l4 4L19 7"
-            />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
           Saved!
         </>
@@ -508,153 +483,48 @@ const SaveButton = ({ loading, saved, label, variant = "primary" }) => {
   );
 };
 
-// Subcomponent for Sidebar Tabs
-const TabButton = ({ active, onClick, label, danger }) => (
+const TabButton = ({ active, onClick, label, icon, danger }) => (
   <button
     onClick={onClick}
-    className={`w-full text-left px-3.5 py-2.5 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${
+    className={`w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all flex items-center gap-2.5 whitespace-nowrap ${
       active
         ? danger
-          ? "bg-red-500/10 text-red-400 border border-red-500/20"
-          : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
-        : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent"
+          ? "bg-rose-100/80 text-rose-800 border border-rose-200 font-semibold"
+          : "bg-white text-stone-900 border border-[#ded7ca] shadow-xs font-semibold"
+        : "text-stone-600 hover:bg-[#ece6da]/50 hover:text-stone-900 border border-transparent"
     }`}
   >
-    {label}
+    <span>{icon}</span>
+    <span>{label}</span>
   </button>
 );
 
-// ─── Premium Expiration Picker ──────────────────────────────────────────────
 const EXPIRATION_OPTIONS = [
   {
     value: "1h",
     label: "1 Hour",
     sublabel: "Short-lived, for quick checks",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
-    ),
-    accent: "from-sky-500/20 to-sky-600/5",
-    ring: "ring-sky-500/50",
-    iconColor: "text-sky-400",
-    dot: "bg-sky-500",
   },
   {
     value: "12h",
     label: "12 Hours",
-    sublabel: "Half a day of sharing",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
-        <path d="M12 2a10 10 0 1 0 10 10" />
-        <path d="M12 6v6l4 2" />
-      </svg>
-    ),
-    accent: "from-violet-500/20 to-violet-600/5",
-    ring: "ring-violet-500/50",
-    iconColor: "text-violet-400",
-    dot: "bg-violet-500",
+    sublabel: "Half day duration",
   },
   {
     value: "24h",
     label: "24 Hours",
-    sublabel: "Full day — most popular",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
-      </svg>
-    ),
-    accent: "from-indigo-500/20 to-indigo-600/5",
-    ring: "ring-indigo-500/50",
-    iconColor: "text-indigo-400",
-    dot: "bg-indigo-500",
+    sublabel: "Full day — recommended",
     badge: "Popular",
   },
   {
     value: "7d",
     label: "7 Days",
     sublabel: "Week-long visibility",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
-        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
-      </svg>
-    ),
-    accent: "from-emerald-500/20 to-emerald-600/5",
-    ring: "ring-emerald-500/50",
-    iconColor: "text-emerald-400",
-    dot: "bg-emerald-500",
   },
   {
     value: "never",
     label: "Never Expire",
-    sublabel: "Link stays active forever",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
-        <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-        <line x1="6" y1="1" x2="6" y2="4" />
-        <line x1="10" y1="1" x2="10" y2="4" />
-        <line x1="14" y1="1" x2="14" y2="4" />
-      </svg>
-    ),
-    accent: "from-amber-500/20 to-amber-600/5",
-    ring: "ring-amber-500/50",
-    iconColor: "text-amber-400",
-    dot: "bg-amber-500",
-    badge: "∞",
+    sublabel: "Link stays active indefinitely",
   },
 ];
 
@@ -669,74 +539,38 @@ const ExpirationPicker = ({ value, onChange }) => {
             type="button"
             onClick={() => onChange(opt.value)}
             className={`
-              relative flex items-center gap-3 p-3 rounded-lg border text-left
-              transition-all duration-200 group overflow-hidden
+              relative flex items-center justify-between p-3.5 rounded-xl border text-left
+              transition-all duration-200
               ${
                 isActive
-                  ? `bg-gradient-to-br ${opt.accent} ${opt.ring} ring-1 border-transparent shadow-md`
-                  : "bg-slate-800/40 border-slate-700/60 hover:border-slate-600 hover:bg-slate-800/70"
+                  ? "bg-[#f7f4ed] border-stone-800 shadow-xs ring-1 ring-stone-800"
+                  : "bg-white border-[#ded7ca] hover:border-stone-400"
               }
             `}
           >
-            {/* Subtle shimmer bg on hover (active only) */}
-            {isActive && (
-              <div className="absolute inset-0 bg-gradient-to-r from-white/[0.03] to-transparent pointer-events-none" />
-            )}
-
-            {/* Icon */}
-            <div
-              className={`flex-shrink-0 p-2 rounded-lg ${
-                isActive
-                  ? `bg-white/10 ${opt.iconColor}`
-                  : "bg-slate-700/50 text-slate-400 group-hover:text-slate-200"
-              } transition-colors duration-200`}
-            >
-              {opt.icon}
-            </div>
-
-            {/* Text */}
-            <div className="flex-1 min-w-0">
-              <div
-                className={`font-semibold text-sm flex items-center gap-2 ${
-                  isActive ? "text-white" : "text-slate-300"
-                }`}
-              >
+            <div className="min-w-0">
+              <div className="font-semibold text-xs sm:text-sm flex items-center gap-2 text-stone-900">
                 {opt.label}
                 {opt.badge && (
-                  <span
-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                      isActive
-                        ? `${opt.dot} text-white`
-                        : "bg-slate-700 text-slate-400"
-                    }`}
-                  >
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-[#ece6da] text-stone-800 border border-[#ded7ca]">
                     {opt.badge}
                   </span>
                 )}
               </div>
-              <div
-                className={`text-xs mt-0.5 truncate ${
-                  isActive ? "text-slate-300" : "text-slate-500"
-                }`}
-              >
+              <div className="text-[11px] text-stone-500 mt-0.5 truncate">
                 {opt.sublabel}
               </div>
             </div>
 
-            {/* Active check */}
             <div
-              className={`flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ml-2 ${
                 isActive
-                  ? `${opt.dot} border-transparent`
-                  : "border-slate-600 group-hover:border-slate-500"
+                  ? "border-stone-900 bg-stone-900 text-white"
+                  : "border-stone-300"
               }`}
             >
               {isActive && (
-                <svg
-                  className="w-2.5 h-2.5 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
+                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

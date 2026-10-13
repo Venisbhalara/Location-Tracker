@@ -75,8 +75,8 @@ const Register = () => {
       return { label: "Too short (min 6 chars)", color: "bg-rose-500", width: "25%" };
     if (p.length < 8) return { label: "Fair", color: "bg-amber-500", width: "50%" };
     if (p.length < 10 || !/[A-Z]/.test(p) || !/[0-9]/.test(p))
-      return { label: "Good", color: "bg-indigo-400", width: "75%" };
-    return { label: "Strong", color: "bg-emerald-400", width: "100%" };
+      return { label: "Good", color: "bg-indigo-500", width: "75%" };
+    return { label: "Strong", color: "bg-emerald-600", width: "100%" };
   })();
 
   return (
@@ -88,23 +88,23 @@ const Register = () => {
         {/* Brand Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
               <img src="/location.png" alt="NexTrack" className="w-6 h-6 object-contain" />
             </div>
-            <span className="font-bold text-xl text-white tracking-tight">
-              Nex<span className="text-indigo-400">Track</span>
+            <span className="font-bold text-xl text-stone-900 tracking-tight">
+              Nex<span className="text-indigo-600">Track</span>
             </span>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight mb-1.5">
             Create Your Account
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-stone-600">
             Start generating consent-based tracking links in seconds
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="surface-elevated p-8 sm:p-10 rounded-3xl border-white/10 shadow-2xl">
+        <div className="surface-elevated p-8 sm:p-10 rounded-3xl border-stone-200/90 shadow-sm bg-white">
           <form onSubmit={handleRegister} className="space-y-4">
             
             {/* Name */}
@@ -157,7 +157,7 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors p-1"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 transition-colors p-1"
                   aria-label={showPw ? "Hide password" : "Show password"}
                 >
                   {showPw ? (
@@ -176,26 +176,26 @@ const Register = () => {
               {/* Password strength indicator */}
               {pwStrength && (
                 <div className="mt-2 space-y-1">
-                  <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-stone-100 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${pwStrength.color} transition-all duration-300 rounded-full`}
                       style={{ width: pwStrength.width }}
                     />
                   </div>
-                  <p className="text-[11px] text-slate-400 flex justify-between">
+                  <p className="text-[11px] text-stone-500 flex justify-between">
                     <span>Password Strength:</span>
-                    <span className="font-semibold text-slate-300">{pwStrength.label}</span>
+                    <span className="font-semibold text-stone-700">{pwStrength.label}</span>
                   </p>
                 </div>
               )}
             </div>
 
             {/* Terms Notice */}
-            <p className="text-[11px] text-slate-400 leading-normal pt-1">
+            <p className="text-[11px] text-stone-500 leading-normal pt-1">
               By creating an account, you agree to our{" "}
-              <Link to="/terms" className="text-indigo-400 hover:underline">Terms</Link>{" "}
+              <Link to="/terms" className="text-indigo-600 hover:underline">Terms</Link>{" "}
               and{" "}
-              <Link to="/privacy-policy" className="text-indigo-400 hover:underline">Privacy Policy</Link>.
+              <Link to="/privacy-policy" className="text-indigo-600 hover:underline">Privacy Policy</Link>.
             </p>
 
             {/* PRIMARY CTA */}
@@ -203,7 +203,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-cta-primary w-full py-3.5 text-sm font-semibold"
+                className="btn-cta-primary w-full py-3.5 text-sm font-semibold shadow-xs"
               >
                 {loading ? "Creating Account..." : "Create Free Account →"}
               </button>
@@ -212,29 +212,29 @@ const Register = () => {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-white/[0.08]" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <div className="flex-1 h-px bg-stone-200" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
               Or sign up with
             </span>
-            <div className="flex-1 h-px bg-white/[0.08]" />
+            <div className="flex-1 h-px bg-stone-200" />
           </div>
 
-          {/* SECONDARY ACTION: Google Sign Up */}
+          {/* Google Sign Up */}
           <button
             type="button"
             onClick={() => customGoogleLogin()}
             disabled={loading}
-            className="btn-cta-secondary w-full py-3 text-sm font-medium flex items-center justify-center gap-3"
+            className="btn-cta-secondary w-full py-2.5 text-sm font-medium flex items-center justify-center gap-3 shadow-xs"
           >
             <GoogleIcon />
             <span>Continue with Google</span>
           </button>
 
           {/* Bottom Switcher */}
-          <div className="mt-8 text-center pt-6 border-t border-white/[0.08]">
-            <p className="text-xs text-slate-400">
+          <div className="mt-8 text-center pt-6 border-t border-stone-100">
+            <p className="text-xs text-stone-600">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+              <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
                 Sign In →
               </Link>
             </p>

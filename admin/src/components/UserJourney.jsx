@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const useCounter = (end, duration = 1000) => {
@@ -17,12 +17,12 @@ const useCounter = (end, duration = 1000) => {
   return count;
 };
 
-const NumberAnimated = ({ value, color }) => {
+const NumberAnimated = ({ value, color = "#1c1b18" }) => {
   const n = useCounter(value);
   return (
     <div
-      className="text-[40px] font-[800] leading-none"
-      style={{ letterSpacing: "-2px", color }}
+      className="text-3xl sm:text-4xl font-serif font-normal leading-none"
+      style={{ color }}
     >
       {n}
     </div>
@@ -41,18 +41,11 @@ export const UserJourney = ({ journeyData }) => {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full flex flex-col"
-      style={{
-        background: "#0d1424",
-        border: "1px solid rgba(255,255,255,0.04)",
-        borderRadius: "16px",
-        padding: "28px",
-        fontFamily: "'Inter', sans-serif"
-      }}
+      className="w-full flex flex-col bg-white border border-[#ded7ca] rounded-2xl p-6 sm:p-7 shadow-sm"
     >
-      <div style={{ marginBottom: "28px" }}>
-        <div style={{ fontSize: "13px", fontWeight: "600", color: "#f1f5f9" }}>User Journey</div>
-        <div style={{ fontSize: "11px", color: "#334155", marginTop: "2px" }}>At a glance — who made it through</div>
+      <div className="mb-6">
+        <div className="text-base font-serif font-normal text-[#1c1b18]">User Journey Funnel</div>
+        <div className="text-xs text-[#6e685f] mt-0.5">Progression through acquisition, handshakes, and retention</div>
       </div>
 
       <div className="flex flex-col sm:flex-row w-full gap-y-6 sm:gap-y-0">
@@ -64,22 +57,20 @@ export const UserJourney = ({ journeyData }) => {
               key={item.step}
               className={`flex-1 flex flex-col ${
                 !isLast ? "border-b sm:border-b-0 sm:border-r pb-4 sm:pb-0" : ""
-              } border-white/[0.04]`}
+              } border-[#f0eae1]`}
               style={{
-                paddingLeft: isFirst ? "0" : "16px",
-                paddingRight: isLast ? "0" : "16px",
+                paddingLeft: isFirst ? "0" : "20px",
+                paddingRight: isLast ? "0" : "20px",
               }}
             >
-              <NumberAnimated value={item.count} color={item.color} />
-              <div style={{ fontSize: "11px", color: "#475569", marginTop: "2px" }}>
+              <NumberAnimated value={item.count} color="#1c1b18" />
+              <div className="text-xs font-medium text-[#6e685f] mt-2">
                 {item.step}
               </div>
               <div
-                style={{
-                  fontSize: "10px",
-                  marginTop: "4px",
-                  color: item.drop ? "#f87171" : (item.positive ? "#34d399" : "#34d399")
-                }}
+                className={`text-[11px] font-mono mt-1 font-semibold ${
+                  item.drop ? "text-[#c84032]" : "text-[#2d7a4f]"
+                }`}
               >
                 {item.drop ? item.drop : item.status}
               </div>
@@ -88,16 +79,11 @@ export const UserJourney = ({ journeyData }) => {
         })}
       </div>
 
-      <div
-        style={{
-          borderTop: "1px solid rgba(255,255,255,0.04)",
-          paddingTop: "20px",
-          marginTop: "24px",
-        }}
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2 sm:gap-y-0"
-      >
-        <div style={{ fontSize: "11px", color: "#334155" }}>Overall conversion · Visited → Returned</div>
-        <div style={{ fontSize: "13px", fontWeight: "600", color: "#7C6FFF" }}>{conversionRate}% conversion rate</div>
+      <div className="border-t border-[#ded7ca] pt-4 mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2 sm:gap-y-0">
+        <div className="text-xs text-[#6e685f]">End-to-End Retention Rate · First Visited → Retained Active</div>
+        <div className="text-sm font-semibold font-mono text-[#1c1b18] bg-[#f0eae1] px-3 py-1 rounded-full border border-[#ded7ca]">
+          {conversionRate}% Conversion
+        </div>
       </div>
     </motion.div>
   );
