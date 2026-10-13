@@ -4,14 +4,13 @@ require("dotenv").config();
 // ── Startup environment variable validation ────────────────────────────────
 // Fail fast with a clear message instead of a cryptic crash deep in the code.
 const REQUIRED_ENV_VARS = [
-  "DB_HOST",
-  "DB_NAME",
-  "DB_USER",
-  "DB_PASSWORD",
   "JWT_SECRET",
   "RAZORPAY_KEY_ID",
   "RAZORPAY_KEY_SECRET",
 ];
+if (!process.env.DATABASE_URL) {
+  REQUIRED_ENV_VARS.push("DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD");
+}
 const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
 if (missingVars.length > 0) {
   console.error(
@@ -357,11 +356,15 @@ function printStartupDiagnostics() {
   const c = (k, v) => console.log(`  ${k.padEnd(22)}: ${v}`);
   c("NODE_ENV",            process.env.NODE_ENV             || "❌ NOT SET");
   c("PORT",                PORT);
-  c("DB_HOST",             process.env.DB_HOST              || "❌ NOT SET");
-  c("DB_PORT",             process.env.DB_PORT              || "❌ NOT SET");
-  c("DB_NAME",             process.env.DB_NAME              || "❌ NOT SET");
-  c("DB_USER",             process.env.DB_USER              || "❌ NOT SET");
-  c("DB_PASSWORD",         process.env.DB_PASSWORD          ? `✅ SET (${process.env.DB_PASSWORD.length} chars)` : "❌ NOT SET");
+  if (process.env.DATABASE_URL) {
+    c("DATABASE_URL",      "✅ SET (URI string)");
+  } else {
+    c("DB_HOST",           process.env.DB_HOST              || "❌ NOT SET");
+    c("DB_PORT",           process.env.DB_PORT              || "❌ NOT SET");
+    c("DB_NAME",           process.env.DB_NAME              || "❌ NOT SET");
+    c("DB_USER",           process.env.DB_USER              || "❌ NOT SET");
+    c("DB_PASSWORD",       process.env.DB_PASSWORD          ? `✅ SET (${process.env.DB_PASSWORD.length} chars)` : "❌ NOT SET");
+  }
   c("JWT_SECRET",          process.env.JWT_SECRET           ? `✅ SET (${process.env.JWT_SECRET.length} chars)` : "❌ NOT SET");
   c("CLIENT_URL",          process.env.CLIENT_URL           || "⚠️  NOT SET");
   c("ADMIN_URL",           process.env.ADMIN_URL            || "⚠️  NOT SET");
@@ -375,10 +378,20 @@ function printStartupDiagnostics() {
 const start = async () => {
   printStartupDiagnostics();
   try {
-    // 1. DB Connection
+    // 1. DB Connection with retry logic (e.g. for cloud database cold starts)
     console.log("⏳ Connecting to MySQL...");
-    await sequelize.authenticate();
-    console.log("✅ MySQL Connected.\n");
+    const MAX_RETRIES = 3;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        await sequelize.authenticate();
+        console.log("✅ MySQL Connected.\n");
+        break;
+      } catch (connErr) {
+        if (attempt === MAX_RETRIES) throw connErr;
+        console.warn(`⚠️ MySQL connect attempt ${attempt}/${MAX_RETRIES} failed (${connErr.message}). Retrying in 4s...`);
+        await new Promise((res) => setTimeout(res, 4000));
+      }
+    }
 
     // 2. Schema repair
     console.log("⏳ Running schema migration...");
@@ -433,7 +446,7 @@ const start = async () => {
 
     server.listen(PORT, "0.0.0.0", () => {
       console.log(`\n🚀 Server live at http://localhost:${PORT}`);
-      console.log(`   DB     : ${process.env.DB_NAME}@${process.env.DB_HOST}:${process.env.DB_PORT}`);
+      console.log(`   DB     : ${process.env.DB_NAME || "DATABASE_URL"}@${process.env.DB_HOST || "cloud"}:${process.env.DB_PORT || "3306"}`);
       console.log(`   Health : http://localhost:${PORT}/api/health\n`);
 
       // Keep-alive pinger for Render free tier
@@ -451,7 +464,16 @@ const start = async () => {
     console.error("\n❌ FATAL: Server failed to start");
     console.error("   Error:", err.message);
     console.error("   SQL  :", err.original?.sqlMessage || "N/A");
-    console.error("   → Ensure DB_HOST, DB_PASSWORD, JWT_SECRET are set in Render dashboard\n");
+
+    if (err.message && (err.message.includes("ENOTFOUND") || err.message.includes("getaddrinfo"))) {
+      console.error("\n🔍 DNS RESOLUTION FAILED (ENOTFOUND):");
+      console.error("   The host name provided in DB_HOST does not exist in DNS.");
+      console.error("   • If using Aiven: Check console.aiven.io to ensure service is 'RUNNING' (not 'POWERED_OFF' or expired).");
+      console.error("   • Verify the exact 'Host' string in Aiven Console > Overview > Connection information.");
+      console.error("   • Or set DATABASE_URL in Render using Aiven's 'Service URI'.\n");
+    } else {
+      console.error("   → Ensure DB_HOST, DB_PASSWORD, JWT_SECRET are set in Render dashboard\n");
+    }
     process.exit(1);
   }
 };
