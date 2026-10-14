@@ -123,22 +123,21 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Register active login timestamp
+    // Register active login timestamp and log activity concurrently
     user.lastLoginAt = new Date();
-    await user.save();
-
-    // Generate token
     const token = generateToken(user.id);
 
-    // Log Activity
-    await logActivity(req.app.get("io"), {
-      type: "login",
-      label: "Login",
-      detail1: user.email,
-      detail2: "Success",
-      color: "border-[#3B82F6]",
-      userId: user.id
-    });
+    await Promise.all([
+      user.save(),
+      logActivity(req.app.get("io"), {
+        type: "login",
+        label: "Login",
+        detail1: user.email,
+        detail2: "Success",
+        color: "border-[#3B82F6]",
+        userId: user.id
+      }),
+    ]);
 
     res.status(200).json({
       message: "Login successful!",

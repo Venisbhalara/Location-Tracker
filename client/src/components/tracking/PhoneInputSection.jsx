@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { 
   getCountries, 
   getCountryCallingCode, 
   AsYouType, 
   isValidPhoneNumber,
   getExampleNumber
-} from "libphonenumber-js";
+} from "libphonenumber-js/min";
 import examples from "libphonenumber-js/mobile/examples";
 
 /**
@@ -49,11 +49,16 @@ const PhoneInputSection = ({ onChange }) => {
     })).sort((a, b) => a.name.localeCompare(b.name));
   }, []);
 
-  const filteredCountries = countries.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.dialCode.includes(searchQuery) ||
-    c.code.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCountries = useMemo(() => {
+    if (!isDropdownOpen) return [];
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return countries;
+    return countries.filter((c) =>
+      c.name.toLowerCase().includes(q) ||
+      c.dialCode.includes(q) ||
+      c.code.toLowerCase().includes(q)
+    );
+  }, [countries, searchQuery, isDropdownOpen]);
   
   const placeholder = useMemo(() => {
     try {
@@ -285,4 +290,4 @@ const PhoneInputSection = ({ onChange }) => {
   );
 };
 
-export default PhoneInputSection;
+export default memo(PhoneInputSection);

@@ -1,7 +1,7 @@
+import { memo, useMemo } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { blogArticles } from "./Blog";
-import AmbientBackground from "../../components/common/AmbientBackground";
+import { blogArticles } from "../../data/blogArticles";
 
 /* ─────────────────────────────────────────────
    ARTICLE CONTENT — 500+ words each
@@ -182,27 +182,30 @@ const articleContent = {
   },
 };
 
-const BlogArticle = () => {
+const BlogArticle = memo(() => {
   const { slug } = useParams();
-  const article = blogArticles.find((a) => a.slug === slug);
+  const article = useMemo(() => blogArticles.find((a) => a.slug === slug), [slug]);
   const content = articleContent[slug];
 
-  if (!article || !content) return <Navigate to="/blog" replace />;
+  const schemaArticle = useMemo(() => {
+    if (!article) return null;
+    return {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: article.title,
+      description: article.excerpt,
+      author: { "@type": "Organization", name: article.author },
+      publisher: {
+        "@type": "Organization",
+        name: "NexTrack",
+        url: "https://location-trackers.vercel.app",
+      },
+      datePublished: article.date,
+      url: `https://location-trackers.vercel.app/blog/${article.slug}`,
+    };
+  }, [article]);
 
-  const schemaArticle = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.excerpt,
-    author: { "@type": "Organization", name: article.author },
-    publisher: {
-      "@type": "Organization",
-      name: "NexTrack",
-      url: "https://location-trackers.vercel.app",
-    },
-    datePublished: article.date,
-    url: `https://location-trackers.vercel.app/blog/${article.slug}`,
-  };
+  if (!article || !content) return <Navigate to="/blog" replace />;
 
   return (
     <>
@@ -218,7 +221,6 @@ const BlogArticle = () => {
       </Helmet>
 
       <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-        <AmbientBackground />
 
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-8">
@@ -296,6 +298,6 @@ const BlogArticle = () => {
       </div>
     </>
   );
-};
+});
 
 export default BlogArticle;

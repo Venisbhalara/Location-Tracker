@@ -17,10 +17,11 @@ const commonOptions = {
       }
     : {},
   pool: {
-    max: 5,
-    min: 0,
-    acquire: 60000,
+    max: 15,
+    min: 2,
+    acquire: 30000,
     idle: 10000,
+    evict: 10000,
   },
 };
 

@@ -4,7 +4,6 @@ import { useAuth } from "../../context/AuthContext";
 import { registerUser, googleLogin } from "../../services/api";
 import { useGoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
 /* ── Google Icon ── */
 const GoogleIcon = () => (
@@ -81,15 +80,20 @@ const Register = () => {
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
-      <AmbientBackground />
-
       <div className="relative z-10 w-full max-w-md">
         
         {/* Brand Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
             <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-              <img src="/location.png" alt="NexTrack" className="w-6 h-6 object-contain" />
+              <img
+                src="/location.png"
+                alt="NexTrack"
+                width="24"
+                height="24"
+                decoding="async"
+                className="w-6 h-6 object-contain"
+              />
             </div>
             <span className="font-bold text-xl text-stone-900 tracking-tight">
               Nex<span className="text-indigo-600">Track</span>

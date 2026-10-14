@@ -1,52 +1,83 @@
-import { useEffect } from 'react'
-import Lenis from 'lenis'
+import { useEffect } from 'react';
+import Lenis from 'lenis';
 
-let lenisInstance = null
+let lenisInstance = null;
+const scrollListeners = new Set();
+
+/**
+ * Register a scroll callback with the centralized Lenis dispatcher.
+ * Handles child-component mount race conditions reliably without timeouts.
+ */
+export function subscribeLenisScroll(callback) {
+  scrollListeners.add(callback);
+  return () => {
+    scrollListeners.delete(callback);
+  };
+}
+
+/**
+ * Reset scroll position smoothly or immediately (used during route navigation).
+ */
+export function resetLenisScroll(options = { immediate: true }) {
+  if (lenisInstance) {
+    lenisInstance.scrollTo(0, options);
+  } else if (typeof window !== 'undefined') {
+    window.scrollTo(0, 0);
+  }
+}
 
 export function useLenis() {
   useEffect(() => {
-    // 1. Ensure browser does not fight Lenis scroll position on page refresh
-    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual'
+    // 1. Accessibility: Respect prefers-reduced-motion
+    if (typeof window !== 'undefined') {
+      const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+      if (prefersReduced) {
+        return;
+      }
+
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
     }
 
-    // 2. High-performance, instant-response Lenis instance
-    // Uses Apple-grade exponential deceleration curve:
-    // Moves INSTANTLY on first touch/wheel notch (zero lag), then coasts with velvety softness
+    // 2. High-performance, single-instance Lenis controller
     const lenis = new Lenis({
-      duration: 0.85, // Snappy response, prevents floaty/delayed feel
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential ease-out
+      duration: 0.85,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      syncTouch: false, // 100% native instant 1:1 on touch/trackpad
+      syncTouch: false,
       wheelMultiplier: 1.0,
       touchMultiplier: 1.0,
-      autoRaf: false,
-    })
+      autoRaf: true,
+    });
 
-    lenisInstance = lenis
+    lenisInstance = lenis;
 
-    // Synchronize immediate scroll position with current viewport
+    // Synchronize initial scroll position
     if (typeof window !== 'undefined') {
-      lenis.scrollTo(window.scrollY, { immediate: true })
+      lenis.scrollTo(window.scrollY, { immediate: true });
     }
 
-    let rafId
-    function raf(time) {
-      lenis.raf(time)
-      rafId = requestAnimationFrame(raf)
-    }
-
-    rafId = requestAnimationFrame(raf)
+    // 3. Single centralized scroll event dispatcher for all registered subscribers
+    const unsubLenis = lenis.on('scroll', (e) => {
+      scrollListeners.forEach((callback) => {
+        try {
+          callback(e);
+        } catch (err) {
+          console.error('[Lenis] Listener error:', err);
+        }
+      });
+    });
 
     return () => {
-      cancelAnimationFrame(rafId)
-      lenis.destroy()
-      lenisInstance = null
-    }
-  }, [])
+      unsubLenis();
+      lenis.destroy();
+      lenisInstance = null;
+    };
+  }, []);
 }
 
-export { lenisInstance }
+export { lenisInstance };
 

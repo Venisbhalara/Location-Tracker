@@ -1,23 +1,34 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { lenisInstance } from "../../hooks/useLenis";
+import { resetLenisScroll, lenisInstance } from "../../hooks/useLenis";
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    // Standard scroll reset
-    window.scrollTo(0, 0);
-
-    // Lenis scroll reset if instance exists
-    if (lenisInstance) {
-      lenisInstance.scrollTo(0, { 
-        lerp: 0.1, 
-        duration: 1.5,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) 
-      });
+    // 1. If URL has an anchor hash (#how-it-works, #faq, etc.), scroll to target
+    if (hash) {
+      const target = document.querySelector(hash);
+      if (target) {
+        if (lenisInstance) {
+          lenisInstance.scrollTo(target, { offset: -80 });
+        } else {
+          target.scrollIntoView({ behavior: "smooth" });
+        }
+        return;
+      }
     }
-  }, [pathname]);
+
+    // 2. Default route navigation: reset scroll to top immediately
+    resetLenisScroll({ immediate: true });
+
+    // 3. Allow DOM to settle and synchronize Lenis boundary limits
+    const rafId = requestAnimationFrame(() => {
+      lenisInstance?.resize();
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [pathname, hash]);
 
   return null;
 };

@@ -2,11 +2,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTracking, getAccessStatus, requestAccess } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import useSocket from "../../hooks/useSocket";
 import toast from "react-hot-toast";
 import LoadingScreen from "../../components/common/LoadingScreen";
-import useSocket from "../../hooks/useSocket";
 import PhoneInputSection from "../../components/tracking/PhoneInputSection";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
 const CreateTracking = () => {
   const { updateUser } = useAuth();
@@ -181,7 +180,6 @@ const CreateTracking = () => {
     if (status === "pending") {
       return (
         <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-          <AmbientBackground />
           <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl text-center border-stone-200">
             <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-3xl mx-auto mb-4">
               ⏳
@@ -205,7 +203,6 @@ const CreateTracking = () => {
     if (status === "rejected") {
       return (
         <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-          <AmbientBackground />
           <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl text-center border-stone-200">
             <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center text-3xl mx-auto mb-4">
               ✕
@@ -237,7 +234,6 @@ const CreateTracking = () => {
     // ─── GATEKEEPER 3: DEFAULT ACCESS REQUEST FORM ───
     return (
       <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-        <AmbientBackground />
         <div className="surface-elevated max-w-lg w-full p-8 sm:p-10 rounded-3xl border-stone-200 shadow-md">
           <div className="text-center mb-6">
             <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center text-2xl mx-auto mb-3">
@@ -282,8 +278,6 @@ const CreateTracking = () => {
   // ─── MAIN TRACKING GENERATOR ───
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <AmbientBackground />
-
       <div
         className={`relative z-10 max-w-xl w-full mx-auto transition-all duration-200 ${
           isClosing ? "opacity-0 translate-y-2 scale-[0.98] pointer-events-none" : "opacity-100 translate-y-0 scale-100"

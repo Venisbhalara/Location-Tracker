@@ -95,7 +95,7 @@ self.addEventListener("push", (event) => {
   if (event.data) {
     try {
       payload = event.data.json();
-    } catch (e) {
+    } catch {
       payload = { body: event.data.text(), type: "user-ping" };
     }
   }

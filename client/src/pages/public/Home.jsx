@@ -1,6 +1,8 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../../context/AuthContext";
+import { preloadRoute } from "../../utils/routePrefetch";
 import HeroProductVisual from "../../components/home/HeroProductVisual";
 import MorphingHeadline from "../../components/home/MorphingHeadline";
 import {
@@ -137,7 +139,7 @@ const schemaFAQ = {
   })),
 };
 
-const Home = () => {
+const Home = memo(() => {
   const { isAuthenticated } = useAuth();
 
   return (
@@ -201,6 +203,9 @@ const Home = () => {
               {isAuthenticated ? (
                 <Link
                   to="/dashboard"
+                  onMouseEnter={() => preloadRoute("/dashboard")}
+                  onTouchStart={() => preloadRoute("/dashboard")}
+                  onFocus={() => preloadRoute("/dashboard")}
                   className="btn-cta-primary text-base px-8 py-3.5 w-full sm:w-auto font-semibold shadow-md"
                 >
                   Open Command Dashboard →
@@ -209,6 +214,9 @@ const Home = () => {
                 <>
                   <Link
                     to="/register"
+                    onMouseEnter={() => preloadRoute("/register")}
+                    onTouchStart={() => preloadRoute("/register")}
+                    onFocus={() => preloadRoute("/register")}
                     className="btn-cta-primary text-base px-8 py-3.5 w-full sm:w-auto font-semibold shadow-md"
                   >
                     Start Tracking Free →
@@ -460,6 +468,9 @@ const Home = () => {
                   {isAuthenticated ? (
                     <Link
                       to="/dashboard"
+                      onMouseEnter={() => preloadRoute("/dashboard")}
+                      onTouchStart={() => preloadRoute("/dashboard")}
+                      onFocus={() => preloadRoute("/dashboard")}
                       className="btn-cta-primary text-base px-10 py-3.5 w-full sm:w-auto font-semibold"
                     >
                       Go to Your Dashboard →
@@ -468,12 +479,18 @@ const Home = () => {
                     <>
                       <Link
                         to="/register"
+                        onMouseEnter={() => preloadRoute("/register")}
+                        onTouchStart={() => preloadRoute("/register")}
+                        onFocus={() => preloadRoute("/register")}
                         className="btn-cta-primary text-base px-10 py-3.5 w-full sm:w-auto font-semibold"
                       >
                         Start Tracking Free
                       </Link>
                       <Link
                         to="/pricing"
+                        onMouseEnter={() => preloadRoute("/pricing")}
+                        onTouchStart={() => preloadRoute("/pricing")}
+                        onFocus={() => preloadRoute("/pricing")}
                         className="btn-cta-secondary text-base px-8 py-3.5 w-full sm:w-auto font-semibold"
                       >
                         Explore Pricing Plans
@@ -488,6 +505,6 @@ const Home = () => {
       </div>
     </>
   );
-};
+});
 
 export default Home;

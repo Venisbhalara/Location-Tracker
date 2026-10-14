@@ -23,7 +23,19 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]|motion' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true, allowExportNames: ['useAuth'] },
+      ],
+    },
+  },
+  {
+    files: ['public/**/*.js', '**/sw.js'],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+      },
     },
   },
 ])

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { getMe } from '../services/api';
 
 const AuthContext = createContext(null);
@@ -27,25 +27,30 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, [token]);
 
-  const login = (userData, jwt) => {
+  const login = useCallback((userData, jwt) => {
     localStorage.setItem('token', jwt);
     setToken(jwt);
     setUser(userData);
-  };
+  }, []);
 
   // Patch user in-place after profile updates — no extra API call, no token re-trigger
-  const updateUser = (partialUser) => {
+  const updateUser = useCallback((partialUser) => {
     setUser((prev) => ({ ...prev, ...partialUser }));
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({ user, token, loading, login, logout, updateUser, isAuthenticated: !!user }),
+    [user, token, loading, login, logout, updateUser]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

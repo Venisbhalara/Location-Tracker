@@ -65,6 +65,37 @@ async function runMigrations() {
         }
       }
     }
+
+    // 4. Ensure high-performance composite and lookup indexes exist
+    const performanceIndexes = [
+      { table: "tracking_requests", indexName: "idx_tr_user_created", columns: "`user_id`, `createdAt`" },
+      { table: "tracking_requests", indexName: "idx_tr_token", columns: "`token`" },
+      { table: "group_members", indexName: "idx_gm_req_id", columns: "`tracking_request_id`" },
+      { table: "group_members", indexName: "idx_gm_group_id", columns: "`group_id`" },
+      { table: "activity_logs", indexName: "idx_al_user_id", columns: "`user_id`" }
+    ];
+
+    for (const idx of performanceIndexes) {
+      try {
+        const [tCheck] = await sequelize.query(
+          `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+           WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${idx.table}'`
+        );
+        if (tCheck.length > 0) {
+          const [idxCheck] = await sequelize.query(
+            `SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS 
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${idx.table}' AND INDEX_NAME = '${idx.indexName}'`
+          );
+          if (idxCheck.length === 0) {
+            console.log(`[Database Repair] ⚡ Creating performance index ${idx.indexName} on ${idx.table}...`);
+            await sequelize.query(`CREATE INDEX \`${idx.indexName}\` ON \`${idx.table}\` (${idx.columns})`);
+          }
+        }
+      } catch (idxErr) {
+        console.warn(`[Database Repair] ⚠️ Index check for ${idx.indexName}: ${idxErr.message}`);
+      }
+    }
+
     console.log("✅ Ultimate Database Repair complete!");
   } catch (err) {
     console.error("❌ Ultimate Database Repair failed:", err.message);

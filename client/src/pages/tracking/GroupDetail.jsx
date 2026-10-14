@@ -1,37 +1,43 @@
-import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { useParams, Link } from "react-router-dom";
 import {
   getGroupDetails,
   addGroupMember,
   removeGroupMember,
 } from "../../services/api";
-import AmbientBackground from "../../components/common/AmbientBackground";
 import toast from "react-hot-toast";
 
 const MEMBER_COLORS = ["#22c55e", "#38bdf8", "#f59e0b", "#fb7185", "#a78bfa"];
 
 const GroupDetail = () => {
   const { groupId } = useParams();
-  const navigate = useNavigate();
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [form, setForm] = useState({ phoneNumber: "", label: "" });
   const [copiedToken, setCopiedToken] = useState(null);
+  const isMountedRef = useRef(true);
 
-  const load = async () => {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const load = useCallback(async () => {
     try {
       const res = await getGroupDetails(groupId);
-      setGroup(res.data.group);
+      if (isMountedRef.current) setGroup(res.data.group);
     } catch {
-      toast.error("Failed to load group.");
+      if (isMountedRef.current) toast.error("Failed to load group.");
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) setLoading(false);
     }
-  };
+  }, [groupId]);
 
-  useEffect(() => { load(); }, [groupId]);
+  useEffect(() => { load(); }, [load]);
 
   const handleAddMember = async (e) => {
     e.preventDefault();
@@ -84,7 +90,6 @@ const GroupDetail = () => {
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <AmbientBackground />
         <div className="w-10 h-10 border-3 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
       </div>
     );
@@ -93,7 +98,6 @@ const GroupDetail = () => {
   if (!group) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <AmbientBackground />
         <div className="text-center">
           <p className="text-stone-600 mb-4">Group not found.</p>
           <Link to="/groups" className="btn-cta-primary px-4 py-2 text-xs">
@@ -106,7 +110,6 @@ const GroupDetail = () => {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] relative overflow-hidden py-10 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <AmbientBackground />
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Breadcrumb */}

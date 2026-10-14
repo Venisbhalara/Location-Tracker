@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import {
   getUserProfile,
@@ -8,11 +8,18 @@ import {
 } from "../../services/api";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
 export default function Profile() {
   const { user, updateUser, logout } = useAuth();
   const navigate = useNavigate();
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const [activeTab, setActiveTab] = useState("general");
   const [profileLoading, setProfileLoading] = useState(false);
@@ -35,24 +42,27 @@ export default function Profile() {
 
   const [deleteData, setDeleteData] = useState({ password: "" });
 
-  useEffect(() => {
-    fetchProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const res = await getUserProfile();
-      setProfileData({
-        name: res.data.name || "",
-        email: res.data.email || "",
-        phoneNumber: res.data.phoneNumber || "",
-        defaultTrackingExpiration: res.data.defaultTrackingExpiration || "24h",
-      });
+      if (isMountedRef.current) {
+        setProfileData({
+          name: res.data.name || "",
+          email: res.data.email || "",
+          phoneNumber: res.data.phoneNumber || "",
+          defaultTrackingExpiration: res.data.defaultTrackingExpiration || "24h",
+        });
+      }
     } catch {
-      toast.error("Failed to load profile data");
+      if (isMountedRef.current) {
+        toast.error("Failed to load profile data");
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleProfileChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -138,8 +148,6 @@ export default function Profile() {
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] py-10 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <AmbientBackground />
-
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>

@@ -18,8 +18,8 @@ const logActivity = require("../utils/activityLogger");
   const { phoneNumber, trackingType, label, expiryHours = 24 } = req.body;
 
   try {
-    // Check if user has approved tracking access
-    const user = await User.findByPk(req.user.id);
+    // Reuse authenticated user instance from protect middleware (eliminates redundant DB query)
+    const user = req.user;
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
@@ -54,19 +54,20 @@ const logActivity = require("../utils/activityLogger");
       expiresAt,
     });
 
-    // --- DECREMENT BALANCE ---
+    // --- DECREMENT BALANCE & LOG ACTIVITY CONCURRENTLY ---
     user.trackingBalance -= 1;
-    await user.save();
-    // -------------------------
-
-    await logActivity(req.app.get("io"), {
-      type: "tracking_start",
-      label: initialStatus === "active" ? "Tracking Start" : "Pending Access",
-      detail1: `user_${user.id}`,
-      detail2: initialStatus === "active" ? `session #${tracking.id}` : "Awaiting approval",
-      color: initialStatus === "active" ? "border-[#7C6FFF]" : "border-[#EAB308]",
-      userId: user.id
-    });
+    await Promise.all([
+      user.save(),
+      logActivity(req.app.get("io"), {
+        type: "tracking_start",
+        label: initialStatus === "active" ? "Tracking Start" : "Pending Access",
+        detail1: `user_${user.id}`,
+        detail2: initialStatus === "active" ? `session #${tracking.id}` : "Awaiting approval",
+        color: initialStatus === "active" ? "border-[#7C6FFF]" : "border-[#EAB308]",
+        userId: user.id
+      }),
+    ]);
+    // ----------------------------------------------------
 
     // Build the shareable tracking URL
     // Use Origin/Host header if CLIENT_URL is not set or looks like a local IP,
@@ -221,6 +222,7 @@ const getUserTrackings = async (req, res) => {
 
     const { count, rows: trackings } = await TrackingRequest.findAndCountAll({
       where,
+      attributes: { exclude: ["pushSubscription", "lastKnownIp"] },
       order: [["createdAt", "DESC"]],
       limit: parseInt(limit),
       offset,

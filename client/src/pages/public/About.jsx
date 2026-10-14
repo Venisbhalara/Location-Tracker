@@ -1,6 +1,6 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
 const values = [
   {
@@ -58,7 +58,7 @@ const breadcrumb = {
   ],
 };
 
-const About = () => {
+const About = memo(() => {
   return (
     <>
       <Helmet>
@@ -76,7 +76,6 @@ const About = () => {
       </Helmet>
 
       <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <AmbientBackground />
 
         {/* Breadcrumb Hierarchy */}
         <nav aria-label="Breadcrumb" className="mb-6">
@@ -184,6 +183,6 @@ const About = () => {
       </div>
     </>
   );
-};
+});
 
 export default About;

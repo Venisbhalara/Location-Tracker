@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet-async";
 import { createPaymentOrder, verifyPayment } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
 const plans = [
   {
@@ -78,12 +77,71 @@ const faqs = [
   },
 ];
 
-const Pricing = () => {
+const FAQItem = React.memo(({ faq, index, isOpen, onToggle }) => (
+  <div className="surface-card rounded-xl border border-[#e7e0d3] overflow-hidden">
+    <button
+      onClick={() => onToggle(index)}
+      className="w-full px-6 py-4.5 text-left flex items-center justify-between text-stone-900 font-medium text-sm sm:text-base hover:text-stone-700 transition-colors"
+    >
+      <span>{faq.q}</span>
+      <span
+        className={`text-xl transition-transform duration-200 ${isOpen ? "rotate-45 text-stone-900" : "text-stone-400"}`}
+      >
+        +
+      </span>
+    </button>
+    {isOpen && (
+      <div className="px-6 pb-5 text-sm text-stone-600 leading-relaxed border-t border-[#f0ece1] pt-3">
+        {faq.a}
+      </div>
+    )}
+  </div>
+));
+
+const schemaPricing = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://locationtracker.app/",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Pricing",
+      item: "https://locationtracker.app/pricing",
+    },
+  ],
+};
+
+const Pricing = React.memo(() => {
   const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [activeFAQ, setActiveFAQ] = useState(null);
+
+  React.useEffect(() => {
+    if (!showModal) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setShowModal(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showModal]);
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
@@ -95,7 +153,7 @@ const Pricing = () => {
     });
   };
 
-  const handlePaymentInitiate = (planId) => {
+  const handlePaymentInitiate = React.useCallback((planId) => {
     if (!isAuthenticated) {
       toast.error("Please sign in or create an account to recharge slots.");
       return;
@@ -103,9 +161,9 @@ const Pricing = () => {
     const plan = plans.find((p) => p.id === planId);
     setSelectedPlan(plan);
     setShowModal(true);
-  };
+  }, [isAuthenticated]);
 
-  const processCheckout = async () => {
+  const processCheckout = React.useCallback(async () => {
     if (!selectedPlan) return;
     const planId = selectedPlan.id;
 
@@ -172,36 +230,7 @@ const Pricing = () => {
     } finally {
       setLoading(null);
     }
-  };
-
-  const schemaPricing = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
-
-  const breadcrumb = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://locationtracker.app/",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Pricing",
-        item: "https://locationtracker.app/pricing",
-      },
-    ],
-  };
+  }, [selectedPlan, user]);
 
   return (
     <>
@@ -228,7 +257,6 @@ const Pricing = () => {
       </Helmet>
 
       <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <AmbientBackground />
 
         {/* Breadcrumb Hierarchy */}
         <nav aria-label="Breadcrumb" className="mb-6">
@@ -414,27 +442,13 @@ const Pricing = () => {
 
           <div className="space-y-3">
             {faqs.map((faq, i) => (
-              <div
+              <FAQItem
                 key={i}
-                className="surface-card rounded-xl border border-[#e7e0d3] overflow-hidden"
-              >
-                <button
-                  onClick={() => setActiveFAQ(activeFAQ === i ? null : i)}
-                  className="w-full px-6 py-4.5 text-left flex items-center justify-between text-stone-900 font-medium text-sm sm:text-base hover:text-stone-700 transition-colors"
-                >
-                  <span>{faq.q}</span>
-                  <span
-                    className={`text-xl transition-transform duration-200 ${activeFAQ === i ? "rotate-45 text-stone-900" : "text-stone-400"}`}
-                  >
-                    +
-                  </span>
-                </button>
-                {activeFAQ === i && (
-                  <div className="px-6 pb-5 text-sm text-stone-600 leading-relaxed border-t border-[#f0ece1] pt-3">
-                    {faq.a}
-                  </div>
-                )}
-              </div>
+                faq={faq}
+                index={i}
+                isOpen={activeFAQ === i}
+                onToggle={(idx) => setActiveFAQ(activeFAQ === idx ? null : idx)}
+              />
             ))}
           </div>
         </div>
@@ -512,6 +526,6 @@ const Pricing = () => {
       </div>
     </>
   );
-};
+});
 
 export default Pricing;

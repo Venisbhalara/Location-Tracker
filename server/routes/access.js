@@ -100,6 +100,7 @@ router.get('/status', protect, async (req, res) => {
   try {
     const latestRequest = await AccessRequest.findOne({
       where: { userId: req.user.id },
+      attributes: ['id', 'status', 'reason', 'rejectionReason', 'createdAt'],
       order: [['createdAt', 'DESC']],
     });
 

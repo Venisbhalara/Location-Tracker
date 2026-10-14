@@ -104,6 +104,22 @@ const io = socketio(server, {
   pingInterval: 25000,
 });
 
+app.disable("x-powered-by");
+
+// High-precision Server-Timing instrumentation
+app.use((req, res, next) => {
+  const start = process.hrtime.bigint();
+  const originalSend = res.send;
+  res.send = function (...args) {
+    if (!res.headersSent) {
+      const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
+      res.setHeader("Server-Timing", `total;dur=${durationMs.toFixed(2)}`);
+    }
+    return originalSend.apply(this, args);
+  };
+  next();
+});
+
 // Middleware
 app.use(
   cors({
@@ -206,6 +222,27 @@ io.on("connection", (socket) => {
       console.log(`[NeuralPing] ✅ Cleared periodic ping — sharer reconnected: ${token}`);
     }
 
+    // ── Cache group membership once on registration to avoid DB queries on every coordinate ──
+    try {
+      const tracking = await TrackingRequest.findOne({ where: { token }, attributes: ["id"] });
+      if (tracking) {
+        const groupMember = await GroupMember.findOne({
+          where: { trackingRequestId: tracking.id },
+          attributes: ["id", "groupId", "label", "color"],
+        });
+        if (groupMember) {
+          socket.data.groupInfo = {
+            groupId: groupMember.groupId,
+            memberId: groupMember.id,
+            label: groupMember.label,
+            color: groupMember.color,
+          };
+        }
+      }
+    } catch (e) {
+      console.warn("[GroupTracking] Could not cache group info:", e.message);
+    }
+
     // Mark sharer as online in DB so viewers can read the mode
     try {
       await TrackingRequest.update(
@@ -238,29 +275,19 @@ io.on("connection", (socket) => {
       ...payload,
     });
 
-    // ── Group Tracking: broadcast to the group room if this token belongs to a group member ──
-    try {
-      const tracking = await TrackingRequest.findOne({ where: { token }, attributes: ["id"] });
-      if (tracking) {
-        const groupMember = await GroupMember.findOne({
-          where: { trackingRequestId: tracking.id },
-          attributes: ["id", "groupId", "label", "color"],
-        });
-        if (groupMember) {
-          io.to(`group:${groupMember.groupId}`).emit("group-location-update", {
-            memberId: groupMember.id,
-            label: groupMember.label,
-            color: groupMember.color,
-            latitude,
-            longitude,
-            accuracy,
-            locationMode: "gps",
-            timestamp: new Date(),
-          });
-        }
-      }
-    } catch (e) {
-      console.warn("[GroupTracking] Failed to broadcast group location update:", e.message);
+    // ── Group Tracking: instant broadcast using cached socket metadata (0 DB overhead) ──
+    const groupInfo = socket.data.groupInfo;
+    if (groupInfo) {
+      io.to(`group:${groupInfo.groupId}`).emit("group-location-update", {
+        memberId: groupInfo.memberId,
+        label: groupInfo.label,
+        color: groupInfo.color,
+        latitude,
+        longitude,
+        accuracy,
+        locationMode: "gps",
+        timestamp: new Date(),
+      });
     }
   });
 
@@ -279,11 +306,10 @@ io.on("connection", (socket) => {
       });
 
       try {
-        const tracking = await TrackingRequest.findOne({ where: { token: sharerToken } });
-        if (tracking) {
-          // Mark as offline
-          await tracking.update({ sharerOnline: false, locationMode: "offline" });
-        }
+        await TrackingRequest.update(
+          { sharerOnline: false, locationMode: "offline" },
+          { where: { token: sharerToken } }
+        );
       } catch (err) {
         console.warn("[NeuralPing] Error updating offline status:", err.message);
       }
@@ -294,17 +320,35 @@ io.on("connection", (socket) => {
         console.warn("[NeuralPing] Background ping error:", e.message)
       );
 
-      // ── Step 4: Periodic pings every 2 min (GPS restoration when GPS turns back on) ──
+      // ── Step 4: Periodic pings every 2 min with MAX attempts (prevents infinite server leak) ──
+      if (offlinePingIntervals.has(sharerToken)) {
+        clearInterval(offlinePingIntervals.get(sharerToken));
+        offlinePingIntervals.delete(sharerToken);
+      }
+
       const PING_INTERVAL_MS = 2 * 60 * 1000;
+      const MAX_OFFLINE_PINGS = 5; // Max 5 pings (10 mins) to avoid perpetual DB query loops
+      let pingCount = 0;
 
       const pingInterval = setInterval(async () => {
+        pingCount += 1;
         try {
-          const tracking = await TrackingRequest.findOne({ where: { token: sharerToken } });
-
-          if (!tracking) {
+          if (pingCount > MAX_OFFLINE_PINGS) {
             clearInterval(pingInterval);
             offlinePingIntervals.delete(sharerToken);
-            console.log(`[NeuralPing] Session deleted, stopping pings for: ${sharerToken}`);
+            console.log(`[NeuralPing] Reached max offline pings (${MAX_OFFLINE_PINGS}), stopping for: ${sharerToken}`);
+            return;
+          }
+
+          const tracking = await TrackingRequest.findOne({
+            where: { token: sharerToken },
+            attributes: ["id", "expiresAt", "sharerOnline"],
+          });
+
+          if (!tracking || (tracking.expiresAt && new Date() > new Date(tracking.expiresAt))) {
+            clearInterval(pingInterval);
+            offlinePingIntervals.delete(sharerToken);
+            console.log(`[NeuralPing] Session deleted or expired, stopping pings for: ${sharerToken}`);
             return;
           }
 
@@ -318,10 +362,10 @@ io.on("connection", (socket) => {
           // Send resume-ping → SW opens Ghost Window if GPS is back on
           const { triggerResumePing } = require("./controllers/pushController");
           await triggerResumePing(sharerToken);
-          console.log(`[NeuralPing] Resume ping sent for: ${sharerToken}`);
+          console.log(`[NeuralPing] Resume ping #${pingCount} sent for: ${sharerToken}`);
         } catch (err) {
           console.warn(`[NeuralPing] Periodic ping error for ${sharerToken}:`, err.message);
-          if (err.statusCode === 410 || err.statusCode === 404) {
+          if (err.statusCode === 410 || err.statusCode === 404 || pingCount >= MAX_OFFLINE_PINGS) {
             clearInterval(pingInterval);
             offlinePingIntervals.delete(sharerToken);
           }
@@ -329,7 +373,7 @@ io.on("connection", (socket) => {
       }, PING_INTERVAL_MS);
 
       offlinePingIntervals.set(sharerToken, pingInterval);
-      console.log(`[NeuralPing] Periodic ping started for: ${sharerToken} (every 2 min)`);
+      console.log(`[NeuralPing] Periodic ping started for: ${sharerToken} (every 2 min, max ${MAX_OFFLINE_PINGS})`);
     }
   });
 

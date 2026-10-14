@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   MapContainer,
@@ -8,21 +8,28 @@ import {
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { getGroupDetails } from "../../services/api";
 import { useGroupSocket } from "../../hooks/useSocket";
 import toast from "react-hot-toast";
 
-// Fix Leaflet default icon
+// Fix Leaflet default icon using bundled local assets
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 });
 
-// Build a custom colored marker with member's first initial
-const buildMemberIcon = (color, initial) =>
-  new L.divIcon({
+// Cache custom colored markers to prevent DOM tearing on Leaflet marker updates
+const memberIconCache = new Map();
+const buildMemberIcon = (color, initial) => {
+  const key = `${color}_${initial}`;
+  if (memberIconCache.has(key)) return memberIconCache.get(key);
+  const icon = new L.divIcon({
     className: "",
     html: `
       <div style="
@@ -38,18 +45,21 @@ const buildMemberIcon = (color, initial) =>
     iconSize: [36, 36],
     iconAnchor: [18, 18],
   });
+  memberIconCache.set(key, icon);
+  return icon;
+};
 
 // Auto-center map when a member is followed
-const MapFollower = ({ position }) => {
+const MapFollower = memo(({ position }) => {
   const map = useMap();
   useEffect(() => {
     if (position) map.setView([position.latitude, position.longitude], 16);
   }, [position, map]);
   return null;
-};
+});
 
 // ── MEMBER SIDEBAR CARD ────────────────────────────────────────────────────────
-const MemberCard = ({ member, isFollowing, onFollow, onCopyLink }) => {
+const MemberCard = memo(({ member, isFollowing, onFollow, onCopyLink }) => {
   const online = member.sharerOnline;
   const hasPos = member.latitude && member.longitude;
 
@@ -115,10 +125,10 @@ const MemberCard = ({ member, isFollowing, onFollow, onCopyLink }) => {
       )}
     </div>
   );
-};
+});
 
 // ── MAIN GROUP MAP PAGE ────────────────────────────────────────────────────────
-const GroupMap = () => {
+const GroupMap = memo(() => {
   const { groupId } = useParams();
   const navigate = useNavigate();
 
@@ -413,6 +423,6 @@ const GroupMap = () => {
       </div>
     </div>
   );
-};
+});
 
 export default GroupMap;

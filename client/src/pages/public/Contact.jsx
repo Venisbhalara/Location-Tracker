@@ -1,9 +1,25 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
-const Contact = () => {
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://locationtracker.app/" },
+    { "@type": "ListItem", position: 2, name: "Contact", item: "https://locationtracker.app/contact" },
+  ],
+};
+
+const contactSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contact NexTrack",
+  url: "https://locationtracker.app/contact",
+  description: "Get in touch with NexTrack support for help with GPS tracking, privacy concerns, or bug reports.",
+};
+
+const Contact = memo(() => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,22 +50,6 @@ const Contact = () => {
     }
   };
 
-  const breadcrumb = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://locationtracker.app/" },
-      { "@type": "ListItem", position: 2, name: "Contact", item: "https://locationtracker.app/contact" },
-    ],
-  };
-
-  const contactSchema = {
-    "@context": "https://schema.org",
-    "@type": "ContactPage",
-    name: "Contact NexTrack",
-    url: "https://locationtracker.app/contact",
-    description: "Get in touch with NexTrack support for help with GPS tracking, privacy concerns, or bug reports.",
-  };
 
   return (
     <>
@@ -68,7 +68,6 @@ const Contact = () => {
       </Helmet>
 
       <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <AmbientBackground />
 
         {/* Breadcrumb Hierarchy */}
         <nav aria-label="Breadcrumb" className="mb-6">
@@ -255,6 +254,6 @@ const Contact = () => {
       </div>
     </>
   );
-};
+});
 
 export default Contact;

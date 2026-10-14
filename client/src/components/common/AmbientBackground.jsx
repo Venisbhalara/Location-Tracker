@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useRef } from "react";
-import { lenisInstance } from "../../hooks/useLenis";
+import { lenisInstance, subscribeLenisScroll } from "../../hooks/useLenis";
 
 /**
  * Calm Minimalist Light Constellation Canvas
@@ -97,13 +97,17 @@ const ConstellationCanvas = () => {
       }, 70);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("wheel", handleScroll, { passive: true });
+    // Centralized subscription to Lenis scroll dispatcher
+    const unsubLenis = subscribeLenisScroll(handleScroll);
 
-    let lenisUnsub = null;
-    if (lenisInstance && typeof lenisInstance.on === "function") {
-      lenisUnsub = lenisInstance.on("scroll", handleScroll);
-    }
+    // Native scroll fallback only when Lenis is not active
+    const handleNativeScroll = () => {
+      if (lenisInstance) return;
+      handleScroll();
+    };
+
+    window.addEventListener("scroll", handleNativeScroll, { passive: true });
+    window.addEventListener("wheel", handleScroll, { passive: true });
 
     const handleResize = () => updateDimensions();
     const handleMouseMove = (e) => {
@@ -122,16 +126,20 @@ const ConstellationCanvas = () => {
     document.addEventListener("mouseleave", handleMouseLeave, { passive: true });
 
     let isVisible = true;
-    const handleVisibilityChange = () => {
-      isVisible = !document.hidden;
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    let isRunning = true;
+    let lastFrameTime = 0;
+    const frameInterval = 1000 / 60; // 60 FPS cap to preserve battery and GPU budget
 
-    const render = () => {
-      if (!isVisible) {
-        animationFrameId = requestAnimationFrame(render);
+    const render = (currentTime) => {
+      if (!isRunning) return;
+
+      animationFrameId = requestAnimationFrame(render);
+
+      // Frame throttle to 60 FPS
+      if (currentTime - lastFrameTime < frameInterval) {
         return;
       }
+      lastFrameTime = currentTime;
 
       ctx.clearRect(0, 0, width, height);
 
@@ -203,22 +211,53 @@ const ConstellationCanvas = () => {
           }
         }
       }
-
-      animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    const handleVisibilityChange = () => {
+      isVisible = !document.hidden;
+      if (isVisible) {
+        if (!isRunning) {
+          isRunning = true;
+          lastFrameTime = performance.now();
+          animationFrameId = requestAnimationFrame(render);
+        }
+      } else {
+        isRunning = false;
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      }
+    };
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+    if (prefersReducedMotion) {
+      // Draw single elegant ambient snapshot with 0 ongoing animation loop
+      render(performance.now());
+      return () => {
+        unsubLenis();
+        window.removeEventListener("resize", handleResize);
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("scroll", handleNativeScroll);
+        window.removeEventListener("wheel", handleScroll);
+        document.removeEventListener("mouseleave", handleMouseLeave);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        if (scrollStopTimer) clearTimeout(scrollStopTimer);
+      };
+    }
+
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
+      isRunning = false;
       cancelAnimationFrame(animationFrameId);
+      unsubLenis();
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleNativeScroll);
       window.removeEventListener("wheel", handleScroll);
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (scrollStopTimer) clearTimeout(scrollStopTimer);
-      if (typeof lenisUnsub === "function") lenisUnsub();
     };
   }, []);
 
@@ -231,33 +270,12 @@ const ConstellationCanvas = () => {
   );
 };
 
-let globalAmbientMounted = false;
-
 /**
  * Reusable light ambient background layer.
  * Warm ivory base (#fcfaf6) + natural feathered radial gradients (ZERO GPU BLUR PENALTY)
- * + ultra-smooth 120FPS constellation canvas.
+ * + smooth constellation canvas.
  */
 const AmbientBackground = memo(() => {
-  const isPrimary = useRef(false);
-
-  if (!globalAmbientMounted) {
-    globalAmbientMounted = true;
-    isPrimary.current = true;
-  }
-
-  useEffect(() => {
-    return () => {
-      if (isPrimary.current) {
-        globalAmbientMounted = false;
-      }
-    };
-  }, []);
-
-  if (!isPrimary.current) {
-    return null;
-  }
-
   return (
     <div
       className="pointer-events-none fixed inset-0 overflow-hidden select-none -z-10 bg-[#fcfaf6]"

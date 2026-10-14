@@ -1,25 +1,27 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
+import { preloadRoute } from "../../utils/routePrefetch";
 
-const Footer = () => {
+const FOOTER_LINKS = {
+  Product: [
+    { label: "Home", to: "/" },
+    { label: "Pricing", to: "/pricing" },
+    { label: "New Tracking Link", to: "/tracking/create" },
+    { label: "Dashboard", to: "/dashboard" },
+  ],
+  Company: [
+    { label: "About Us", to: "/about" },
+    { label: "Blog", to: "/blog" },
+    { label: "Contact Us", to: "/contact" },
+  ],
+  Legal: [
+    { label: "Privacy Policy", to: "/privacy-policy" },
+    { label: "Terms & Conditions", to: "/terms" },
+  ],
+};
+
+const Footer = memo(() => {
   const year = new Date().getFullYear();
-
-  const footerLinks = {
-    Product: [
-      { label: "Home", to: "/" },
-      { label: "Pricing", to: "/pricing" },
-      { label: "New Tracking Link", to: "/tracking/create" },
-      { label: "Dashboard", to: "/dashboard" },
-    ],
-    Company: [
-      { label: "About Us", to: "/about" },
-      { label: "Blog", to: "/blog" },
-      { label: "Contact Us", to: "/contact" },
-    ],
-    Legal: [
-      { label: "Privacy Policy", to: "/privacy-policy" },
-      { label: "Terms & Conditions", to: "/terms" },
-    ],
-  };
 
   return (
     <footer
@@ -31,9 +33,23 @@ const Footer = () => {
           
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-4 group">
+            <Link
+              to="/"
+              onMouseEnter={() => preloadRoute("/")}
+              onTouchStart={() => preloadRoute("/")}
+              onFocus={() => preloadRoute("/")}
+              className="flex items-center gap-2.5 mb-4 group"
+            >
               <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200/80 flex items-center justify-center shadow-xs">
-                <img src="/location.png" alt="NexTrack" className="w-5 h-5 object-contain" />
+                <img
+                  src="/location.png"
+                  alt="NexTrack"
+                  width="20"
+                  height="20"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-5 h-5 object-contain"
+                />
               </div>
               <span className="font-bold text-lg text-stone-900 tracking-tight">
                 Nex<span className="text-indigo-600">Track</span>
@@ -47,7 +63,7 @@ const Footer = () => {
           </div>
 
           {/* Navigation Columns */}
-          {Object.entries(footerLinks).map(([title, links]) => (
+          {Object.entries(FOOTER_LINKS).map(([title, links]) => (
             <div key={title}>
               <h3 className="text-xs font-bold uppercase tracking-wider text-stone-800 mb-4">
                 {title}
@@ -57,6 +73,9 @@ const Footer = () => {
                   <li key={link.label}>
                     <Link
                       to={link.to}
+                      onMouseEnter={() => preloadRoute(link.to)}
+                      onTouchStart={() => preloadRoute(link.to)}
+                      onFocus={() => preloadRoute(link.to)}
                       className="text-sm text-stone-600 hover:text-stone-900 transition-colors duration-150 inline-block py-0.5"
                     >
                       {link.label}
@@ -75,14 +94,35 @@ const Footer = () => {
             <span className="text-stone-800 font-semibold">NexTrack</span>. All rights reserved. Built with privacy in mind.
           </p>
           <div className="flex items-center gap-6">
-            <Link to="/privacy-policy" className="hover:text-stone-800 transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-stone-800 transition-colors">Terms of Service</Link>
-            <Link to="/contact" className="hover:text-stone-800 transition-colors">Support</Link>
+            <Link
+              to="/privacy-policy"
+              onMouseEnter={() => preloadRoute("/privacy-policy")}
+              onTouchStart={() => preloadRoute("/privacy-policy")}
+              className="hover:text-stone-800 transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              to="/terms"
+              onMouseEnter={() => preloadRoute("/terms")}
+              onTouchStart={() => preloadRoute("/terms")}
+              className="hover:text-stone-800 transition-colors"
+            >
+              Terms of Service
+            </Link>
+            <Link
+              to="/contact"
+              onMouseEnter={() => preloadRoute("/contact")}
+              onTouchStart={() => preloadRoute("/contact")}
+              className="hover:text-stone-800 transition-colors"
+            >
+              Support
+            </Link>
           </div>
         </div>
       </div>
     </footer>
   );
-};
+});
 
 export default Footer;

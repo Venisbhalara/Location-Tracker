@@ -6,11 +6,10 @@ const bcrypt = require("bcryptjs");
 // @access  Private
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id);
-    if (!user) {
+    if (!req.user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json(user.toSafeJSON());
+    res.json(req.user.toSafeJSON());
   } catch (error) {
     console.error("Error fetching profile:", error);
     res.status(500).json({ message: "Server error fetching profile" });
@@ -22,7 +21,7 @@ exports.getUserProfile = async (req, res) => {
 // @access  Private
 exports.updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id);
+    const user = req.user;
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

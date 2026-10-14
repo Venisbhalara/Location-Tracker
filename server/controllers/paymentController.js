@@ -1,6 +1,7 @@
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const { Payment, User } = require("../models");
+const sequelize = require("../config/db");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID || "placeholder_key_id",
@@ -80,20 +81,22 @@ exports.verifyPayment = async (req, res) => {
         return res.status(200).json({ success: true, message: "Payment already verified" });
       }
 
-      // Update payment record
-      payment.paymentId = razorpay_payment_id;
-      payment.signature = razorpay_signature;
-      payment.status = "paid";
-      await payment.save();
+      // Update payment record and user tracking balance atomically in a transaction
+      await sequelize.transaction(async (t) => {
+        payment.paymentId = razorpay_payment_id;
+        payment.signature = razorpay_signature;
+        payment.status = "paid";
+        await payment.save({ transaction: t });
 
-      // Update user tracking balance
-      const user = await User.findByPk(payment.userId);
-      if (user) {
-        const addedBalance = payment.planDetails.trackingBalance || 0;
-        user.trackingBalance += addedBalance;
-        user.planType = payment.planDetails.label;
-        await user.save();
-      }
+        // Update user tracking balance
+        const user = await User.findByPk(payment.userId, { transaction: t });
+        if (user) {
+          const addedBalance = payment.planDetails?.trackingBalance || 0;
+          user.trackingBalance += addedBalance;
+          user.planType = payment.planDetails?.label || user.planType;
+          await user.save({ transaction: t });
+        }
+      });
 
       return res.status(200).json({ success: true, message: "Payment verified successfully" });
     } else {

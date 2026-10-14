@@ -14,7 +14,7 @@
  * Design: Minimal, ultra-fast, calm luxury light theme.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const STATUS = {
@@ -30,15 +30,23 @@ const GhostLocation = () => {
   const token = searchParams.get("token");
   const apiBase = searchParams.get("apiBase") || "/api";
 
-  const [status, setStatus] = useState(STATUS.ACQUIRING);
+  const [status, setStatus] = useState(() => (token ? STATUS.ACQUIRING : STATUS.ERROR));
   const [coords, setCoords] = useState(null);
   const [countdown, setCountdown] = useState(3);
 
+  const autoClose = useCallback((delay) => {
+    setTimeout(() => {
+      window.close();
+      setTimeout(() => {
+        if (!window.closed) {
+          window.location.replace(`/track/${token}`);
+        }
+      }, 300);
+    }, delay);
+  }, [token]);
+
   useEffect(() => {
-    if (!token) {
-      setStatus(STATUS.ERROR);
-      return;
-    }
+    if (!token) return;
 
     const geoOptions = {
       enableHighAccuracy: true,
@@ -81,7 +89,7 @@ const GhostLocation = () => {
       },
       geoOptions
     );
-  }, [token, apiBase]);
+  }, [token, apiBase, autoClose]);
 
   // Countdown for auto-close visual
   useEffect(() => {
@@ -91,17 +99,6 @@ const GhostLocation = () => {
     }, 1000);
     return () => clearInterval(t);
   }, [status]);
-
-  const autoClose = (delay) => {
-    setTimeout(() => {
-      window.close();
-      setTimeout(() => {
-        if (!window.closed) {
-          window.location.replace(`/track/${token}`);
-        }
-      }, 300);
-    }, delay);
-  };
 
   const getStatusConfig = () => {
     switch (status) {

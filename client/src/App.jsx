@@ -1,11 +1,11 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, memo, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useLenis } from "./hooks/useLenis";
+import { scheduleIdlePrefetch } from "./utils/routePrefetch";
 
-import Dashboard from "./pages/user/Dashboard";
-import CreateTracking from "./pages/tracking/CreateTracking";
-
-// ── Lazy-loaded secondary pages ──────────────────────────────────────────────
+// ── Lazy-loaded pages ────────────────────────────────────────────────────────
+const Dashboard = lazy(() => import("./pages/user/Dashboard"));
+const CreateTracking = lazy(() => import("./pages/tracking/CreateTracking"));
 const Home = lazy(() => import("./pages/public/Home"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
@@ -34,15 +34,15 @@ import ScrollProgressBar from "./components/common/ScrollProgressBar";
 import AppleMagneticCursor from "./components/common/AppleMagneticCursor";
 import ScrollToTopButton from "./components/common/ScrollToTopButton";
 
-// ── Lightweight inline fallback ───────────────────────────────────────────────
+// ── Non-collapsing route fallback (prevents vertical layout shifts) ───────────
 const PageLoader = () => (
-  <div className="flex items-center justify-center py-24">
-    <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+  <div className="min-h-[60vh] flex items-center justify-center py-24" aria-live="polite">
+    <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin" />
   </div>
 );
 
 // ── Main layout with navbar and footer ────────────────────────────────────────
-const MainLayout = ({ children, hideFooter }) => (
+const MainLayout = memo(({ children, hideFooter }) => (
   <div className="min-h-screen flex flex-col relative">
     <ScrollProgressBar />
     <Navbar />
@@ -50,12 +50,12 @@ const MainLayout = ({ children, hideFooter }) => (
     <ScrollToTopButton />
     {!hideFooter && <Footer />}
   </div>
-);
+));
 
 // ── Minimal layout for tracking links (no navbar/footer) ───────────────────────
-const MinimalLayout = ({ children }) => (
+const MinimalLayout = memo(({ children }) => (
   <div className="min-h-screen relative">{children}</div>
-);
+));
 
 function App() {
   useLenis();
@@ -64,6 +64,11 @@ function App() {
   const isAuthRoute =
     location.pathname === "/login" || location.pathname === "/register";
   const isGhostRoute = location.pathname === "/ghost";
+
+  // Warm up primary public routes during browser idle time
+  useEffect(() => {
+    scheduleIdlePrefetch(["/pricing", "/about", "/login"]);
+  }, []);
 
   // Ghost route: bare layout — no navbar, no footer, no spinner
   // Opens automatically from SW push, captures GPS, auto-closes
@@ -79,61 +84,55 @@ function App() {
     );
   }
 
-  // If it's a tracking route, use minimal layout
-  if (isTrackingRoute) {
-    return (
-      <MinimalLayout>
-        <AppleMagneticCursor />
-        <AmbientBackground />
-        <ScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/track/:token" element={<TrackingLink />} />
-          </Routes>
-        </Suspense>
-      </MinimalLayout>
-    );
-  }
-
-  // Otherwise, use the main layout with navbar and footer
   return (
     <>
       <AppleMagneticCursor />
       <AmbientBackground />
-      <MainLayout hideFooter={isAuthRoute}>
-        <ScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <Routes location={location}>
-            {/* Public */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+      {isTrackingRoute ? (
+        <MinimalLayout>
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/track/:token" element={<TrackingLink />} />
+            </Routes>
+          </Suspense>
+        </MinimalLayout>
+      ) : (
+        <MainLayout hideFooter={isAuthRoute}>
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Public */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            {/* Legal & Info */}
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogArticle />} />
+              {/* Legal & Info */}
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogArticle />} />
 
-            {/* Protected */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/tracking/create" element={<CreateTracking />} />
-              <Route path="/tracking/map/:token" element={<LiveMap />} />
-              <Route path="/groups" element={<GroupDashboard />} />
-              <Route path="/groups/:groupId" element={<GroupDetail />} />
-              <Route path="/groups/:groupId/map" element={<GroupMap />} />
-            </Route>
+              {/* Protected */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/tracking/create" element={<CreateTracking />} />
+                <Route path="/tracking/map/:token" element={<LiveMap />} />
+                <Route path="/groups" element={<GroupDashboard />} />
+                <Route path="/groups/:groupId" element={<GroupDetail />} />
+                <Route path="/groups/:groupId/map" element={<GroupMap />} />
+              </Route>
 
-            {/* Catch-all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </MainLayout>
+              {/* Catch-all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </MainLayout>
+      )}
     </>
   );
 }

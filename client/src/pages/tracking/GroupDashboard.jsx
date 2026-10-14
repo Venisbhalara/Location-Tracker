@@ -1,30 +1,39 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef, memo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getUserGroups, deleteGroup } from "../../services/api";
 import toast from "react-hot-toast";
 import CreateGroupModal from "../../components/tracking/CreateGroupModal";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
-const GroupDashboard = () => {
+const isExpired = (expiresAt) => expiresAt && new Date() > new Date(expiresAt);
+
+const GroupDashboard = memo(() => {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const navigate = useNavigate();
+  const isMountedRef = useRef(true);
 
-  const load = async () => {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const load = useCallback(async () => {
     try {
       const res = await getUserGroups();
-      setGroups(res.data.groups);
+      if (isMountedRef.current) setGroups(res.data.groups);
     } catch {
-      toast.error("Failed to load groups.");
+      if (isMountedRef.current) toast.error("Failed to load groups.");
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
-  const handleDelete = async (id, name) => {
+  const handleDelete = useCallback(async (id, name) => {
     if (!confirm(`Delete group "${name}" and all associated member sessions?`)) return;
     try {
       await deleteGroup(id);
@@ -33,14 +42,17 @@ const GroupDashboard = () => {
     } catch {
       toast.error("Failed to delete group.");
     }
-  };
+  }, [load]);
 
-  const isExpired = (expiresAt) => expiresAt && new Date() > new Date(expiresAt);
+  const metrics = useMemo(() => [
+    { label: "Total Groups", value: groups.length, icon: "👥", color: "text-stone-900" },
+    { label: "Active Groups", value: groups.filter(g => g.status === "active" && !isExpired(g.expiresAt)).length, icon: "🟢", color: "text-emerald-700" },
+    { label: "Online Members", value: groups.reduce((acc, g) => acc + (g.activeMembers || 0), 0), icon: "📡", color: "text-stone-800" },
+  ], [groups]);
 
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <AmbientBackground />
         <div className="w-10 h-10 border-3 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
       </div>
     );
@@ -48,7 +60,6 @@ const GroupDashboard = () => {
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <AmbientBackground />
 
       {showCreate && (
         <CreateGroupModal
@@ -94,11 +105,7 @@ const GroupDashboard = () => {
 
       {/* ── METRICS STRIP ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
-        {[
-          { label: "Total Groups", value: groups.length, icon: "👥", color: "text-stone-900" },
-          { label: "Active Groups", value: groups.filter(g => g.status === "active" && !isExpired(g.expiresAt)).length, icon: "🟢", color: "text-emerald-700" },
-          { label: "Online Members", value: groups.reduce((acc, g) => acc + (g.activeMembers || 0), 0), icon: "📡", color: "text-stone-800" },
-        ].map((s) => (
+        {metrics.map((s) => (
           <div
             key={s.label}
             className="surface-card p-6 rounded-2xl border border-[#e7e0d3] flex items-center justify-between shadow-xs"
@@ -210,6 +217,6 @@ const GroupDashboard = () => {
       )}
     </div>
   );
-};
+});
 
 export default GroupDashboard;

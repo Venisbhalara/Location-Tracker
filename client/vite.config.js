@@ -39,7 +39,39 @@ export default defineConfig({
   },
 
   build: {
-    // Warn when a single chunk exceeds 600 kB
-    chunkSizeWarningLimit: 2000,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            const normalized = id.replace(/\\/g, "/");
+            if (normalized.includes("/leaflet") || normalized.includes("/react-leaflet")) {
+              return "vendor-maps";
+            }
+            if (normalized.includes("/framer-motion") || normalized.includes("/lenis")) {
+              return "vendor-motion";
+            }
+            if (normalized.includes("/lucide-react") || normalized.includes("/react-hot-toast")) {
+              return "vendor-ui";
+            }
+            if (normalized.includes("/socket.io-client") || normalized.includes("/engine.io-client")) {
+              return "vendor-socket";
+            }
+            if (normalized.includes("/libphonenumber-js")) {
+              return "vendor-phone";
+            }
+            if (
+              normalized.includes("/react-router-dom") ||
+              normalized.includes("/react-router") ||
+              normalized.includes("/react-dom") ||
+              normalized.includes("/react/") ||
+              normalized.includes("/react-helmet-async")
+            ) {
+              return "vendor-react";
+            }
+          }
+        },
+      },
+    },
   },
 });

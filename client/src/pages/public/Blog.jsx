@@ -1,42 +1,8 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import AmbientBackground from "../../components/common/AmbientBackground";
-
-export const blogArticles = [
-  {
-    slug: "how-gps-location-tracking-works",
-    title: "How GPS Location Tracking Works: A Complete Technical Guide",
-    excerpt:
-      "Ever wondered how your smartphone calculates its exact coordinates within metres? This comprehensive guide breaks down satellite trilateration, cell-tower triangulation, Wi-Fi positioning, and how NexTrack's WebSocket stream delivers updates in real time.",
-    category: "Technology",
-    author: "NexTrack Engineering",
-    date: "June 10, 2026",
-    readTime: "7 min read",
-    icon: "📡",
-  },
-  {
-    slug: "top-5-use-cases-for-location-trackers",
-    title: "Top 5 Real-World Use Cases for Live Location Trackers",
-    excerpt:
-      "From keeping children safe during the school commute to lightweight field fleet management without bulky software — discover how real-time location sharing solves daily coordination challenges.",
-    category: "Guides",
-    author: "Product Team",
-    date: "June 5, 2026",
-    readTime: "6 min read",
-    icon: "🗺️",
-  },
-  {
-    slug: "how-to-share-your-location-safely",
-    title: "How to Share Your Real-Time Location Safely: Privacy Best Practices",
-    excerpt:
-      "Sharing your live coordinates is invaluable, but only on your own terms. Learn about hardware browser permissions, how to revoke access instantly, and why consent-based design is critical.",
-    category: "Privacy & Security",
-    author: "Security Team",
-    date: "May 28, 2026",
-    readTime: "8 min read",
-    icon: "🔒",
-  },
-];
+import { blogArticles } from "../../data/blogArticles";
+import { preloadRoute } from "../../utils/routePrefetch";
 
 const schemaBlog = {
   "@context": "https://schema.org",
@@ -52,8 +18,9 @@ const schemaBlog = {
   },
 };
 
-const Blog = () => {
-  const [featured, ...otherArticles] = blogArticles;
+const [featured, ...otherArticles] = blogArticles;
+
+const Blog = memo(() => {
 
   return (
     <>
@@ -75,7 +42,6 @@ const Blog = () => {
       </Helmet>
 
       <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <AmbientBackground />
 
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-6">
@@ -105,6 +71,9 @@ const Blog = () => {
           <div className="mb-12">
             <Link
               to={`/blog/${featured.slug}`}
+              onMouseEnter={() => preloadRoute(`/blog/${featured.slug}`)}
+              onTouchStart={() => preloadRoute(`/blog/${featured.slug}`)}
+              onFocus={() => preloadRoute(`/blog/${featured.slug}`)}
               className="group block surface-card p-8 sm:p-10 rounded-3xl border border-[#ded7ca] hover:border-stone-400 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
@@ -146,6 +115,9 @@ const Blog = () => {
             <Link
               key={article.slug}
               to={`/blog/${article.slug}`}
+              onMouseEnter={() => preloadRoute(`/blog/${article.slug}`)}
+              onTouchStart={() => preloadRoute(`/blog/${article.slug}`)}
+              onFocus={() => preloadRoute(`/blog/${article.slug}`)}
               className="group surface-card p-7 rounded-2xl border border-[#e7e0d3] hover:border-stone-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
             >
               <div>
@@ -180,6 +152,6 @@ const Blog = () => {
       </div>
     </>
   );
-};
+});
 
 export default Blog;

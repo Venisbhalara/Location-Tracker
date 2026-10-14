@@ -1,7 +1,7 @@
+import { memo } from "react";
 import { Helmet } from "react-helmet-async";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
-const Section = ({ title, children }) => (
+const Section = memo(({ title, children }) => (
   <div className="mb-10">
     <h2 className="text-xl sm:text-2xl font-bold text-stone-900 mb-4 flex items-center gap-3 font-serif">
       <span className="w-1.5 h-6 rounded-full bg-stone-800 inline-block" />
@@ -9,9 +9,9 @@ const Section = ({ title, children }) => (
     </h2>
     <div className="text-stone-700 text-sm sm:text-base leading-relaxed space-y-3">{children}</div>
   </div>
-);
+));
 
-const Terms = () => {
+const Terms = memo(() => {
   return (
     <div className="relative min-h-screen py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       <Helmet>
@@ -20,8 +20,6 @@ const Terms = () => {
         <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://locationtracker.app/terms" />
       </Helmet>
-
-      <AmbientBackground />
 
       <div className="relative z-10 max-w-3xl mx-auto">
         <div className="mb-12 text-center">
@@ -182,6 +180,6 @@ const Terms = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Terms;

@@ -1,6 +1,5 @@
 const webpush = require("web-push");
 const { TrackingRequest } = require("../models");
-const { getLocationFromIp } = require("../utils/ipGeocode");
 
 // Configure web-push with VAPID keys
 webpush.setVapidDetails(

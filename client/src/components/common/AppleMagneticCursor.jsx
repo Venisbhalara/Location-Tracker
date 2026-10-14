@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, memo } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { lenisInstance } from "../../hooks/useLenis";
+import { lenisInstance, subscribeLenisScroll } from "../../hooks/useLenis";
 
 /**
  * Apple iPadOS Style "Magnetic Fluid" Cursor
@@ -24,7 +24,12 @@ export const AppleMagneticCursor = memo(() => {
   });
   const [isClicking, setIsClicking] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(true);
+  const [isTouchDevice] = useState(() => {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return !window.matchMedia("(pointer: fine)").matches;
+    }
+    return true;
+  });
 
   // Target coordinates for outer fluid morphing capsule
   const targetX = useMotionValue(-100);
@@ -44,6 +49,7 @@ export const AppleMagneticCursor = memo(() => {
   const cursorModeRef = useRef("default");
   const isScrollingRef = useRef(false);
   const scrollDebounceTimerRef = useRef(null);
+  const isVisibleRef = useRef(false);
 
   const applyCursorMode = (mode) => {
     if (cursorModeRef.current !== mode) {
@@ -54,11 +60,15 @@ export const AppleMagneticCursor = memo(() => {
 
   useEffect(() => {
     // Only activate on pointer devices with fine mouse/trackpad control
-    if (typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches) {
-      setIsTouchDevice(false);
-    } else {
-      return;
-    }
+    if (isTouchDevice) return;
+
+    let rafId = null;
+    let pendingMouseX = -100;
+    let pendingMouseY = -100;
+    let pendingTarget = null;
+    let cachedInteractiveTarget = null;
+    let cachedRect = null;
+    let cachedBorderRadius = 12;
 
     // Unified target evaluator for any (x, y) coordinates
     const evaluateTargetAtPoint = (clientX, clientY, targetElement = null) => {
@@ -72,6 +82,8 @@ export const AppleMagneticCursor = memo(() => {
 
       if (!target || !(target instanceof Element)) {
         activeElementRef.current = null;
+        cachedInteractiveTarget = null;
+        cachedRect = null;
         targetX.set(clientX);
         targetY.set(clientY);
         applyCursorMode("default");
@@ -87,13 +99,28 @@ export const AppleMagneticCursor = memo(() => {
         : null;
 
       if (interactiveTarget) {
-        const rect = interactiveTarget.getBoundingClientRect();
+        // Cache rect to avoid repeated getBoundingClientRect on micro-movement
+        if (cachedInteractiveTarget !== interactiveTarget) {
+          cachedInteractiveTarget = interactiveTarget;
+          cachedRect = interactiveTarget.getBoundingClientRect();
+          const computedStyle = window.getComputedStyle(interactiveTarget);
+          cachedBorderRadius = parseFloat(computedStyle.borderRadius) || 12;
+
+          const isCompact = cachedRect.width <= 320 && cachedRect.height <= 85;
+          if (isCompact) {
+            setMagneticDimensions({
+              width: cachedRect.width + 8,
+              height: cachedRect.height + 6,
+              borderRadius: Math.min(cachedBorderRadius + 3, 32),
+            });
+          }
+        }
 
         // Snap to compact buttons (width <= 320px)
-        if (rect.width <= 320 && rect.height <= 85) {
+        if (cachedRect && cachedRect.width <= 320 && cachedRect.height <= 85) {
           activeElementRef.current = interactiveTarget;
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
+          const centerX = cachedRect.left + cachedRect.width / 2;
+          const centerY = cachedRect.top + cachedRect.height / 2;
 
           // Apple elastic magnetic drag
           const magneticPullX = centerX + (clientX - centerX) * 0.22;
@@ -101,15 +128,6 @@ export const AppleMagneticCursor = memo(() => {
 
           targetX.set(magneticPullX);
           targetY.set(magneticPullY);
-
-          const computedStyle = window.getComputedStyle(interactiveTarget);
-          const br = parseFloat(computedStyle.borderRadius) || 12;
-
-          setMagneticDimensions({
-            width: rect.width + 8,
-            height: rect.height + 6,
-            borderRadius: Math.min(br + 3, 32),
-          });
           applyCursorMode("magnetic");
           return;
         } else {
@@ -122,6 +140,9 @@ export const AppleMagneticCursor = memo(() => {
         }
       }
 
+      cachedInteractiveTarget = null;
+      cachedRect = null;
+
       // If over FAQ summary or clickable row, provide subtle hover circle
       if (isSummaryOrWide) {
         activeElementRef.current = null;
@@ -132,19 +153,15 @@ export const AppleMagneticCursor = memo(() => {
       }
 
       // 2. Check for text content zones (words)
-      // Must be actual text container, and NOT have cursor: pointer
       const isTextContainer = target.closest("p, h1, h2, h3, h4, h5, h6, blockquote, code, span, li, label, strong, em, b, i");
       const isNotClickable = !target.closest("button, a, [role='button'], summary");
 
       if (isTextContainer && isNotClickable) {
-        const computed = window.getComputedStyle(target);
-        if (computed.cursor !== "pointer") {
-          activeElementRef.current = null;
-          targetX.set(clientX);
-          targetY.set(clientY);
-          applyCursorMode("text"); // Word/Text I-Beam effect active!
-          return;
-        }
+        activeElementRef.current = null;
+        targetX.set(clientX);
+        targetY.set(clientY);
+        applyCursorMode("text"); // Word/Text I-Beam effect active!
+        return;
       }
 
       // 3. Default free floating state
@@ -152,6 +169,11 @@ export const AppleMagneticCursor = memo(() => {
       targetX.set(clientX);
       targetY.set(clientY);
       applyCursorMode("default");
+    };
+
+    const processScheduledPointer = () => {
+      rafId = null;
+      evaluateTargetAtPoint(pendingMouseX, pendingMouseY, pendingTarget);
     };
 
     const handleMouseMove = (e) => {
@@ -162,9 +184,18 @@ export const AppleMagneticCursor = memo(() => {
       directMouseX.set(clientX);
       directMouseY.set(clientY);
 
-      if (!isVisible) setIsVisible(true);
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
 
-      evaluateTargetAtPoint(clientX, clientY, e.target);
+      pendingMouseX = clientX;
+      pendingMouseY = clientY;
+      pendingTarget = e.target;
+
+      if (!rafId) {
+        rafId = requestAnimationFrame(processScheduledPointer);
+      }
     };
 
     // Scroll & Wheel handler: throttled to avoid any React re-render spikes during scroll
@@ -177,6 +208,8 @@ export const AppleMagneticCursor = memo(() => {
         targetX.set(x);
         targetY.set(y);
         activeElementRef.current = null;
+        cachedInteractiveTarget = null;
+        cachedRect = null;
         applyCursorMode("default");
       }
 
@@ -190,34 +223,47 @@ export const AppleMagneticCursor = memo(() => {
       }, 60);
     };
 
-
     const handleMouseDown = () => setIsClicking(true);
     const handleMouseUp = () => setIsClicking(false);
 
-    const handleMouseEnter = () => setIsVisible(true);
+    const handleMouseEnter = () => {
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
+    };
+
     const handleMouseLeave = () => {
+      isVisibleRef.current = false;
       setIsVisible(false);
-      setCursorMode("default");
+      applyCursorMode("default");
       activeElementRef.current = null;
+      cachedInteractiveTarget = null;
+      cachedRect = null;
+    };
+
+    // Centralized subscription to Lenis scroll dispatcher
+    const unsubLenis = subscribeLenisScroll(handleScrollOrWheel);
+
+    // Native scroll fallback only when Lenis is not active
+    const handleNativeScroll = () => {
+      if (lenisInstance) return;
+      handleScrollOrWheel();
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("scroll", handleScrollOrWheel, { passive: true });
+    window.addEventListener("scroll", handleNativeScroll, { passive: true });
     window.addEventListener("wheel", handleScrollOrWheel, { passive: true });
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("mouseenter", handleMouseEnter);
     document.addEventListener("mouseleave", handleMouseLeave);
 
-    // Also attach to lenisInstance if available
-    let lenisUnsub = null;
-    if (lenisInstance && typeof lenisInstance.on === "function") {
-      lenisUnsub = lenisInstance.on("scroll", handleScrollOrWheel);
-    }
-
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      unsubLenis();
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("scroll", handleScrollOrWheel);
+      window.removeEventListener("scroll", handleNativeScroll);
       window.removeEventListener("wheel", handleScrollOrWheel);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
@@ -226,11 +272,8 @@ export const AppleMagneticCursor = memo(() => {
       if (scrollDebounceTimerRef.current) {
         clearTimeout(scrollDebounceTimerRef.current);
       }
-      if (typeof lenisUnsub === "function") {
-        lenisUnsub();
-      }
     };
-  }, [isVisible, targetX, targetY, directMouseX, directMouseY]);
+  }, [isTouchDevice, targetX, targetY, directMouseX, directMouseY]);
 
   if (isTouchDevice) return null;
 

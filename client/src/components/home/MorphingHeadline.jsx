@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 
 // Symmetrically balanced 5-6 letter words with calm, refined deep-contrast palettes
 const WORDS = [
@@ -38,29 +38,71 @@ const WORDS = [
  * MorphingHeadline Component — Light Luxury Edition
  * Balanced proportions with zero-layout-shift stability.
  */
-export default function MorphingHeadline() {
+function MorphingHeadline() {
   const [index, setIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const timeoutRef = useRef(null);
+  const headlineRef = useRef(null);
 
   useEffect(() => {
-    if (isPaused) return;
+    let interval = null;
+    let isVisible = !document.hidden;
+    let isInView = true;
 
-    const interval = setInterval(() => {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setIndex((prev) => (prev + 1) % WORDS.length);
-        setIsAnimating(false);
-      }, 200);
-    }, 3200);
+    const start = () => {
+      if (interval || isPaused || !isVisible || !isInView) return;
+      interval = setInterval(() => {
+        setIsAnimating(true);
+        timeoutRef.current = setTimeout(() => {
+          setIndex((prev) => (prev + 1) % WORDS.length);
+          setIsAnimating(false);
+        }, 200);
+      }, 3200);
+    };
 
-    return () => clearInterval(interval);
+    const stop = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+      if (isVisible && isInView && !isPaused) start();
+      else stop();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    let observer = null;
+    if (typeof IntersectionObserver !== "undefined" && headlineRef.current) {
+      observer = new IntersectionObserver(([entry]) => {
+        isInView = entry.isIntersecting;
+        if (isInView && isVisible && !isPaused) start();
+        else stop();
+      });
+      observer.observe(headlineRef.current);
+    } else {
+      start();
+    }
+
+    if (!isPaused && isVisible && isInView) start();
+
+    return () => {
+      stop();
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      if (observer) observer.disconnect();
+    };
   }, [isPaused]);
 
   const currentWord = WORDS[index];
 
   return (
     <h1
+      ref={headlineRef}
       className="max-w-4xl mx-auto mb-6 text-center select-none font-display"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -95,3 +137,5 @@ export default function MorphingHeadline() {
     </h1>
   );
 }
+
+export default memo(MorphingHeadline);

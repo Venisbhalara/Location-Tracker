@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createGroup } from "../../services/api";
 import toast from "react-hot-toast";
 
@@ -13,6 +13,14 @@ const EXPIRY_OPTIONS = [
 const CreateGroupModal = ({ onClose, onCreated }) => {
   const [form, setForm] = useState({ name: "", description: "", expiryHours: 24 });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,8 +49,14 @@ const CreateGroupModal = ({ onClose, onCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/40 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-2xl border border-[#ded7ca] bg-[#fcfaf6] shadow-2xl overflow-hidden animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/40 backdrop-blur-xs"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl border border-[#ded7ca] bg-[#fcfaf6] shadow-2xl overflow-hidden animate-fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="px-6 py-4.5 border-b border-[#e7e0d3] bg-[#f7f4ed] flex items-center justify-between">
           <div>

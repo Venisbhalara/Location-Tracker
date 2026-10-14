@@ -7,7 +7,7 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { ArrowUp } from "lucide-react";
-import { lenisInstance } from "../../hooks/useLenis";
+import { lenisInstance, subscribeLenisScroll } from "../../hooks/useLenis";
 
 /**
  * Aero Float — Circular Glass Pill with Frame-Perfect 1:1 Live Progress Ring
@@ -43,22 +43,40 @@ export const ScrollToTopButton = memo(() => {
     [circumference, 0]
   );
 
+  const isHoveredRef = useRef(false);
+
   // Update hover percentage tooltip without re-rendering on every scroll tick
   useMotionValueEvent(progressMotion, "change", (latest) => {
     const rounded = Math.round(Math.min(Math.max(latest, 0), 1) * 100);
-    if (rounded !== percentRef.current) {
-      percentRef.current = rounded;
+    percentRef.current = rounded;
+    if (isHoveredRef.current && rounded !== percentText) {
       setPercentText(rounded);
     }
   });
 
-  useEffect(() => {
-    let lenisUnsub = null;
+  const handleMouseEnter = () => {
+    isHoveredRef.current = true;
+    setIsHovered(true);
+    setPercentText(percentRef.current);
+  };
 
+  const handleMouseLeave = () => {
+    isHoveredRef.current = false;
+    setIsHovered(false);
+  };
+
+  useEffect(() => {
     // High-precision Lenis handler: ground truth direct from Lenis RAF pipeline
-    const handleLenisScroll = (e) => {
+    const handleScroll = (e) => {
       if (typeof e.progress === "number") {
         progressMotion.set(e.progress);
+      } else {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        if (scrollHeight > 0) {
+          progressMotion.set(Math.min(Math.max(scrollY / scrollHeight, 0), 1));
+        }
       }
 
       const currentScroll =
@@ -76,45 +94,17 @@ export const ScrollToTopButton = memo(() => {
       }
     };
 
-    // Native fallback scroll handler
+    // 1. Centralized subscription to Lenis scroll dispatcher
+    const unsubLenis = subscribeLenisScroll(handleScroll);
+
+    // 2. Native fallback handler when Lenis is not active
     const handleNativeScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const scrollHeight =
-        document.documentElement.scrollHeight - window.innerHeight;
-
-      if (scrollHeight > 0) {
-        const p = Math.min(Math.max(scrollY / scrollHeight, 0), 1);
-        progressMotion.set(p);
-      }
-
-      if (scrollY > 260 && !isVisibleRef.current) {
-        isVisibleRef.current = true;
-        setIsVisible(true);
-      } else if (scrollY <= 220 && isVisibleRef.current) {
-        isVisibleRef.current = false;
-        setIsVisible(false);
-      }
+      if (lenisInstance) return; // Lenis is actively handling updates
+      handleScroll({
+        scroll: window.scrollY || document.documentElement.scrollTop,
+      });
     };
 
-    // Attempt to hook into Lenis instance
-    const attachLenis = () => {
-      if (lenisInstance && typeof lenisInstance.on === "function" && !lenisUnsub) {
-        lenisUnsub = lenisInstance.on("scroll", handleLenisScroll);
-        return true;
-      }
-      return false;
-    };
-
-    if (!attachLenis()) {
-      const timer = setTimeout(attachLenis, 80);
-      const timer2 = setTimeout(attachLenis, 300);
-      return () => {
-        clearTimeout(timer);
-        clearTimeout(timer2);
-      };
-    }
-
-    // Always listen to passive window scroll as rock-solid ground fallback
     window.addEventListener("scroll", handleNativeScroll, { passive: true });
     window.addEventListener("resize", handleNativeScroll, { passive: true });
 
@@ -122,9 +112,9 @@ export const ScrollToTopButton = memo(() => {
     handleNativeScroll();
 
     return () => {
+      unsubLenis();
       window.removeEventListener("scroll", handleNativeScroll);
       window.removeEventListener("resize", handleNativeScroll);
-      if (typeof lenisUnsub === "function") lenisUnsub();
     };
   }, [progressMotion]);
 
@@ -178,8 +168,8 @@ export const ScrollToTopButton = memo(() => {
           {/* Main Circular Glass Pill Button */}
           <motion.button
             onClick={scrollToTop}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.92 }}
             data-cursor="magnetic"

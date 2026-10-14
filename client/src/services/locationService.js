@@ -76,7 +76,7 @@ class LocationTrackingService {
 
         const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
         const base64 = (base64String + padding)
-          .replace(/\-/g, "+")
+          .replace(/-/g, "+")
           .replace(/_/g, "/");
         const rawData = window.atob(base64);
         const applicationServerKey = new Uint8Array(rawData.length);
@@ -271,18 +271,21 @@ class LocationTrackingService {
       geoOptions
     );
 
-    // 5-second interval forces a fresh GPS fix regularly
+    // 5-second interval watchdog: only requests fresh fix if watchPosition hasn't fired in >= 5000ms
     if (!this.intervalId) {
       this.intervalId = setInterval(() => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => this._handlePosition(position),
-          (err) => {
-            if (err.code !== err.TIMEOUT) {
-              this._handleError(err, this._onPermissionDenied);
-            }
-          },
-          geoOptions
-        );
+        const timeSinceLastFix = Date.now() - (this.lastSentAt?.getTime() || 0);
+        if (timeSinceLastFix >= AUTO_REFRESH_INTERVAL_MS) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => this._handlePosition(position),
+            (err) => {
+              if (err.code !== err.TIMEOUT) {
+                this._handleError(err, this._onPermissionDenied);
+              }
+            },
+            geoOptions
+          );
+        }
       }, AUTO_REFRESH_INTERVAL_MS);
     }
   }
@@ -298,6 +301,7 @@ class LocationTrackingService {
     this._onError = onError;
     this._onPermissionDenied = onPermissionDenied;
     this._onStopped = onStopped;
+    this._lastRestPersistAt = 0;
 
     if (!("geolocation" in navigator)) {
       onError?.("Geolocation is not supported by your browser.");
@@ -343,21 +347,10 @@ class LocationTrackingService {
     this.onPosition?.({ latitude, longitude, accuracy, timestamp });
     this.lastSentAt = timestamp;
 
-    // The user requested every 5 second updates regardless of position change
-    try {
-      await updateLocation({
-        token: this.token,
-        latitude,
-        longitude,
-        accuracy,
-      });
-    } catch (err) {
-      console.warn("[LocationService] REST update failed, queuing offline sync:", err.message);
-      await this._saveOfflineLocation(latitude, longitude, accuracy);
-    }
+    const isSocketOnline = Boolean(this.socket?.connected);
 
-    // Always emit via socket
-    if (this.socket?.connected) {
+    // 1. Live WebSocket streaming: Instant zero-latency delivery to viewers
+    if (isSocketOnline) {
       this.socket.emit("send-location", {
         token: this.token,
         latitude,
@@ -365,9 +358,34 @@ class LocationTrackingService {
         accuracy,
         timestamp: timestamp.toISOString(),
       });
+
+      // Periodic background DB persistence (every 15s) without flooding network on every tick
+      const now = Date.now();
+      if (now - (this._lastRestPersistAt || 0) >= 15000) {
+        this._lastRestPersistAt = now;
+        updateLocation({
+          token: this.token,
+          latitude,
+          longitude,
+          accuracy,
+        }).catch((err) => {
+          console.warn("[LocationService] Background REST sync failed:", err.message);
+        });
+      }
     } else {
-      // Disconnected: Queue in DB for SW background sync
-      await this._saveOfflineLocation(latitude, longitude, accuracy);
+      // 2. Offline / Socket Disconnected: Fall back to direct REST + IndexedDB background sync
+      try {
+        await updateLocation({
+          token: this.token,
+          latitude,
+          longitude,
+          accuracy,
+        });
+        this._lastRestPersistAt = Date.now();
+      } catch (err) {
+        console.warn("[LocationService] REST update failed, queuing offline sync:", err.message);
+        await this._saveOfflineLocation(latitude, longitude, accuracy);
+      }
     }
   }
 

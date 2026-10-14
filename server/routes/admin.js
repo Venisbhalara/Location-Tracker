@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
+const sequelize = require("../config/db");
 const { User, TrackingRequest, AccessRequest, ActivityLog, Payment } = require("../models/index");
 const sendEmail = require("../utils/sendEmail");
 
@@ -79,47 +80,55 @@ router.post("/users/:id/update-balance", async (req, res) => {
 // GET /api/admin/dashboard
 router.get("/dashboard", async (req, res) => {
   try {
-    // 1. Total users
-    const totalUsers = await User.count();
-
-    // 2. Total active tracking sessions
-    const activeSessions = await TrackingRequest.count({
-      where: { status: "active" },
-    });
-
-    // 3. Pending access approval count
-    const pendingApprovals = await TrackingRequest.count({
-      where: { status: "pending" },
-    });
-
-    // 4. Total location updates collected today
-    const locationUpdatesToday = global.locationUpdatesToday || 0;
-
-    // 5. New signups in last 24 hours
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const newSignups24h = await User.count({
-      where: {
-        createdAt: {
-          [Op.gte]: oneDayAgo,
-        },
-      },
-    });
-
-    // 6. Chart of activity over last 7 days (mock/aggregated data)
-    // For simplicity, we'll fetch the last 7 days of signups and tracking requests
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     sevenDaysAgo.setHours(0, 0, 0, 0);
 
-    const recentUsers = await User.findAll({
-      where: { createdAt: { [Op.gte]: sevenDaysAgo } },
-      attributes: ["createdAt"],
-    });
+    const locationUpdatesToday = global.locationUpdatesToday || 0;
 
-    const recentRequests = await TrackingRequest.findAll({
-      where: { createdAt: { [Op.gte]: sevenDaysAgo } },
-      attributes: ["createdAt"],
-    });
+    // Run all independent dashboard metrics and charts concurrently
+    const [
+      totalUsers,
+      activeSessions,
+      pendingApprovals,
+      newSignups24h,
+      recentUsers,
+      recentRequests,
+      expiredSessions,
+      adminUsers,
+      totalTrackRequests,
+      bannedUsers,
+      recentActivity,
+    ] = await Promise.all([
+      User.count(),
+      TrackingRequest.count({ where: { status: "active" } }),
+      TrackingRequest.count({ where: { status: "pending" } }),
+      User.count({ where: { createdAt: { [Op.gte]: oneDayAgo } } }),
+      User.findAll({
+        where: { createdAt: { [Op.gte]: sevenDaysAgo } },
+        attributes: ["createdAt"],
+        raw: true,
+      }),
+      TrackingRequest.findAll({
+        where: { createdAt: { [Op.gte]: sevenDaysAgo } },
+        attributes: ["createdAt"],
+        raw: true,
+      }),
+      TrackingRequest.count({ where: { status: "expired" } }).catch(() => 0),
+      User.count({ where: { role: "admin" } }).catch(() => 0),
+      TrackingRequest.count().catch(() => 0),
+      User.count({ where: { trackingAccess: false } }).catch(() => 0),
+      ActivityLog.findAll({
+        order: [["createdAt", "DESC"]],
+        limit: 50,
+        attributes: ["id", "type", "label", "detail1", "detail2", "color", "alert", ["createdAt", "time"]],
+        raw: true,
+      }).catch(() => []),
+    ]);
+
+    // Derived directly without extra full-table scan query
+    const standardUsers = Math.max(0, totalUsers - adminUsers);
 
     // Format data into 7 days array
     const activityChart = [];
@@ -129,11 +138,11 @@ router.get("/dashboard", async (req, res) => {
       const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
       
       const signups = recentUsers.filter(
-        (u) => u.createdAt.toISOString().split("T")[0] === dateStr
+        (u) => new Date(u.createdAt).toISOString().split("T")[0] === dateStr
       ).length;
       
       const requests = recentRequests.filter(
-        (r) => r.createdAt.toISOString().split("T")[0] === dateStr
+        (r) => new Date(r.createdAt).toISOString().split("T")[0] === dateStr
       ).length;
 
       // Make date more readable (e.g. "Mon", "Tue")
@@ -147,32 +156,11 @@ router.get("/dashboard", async (req, res) => {
       });
     }
 
-    // Metrics for Donut Charts
-    const [offlineSessions, expiredSessions, adminUsers, standardUsers, totalTrackRequests, bannedUsers] = await Promise.all([
-      TrackingRequest.count({ where: { status: "pending" } }).catch(() => 0),
-      TrackingRequest.count({ where: { status: "expired" } }).catch(() => 0),
-      User.count({ where: { role: "admin" } }).catch(() => 0),
-      User.count({ 
-        where: { 
-          [Op.or]: [
-            { role: "user" },
-            { role: { [Op.is]: null } }
-          ] 
-        } 
-      }).catch(() => 0),
-      TrackingRequest.count().catch(() => 0),
-      User.count({ where: { trackingAccess: false } }).catch(() => 0)
-    ]);
+    // Reuse pendingApprovals for offlineSessions to avoid duplicate DB query
+    const offlineSessions = pendingApprovals;
     
     // Mini Stats calculations
     const successRate = totalTrackRequests > 0 ? Math.round((activeSessions / totalTrackRequests) * 100) : 0;
-
-    // Recent Activity Feed
-    const recentActivity = await ActivityLog.findAll({
-      order: [["createdAt", "DESC"]],
-      limit: 50,
-      attributes: ["id", "type", "label", "detail1", "detail2", "color", "alert", ["createdAt", "time"]]
-    }).catch(() => []);
 
     res.json({
       totalUsers,
@@ -202,14 +190,28 @@ router.get("/dashboard", async (req, res) => {
 // GET /api/admin/users
 router.get("/users", async (req, res) => {
   try {
-    const users = await User.findAll({ attributes: { exclude: ["password"] } });
-    
-    const usersWithCounts = await Promise.all(
-      users.map(async (u) => {
-        const sessionCount = await TrackingRequest.count({ where: { userId: u.id } });
-        return { ...u.toJSON(), sessionCount };
-      })
-    );
+    const [users, trackingCounts] = await Promise.all([
+      User.findAll({ attributes: { exclude: ["password", "plainPassword"] } }),
+      TrackingRequest.findAll({
+        attributes: [
+          "userId",
+          [sequelize.fn("COUNT", sequelize.col("id")), "sessionCount"],
+        ],
+        group: ["userId"],
+        raw: true,
+      }),
+    ]);
+
+    const countMap = {};
+    trackingCounts.forEach((c) => {
+      countMap[c.userId] = parseInt(c.sessionCount, 10);
+    });
+
+    const usersWithCounts = users.map((u) => ({
+      ...u.toJSON(),
+      sessionCount: countMap[u.id] || 0,
+    }));
+
     res.json(usersWithCounts);
   } catch (error) {
     console.error("Fetch users error:", error);
@@ -353,6 +355,7 @@ router.put("/access-requests/:id", async (req, res) => {
 router.get("/tracking-sessions", async (req, res) => {
   try {
     const sessions = await TrackingRequest.findAll({
+      attributes: { exclude: ["pushSubscription"] },
       include: [{ model: User, as: "user", attributes: ["name", "email"] }],
       order: [["updatedAt", "DESC"]],
     });
@@ -496,6 +499,7 @@ router.get("/analytics", async (req, res) => {
       todayTracking,
       prevWeekTracking,
       activeNow,
+      prevTotalUsers,
     ] = await Promise.all([
       User.count().catch(() => 0),
       User.count({ where: { createdAt: { [Op.gte]: todayStart } } }).catch(() => 0),
@@ -503,10 +507,6 @@ router.get("/analytics", async (req, res) => {
       TrackingRequest.count({ where: { createdAt: { [Op.gte]: todayStart } } }).catch(() => 0),
       TrackingRequest.count({ where: { createdAt: { [Op.between]: [weekAgo, todayStart] } } }).catch(() => 0),
       TrackingRequest.count({ where: { status: "active", sharerOnline: true } }).catch(() => 0),
-    ]);
-
-    // Previous period totals for weekly change  
-    const [prevTotalUsers] = await Promise.all([
       User.count({ where: { createdAt: { [Op.lt]: todayStart } } }).catch(() => 0),
     ]);
 
@@ -528,8 +528,8 @@ router.get("/analytics", async (req, res) => {
 
     // ── 2. Chart Data (grouped by day) ────────────────────────────────────
     const [recentUsers, recentRequests] = await Promise.all([
-      User.findAll({ where: { createdAt: { [Op.gte]: rangeStart } }, attributes: ["createdAt"] }),
-      TrackingRequest.findAll({ where: { createdAt: { [Op.gte]: rangeStart } }, attributes: ["createdAt"] }),
+      User.findAll({ where: { createdAt: { [Op.gte]: rangeStart } }, attributes: ["createdAt"], raw: true }),
+      TrackingRequest.findAll({ where: { createdAt: { [Op.gte]: rangeStart } }, attributes: ["createdAt"], raw: true }),
     ]);
 
     const chartData = [];
@@ -541,8 +541,8 @@ router.get("/analytics", async (req, res) => {
       chartData.push({
         date: dateStr,
         day: dayName,
-        signups: recentUsers.filter(u => u.createdAt.toISOString().split("T")[0] === dateStr).length,
-        trackingRequests: recentRequests.filter(r => r.createdAt.toISOString().split("T")[0] === dateStr).length,
+        signups: recentUsers.filter(u => new Date(u.createdAt).toISOString().split("T")[0] === dateStr).length,
+        trackingRequests: recentRequests.filter(r => new Date(r.createdAt).toISOString().split("T")[0] === dateStr).length,
       });
     }
 
@@ -550,14 +550,15 @@ router.get("/analytics", async (req, res) => {
     // We query last 90 days of data for a useful heatmap
     const heatmapCutoff = dayStart(89);
     const [hmUsers, hmReqs] = await Promise.all([
-      User.findAll({ where: { createdAt: { [Op.gte]: heatmapCutoff } }, attributes: ["createdAt"] }),
-      TrackingRequest.findAll({ where: { createdAt: { [Op.gte]: heatmapCutoff } }, attributes: ["createdAt"] }),
+      User.findAll({ where: { createdAt: { [Op.gte]: heatmapCutoff } }, attributes: ["createdAt"], raw: true }),
+      TrackingRequest.findAll({ where: { createdAt: { [Op.gte]: heatmapCutoff } }, attributes: ["createdAt"], raw: true }),
     ]);
     const heatGrid = {};
     const allEvents = [...hmUsers.map(r => r.createdAt), ...hmReqs.map(r => r.createdAt)];
     allEvents.forEach(dt => {
-      const day  = dt.getDay();   // 0=Sun … 6=Sat
-      const hour = dt.getHours(); // 0-23
+      const parsedDate = new Date(dt);
+      const day  = parsedDate.getDay();   // 0=Sun … 6=Sat
+      const hour = parsedDate.getHours(); // 0-23
       const key  = `${day}_${hour}`;
       heatGrid[key] = (heatGrid[key] || 0) + 1;
     });
@@ -572,6 +573,7 @@ router.get("/analytics", async (req, res) => {
     const geoRaw = await TrackingRequest.findAll({
       attributes: ["ipCountry"],
       where: { ipCountry: { [Op.ne]: null } },
+      raw: true,
     });
     const geoMap = {};
     geoRaw.forEach(r => {
@@ -585,15 +587,16 @@ router.get("/analytics", async (req, res) => {
       order: [["createdAt", "DESC"]],
       limit: 20,
       attributes: ["id", "type", "label", "detail1", "detail2", "createdAt"],
+      raw: true,
     });
 
     // ── 6. User Journey Funnel ────────────────────────────────────────────
-    const [visited, signedup, usedTracking, returned] = await Promise.all([
-      User.count(),                                                                   // visited ≈ all signups (proxy)
-      User.count(),                                                                   // signed up
-      User.count({ where: { trackingAccess: true } }),                               // used tracking
-      User.count({ where: { lastLoginAt: { [Op.gte]: dayStart(30) } } }),            // returned in 30d
+    // Reuses totalUsers already queried above; eliminates 2 redundant User.count() calls
+    const [usedTracking, returned] = await Promise.all([
+      User.count({ where: { trackingAccess: true } }).catch(() => 0),
+      User.count({ where: { lastLoginAt: { [Op.gte]: dayStart(30) } } }).catch(() => 0),
     ]);
+    const signedup = totalUsers;
     const funnel = [
       { stage: "Visited",         count: Math.round(signedup * 3.4) },
       { stage: "Signed Up",       count: signedup },

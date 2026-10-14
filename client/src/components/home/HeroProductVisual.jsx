@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Compass,
@@ -16,13 +16,233 @@ import {
 } from "lucide-react";
 
 /**
+ * Static Cartography SVG Map Layer
+ * Fully memoized to prevent re-rendering during telemetry speed/ping ticks.
+ */
+const StaticCartoMap = memo(() => (
+  <svg
+    className="absolute inset-0 w-full h-full opacity-90 pointer-events-none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <pattern
+        id="cartoGrid"
+        width="40"
+        height="40"
+        patternUnits="userSpaceOnUse"
+      >
+        <path
+          d="M 40 0 L 0 0 0 40"
+          fill="none"
+          stroke="rgba(43, 42, 39, 0.035)"
+          strokeWidth="1"
+        />
+      </pattern>
+
+      <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#818cf8" />
+        <stop offset="50%" stopColor="#6366f1" />
+        <stop offset="100%" stopColor="#4f46e5" />
+      </linearGradient>
+    </defs>
+
+    <rect width="100%" height="100%" fill="url(#cartoGrid)" />
+
+    <path
+      d="M-50,230 C170,190 320,300 610,250 C860,210 990,320 1200,270"
+      fill="none"
+      stroke="rgba(14, 165, 233, 0.16)"
+      strokeWidth="52"
+      strokeLinecap="round"
+    />
+    <path
+      d="M-50,230 C170,190 320,300 610,250 C860,210 990,320 1200,270"
+      fill="none"
+      stroke="rgba(14, 165, 233, 0.28)"
+      strokeWidth="14"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M-20,90 L1150,90"
+      stroke="rgba(43, 42, 39, 0.075)"
+      strokeWidth="16"
+    />
+    <path
+      d="M-20,290 L1150,290"
+      stroke="rgba(43, 42, 39, 0.07)"
+      strokeWidth="14"
+    />
+    <path
+      d="M160,-20 L160,520"
+      stroke="rgba(43, 42, 39, 0.075)"
+      strokeWidth="14"
+    />
+    <path
+      d="M440,-20 L440,520"
+      stroke="rgba(43, 42, 39, 0.085)"
+      strokeWidth="18"
+    />
+    <path
+      d="M740,-20 L740,520"
+      stroke="rgba(43, 42, 39, 0.065)"
+      strokeWidth="12"
+    />
+
+    <path
+      d="M-20,190 L1150,190"
+      stroke="rgba(43, 42, 39, 0.04)"
+      strokeWidth="6"
+    />
+    <path
+      d="M-20,390 L1150,390"
+      stroke="rgba(43, 42, 39, 0.04)"
+      strokeWidth="6"
+    />
+    <path
+      d="M290,-20 L290,520"
+      stroke="rgba(43, 42, 39, 0.04)"
+      strokeWidth="6"
+    />
+    <path
+      d="M580,-20 L580,520"
+      stroke="rgba(43, 42, 39, 0.04)"
+      strokeWidth="6"
+    />
+
+    <rect x="70" y="115" width="60" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
+    <rect x="190" y="115" width="75" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
+    <rect x="315" y="115" width="95" height="50" rx="3" fill="rgba(43, 42, 39, 0.035)" />
+    <rect x="70" y="215" width="60" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
+    <rect x="475" y="115" width="80" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
+    <rect x="475" y="215" width="80" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
+
+    <text x="50" y="85" fill="#a8a29e" fontSize="9" fontFamily="sans-serif" fontWeight="600" letterSpacing="0.05em">
+      MONTGOMERY BLVD
+    </text>
+    <text x="450" y="385" fill="#a8a29e" fontSize="9" fontFamily="sans-serif" fontWeight="600" letterSpacing="0.05em">
+      MARKET AVENUE
+    </text>
+
+    <path
+      d="M 160,330 L 220,330 L 290,270 L 290,190 L 370,190 L 440,140"
+      fill="none"
+      stroke="#6366f1"
+      strokeWidth="8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      opacity="0.3"
+    />
+
+    <path
+      d="M 160,330 L 220,330 L 290,270 L 290,190 L 370,190 L 440,140"
+      fill="none"
+      stroke="url(#routeGradient)"
+      strokeWidth="4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeDasharray="8 4"
+      className="animate-gps-flow"
+    />
+
+    <circle cx="160" cy="330" r="3.5" fill="#4f46e5" stroke="#ffffff" strokeWidth="2" />
+    <circle cx="290" cy="270" r="3" fill="#6366f1" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="290" cy="190" r="3" fill="#6366f1" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="370" cy="190" r="3" fill="#6366f1" stroke="#ffffff" strokeWidth="1.5" />
+  </svg>
+));
+
+/**
+ * Concentric Sonar Range Rings and Rotating Conical Radar Sweep
+ */
+const SonarRadarSweep = memo(() => (
+  <div
+    className="absolute left-[36%] sm:left-[43%] top-[30%] sm:top-[28%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+    style={{ width: "320px", height: "320px" }}
+  >
+    <div className="absolute inset-[30%] rounded-full border border-indigo-400/25 border-dashed" />
+    <span className="absolute top-[31%] left-1/2 -translate-x-1/2 text-[8px] font-mono text-indigo-400 font-semibold bg-[#fbf9f4]/80 px-1 rounded">
+      100m
+    </span>
+
+    <div className="absolute inset-[15%] rounded-full border border-indigo-300/30" />
+    <span className="absolute top-[16%] left-1/2 -translate-x-1/2 text-[8px] font-mono text-indigo-400 font-semibold bg-[#fbf9f4]/80 px-1 rounded">
+      250m
+    </span>
+
+    <div className="absolute inset-0 rounded-full border border-indigo-200/40" />
+    <span className="absolute top-[2%] left-1/2 -translate-x-1/2 text-[8px] font-mono text-indigo-400 font-semibold bg-[#fbf9f4]/80 px-1 rounded">
+      500m
+    </span>
+
+    <div
+      className="absolute inset-0 rounded-full animate-radar-sweep pointer-events-none"
+      style={{
+        willChange: "transform",
+        transform: "translate3d(0, 0, 0)",
+        background:
+          "conic-gradient(from 0deg, transparent 0deg, transparent 310deg, rgba(99, 102, 241, 0.08) 330deg, rgba(99, 102, 241, 0.32) 360deg)",
+      }}
+    />
+
+    <div className="absolute inset-[38%] rounded-full border-2 border-indigo-500/50 bg-indigo-500/10 animate-sonar-pulse" />
+  </div>
+));
+
+/**
+ * 3-Step Journey Bar
+ */
+const JourneyStepBar = memo(({ activeStep }) => (
+  <div className="relative grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-stone-200 bg-stone-50/90 border-t border-stone-200 text-center text-xs overflow-hidden">
+    <div
+      className="absolute top-0 bottom-0 left-0 w-32 bg-gradient-to-r from-transparent via-indigo-500/15 to-transparent pointer-events-none animate-beam-travel"
+      aria-hidden="true"
+    />
+
+    <div
+      className={`p-3 sm:p-3.5 flex items-center justify-center gap-2 transition-colors ${
+        activeStep === 1 ? "bg-indigo-50/50" : ""
+      }`}
+    >
+      <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[10px]">
+        1
+      </span>
+      <span className="text-stone-700">
+        Generate encrypted tracking link
+      </span>
+    </div>
+
+    <div
+      className={`p-3 sm:p-3.5 flex items-center justify-center gap-2 transition-colors ${
+        activeStep === 2 ? "bg-indigo-50/50 font-medium" : ""
+      }`}
+    >
+      <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[10px]">
+        2
+      </span>
+      <span className="text-stone-700">
+        Recipient taps "Allow" in browser
+      </span>
+    </div>
+
+    <div
+      className={`p-3 sm:p-3.5 flex items-center justify-center gap-2 transition-colors ${
+        activeStep === 3 ? "bg-emerald-50/60 font-semibold" : ""
+      }`}
+    >
+      <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-[10px]">
+        3
+      </span>
+      <span className="text-stone-800 flex items-center gap-1">
+        <span>Live GPS streams to map in &lt;1s</span>
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      </span>
+    </div>
+  </div>
+));
+
+/**
  * HeroProductVisual Component — Classy & Aesthetic Interactive Luxury Edition
- *
- * Visualizes the 2-way consent-based tracking architecture:
- * 1. The Sender's Perspective: Real-time Live Radar Map with animated GPS vector trail,
- *    conical rotating radar sweep, telemetry HUD, and live satellite signal meters.
- * 2. The Recipient's Perspective: Glassmorphic interactive phone card simulating
- *    instant 1-tap browser consent with zero app downloads.
  */
 const HeroProductVisual = () => {
   // Interactive Simulation State
@@ -31,41 +251,89 @@ const HeroProductVisual = () => {
   const [pingLatency, setPingLatency] = useState(0.4);
   const [activeStep, setActiveStep] = useState(2);
   const [isRecenterTriggered, setIsRecenterTriggered] = useState(false);
+  const recenterTimeoutRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Subtle live telemetry heartbeat (organic micro-fluctuations every 2.8s)
+  // Pauses automatically when scrolled out of view or tab is hidden to save GPU/CPU
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSpeed((prev) => {
-        const delta = (Math.random() - 0.5) * 0.8;
-        return Number((Math.max(19.5, Math.min(25.5, prev + delta))).toFixed(1));
-      });
-      setPingLatency((prev) => {
-        const next = Math.random() > 0.5 ? 0.3 : 0.4;
-        return next;
-      });
-    }, 2800);
+    let intervalId = null;
+    let isVisible = !document.hidden;
+    let isInView = true;
 
-    return () => clearInterval(interval);
+    const startInterval = () => {
+      if (intervalId || !isVisible || !isInView) return;
+      intervalId = setInterval(() => {
+        setSpeed((prev) => {
+          const delta = (Math.random() - 0.5) * 0.8;
+          return Number((Math.max(19.5, Math.min(25.5, prev + delta))).toFixed(1));
+        });
+        setPingLatency(Math.random() > 0.5 ? 0.3 : 0.4);
+      }, 2800);
+    };
+
+    const stopInterval = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+      if (isVisible && isInView) startInterval();
+      else stopInterval();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    let observer = null;
+    if (typeof IntersectionObserver !== "undefined" && containerRef.current) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isInView = entry.isIntersecting;
+          if (isInView && isVisible) startInterval();
+          else stopInterval();
+        },
+        { rootMargin: "100px" }
+      );
+      observer.observe(containerRef.current);
+    } else {
+      startInterval();
+    }
+
+    return () => {
+      stopInterval();
+      document.removeEventListener("visibilitychange", handleVisibility);
+      if (observer) observer.disconnect();
+    };
   }, []);
 
-  const handleConsentClick = () => {
+  const handleConsentClick = useCallback(() => {
     setHasGrantedConsent(true);
     setActiveStep(3);
-  };
+  }, []);
 
-  const handleReset = (e) => {
+  const handleReset = useCallback((e) => {
     e.stopPropagation();
     setHasGrantedConsent(false);
     setActiveStep(2);
-  };
+  }, []);
 
-  const triggerRecenter = () => {
+  const triggerRecenter = useCallback(() => {
     setIsRecenterTriggered(true);
-    setTimeout(() => setIsRecenterTriggered(false), 800);
-  };
+    if (recenterTimeoutRef.current) clearTimeout(recenterTimeoutRef.current);
+    recenterTimeoutRef.current = setTimeout(() => setIsRecenterTriggered(false), 800);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (recenterTimeoutRef.current) clearTimeout(recenterTimeoutRef.current);
+    };
+  }, []);
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto mt-8 sm:mt-12 mb-14 lg:mb-20 select-none">
+    <div ref={containerRef} className="relative w-full max-w-5xl mx-auto mt-8 sm:mt-12 mb-14 lg:mb-20 select-none">
       {/* Dynamic Ambient Luxury Glow behind the frame (optimized feathering) */}
       <div
         className="absolute -inset-1.5 bg-gradient-to-r from-indigo-200/35 via-emerald-100/25 to-amber-100/35 rounded-3xl blur-lg opacity-70 pointer-events-none"
@@ -114,185 +382,11 @@ const HeroProductVisual = () => {
 
         {/* ── MAP CANVAS & HUD GRID ── */}
         <div className="relative h-[360px] sm:h-[430px] lg:h-[480px] w-full overflow-hidden bg-[#fbf9f4]">
-          {/* Subtle warm cartography grid pattern */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-90 pointer-events-none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <pattern
-                id="cartoGrid"
-                width="40"
-                height="40"
-                patternUnits="userSpaceOnUse"
-              >
-                <path
-                  d="M 40 0 L 0 0 0 40"
-                  fill="none"
-                  stroke="rgba(43, 42, 39, 0.035)"
-                  strokeWidth="1"
-                />
-              </pattern>
+          {/* Memoized cartography grid & route vectors */}
+          <StaticCartoMap />
 
-              {/* Linear route gradient */}
-              <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#818cf8" />
-                <stop offset="50%" stopColor="#6366f1" />
-                <stop offset="100%" stopColor="#4f46e5" />
-              </linearGradient>
-            </defs>
-
-            <rect width="100%" height="100%" fill="url(#cartoGrid)" />
-
-            {/* River / Water Canal Contour with soft natural curve */}
-            <path
-              d="M-50,230 C170,190 320,300 610,250 C860,210 990,320 1200,270"
-              fill="none"
-              stroke="rgba(14, 165, 233, 0.16)"
-              strokeWidth="52"
-              strokeLinecap="round"
-            />
-            <path
-              d="M-50,230 C170,190 320,300 610,250 C860,210 990,320 1200,270"
-              fill="none"
-              stroke="rgba(14, 165, 233, 0.28)"
-              strokeWidth="14"
-              strokeLinecap="round"
-            />
-
-            {/* Major Arterial Roads */}
-            <path
-              d="M-20,90 L1150,90"
-              stroke="rgba(43, 42, 39, 0.075)"
-              strokeWidth="16"
-            />
-            <path
-              d="M-20,290 L1150,290"
-              stroke="rgba(43, 42, 39, 0.07)"
-              strokeWidth="14"
-            />
-            <path
-              d="M160,-20 L160,520"
-              stroke="rgba(43, 42, 39, 0.075)"
-              strokeWidth="14"
-            />
-            <path
-              d="M440,-20 L440,520"
-              stroke="rgba(43, 42, 39, 0.085)"
-              strokeWidth="18"
-            />
-            <path
-              d="M740,-20 L740,520"
-              stroke="rgba(43, 42, 39, 0.065)"
-              strokeWidth="12"
-            />
-
-            {/* Secondary Avenue Grid Lines */}
-            <path
-              d="M-20,190 L1150,190"
-              stroke="rgba(43, 42, 39, 0.04)"
-              strokeWidth="6"
-            />
-            <path
-              d="M-20,390 L1150,390"
-              stroke="rgba(43, 42, 39, 0.04)"
-              strokeWidth="6"
-            />
-            <path
-              d="M290,-20 L290,520"
-              stroke="rgba(43, 42, 39, 0.04)"
-              strokeWidth="6"
-            />
-            <path
-              d="M580,-20 L580,520"
-              stroke="rgba(43, 42, 39, 0.04)"
-              strokeWidth="6"
-            />
-
-            {/* Building Footprint Silhouettes (Soft Architectural Warm Grey) */}
-            <rect x="70" y="115" width="60" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
-            <rect x="190" y="115" width="75" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
-            <rect x="315" y="115" width="95" height="50" rx="3" fill="rgba(43, 42, 39, 0.035)" />
-            <rect x="70" y="215" width="60" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
-            <rect x="475" y="115" width="80" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
-            <rect x="475" y="215" width="80" height="50" rx="3" fill="rgba(43, 42, 39, 0.03)" />
-
-            {/* Road Name Labels (Luxury Typography) */}
-            <text x="50" y="85" fill="#a8a29e" fontSize="9" fontFamily="sans-serif" fontWeight="600" letterSpacing="0.05em">
-              MONTGOMERY BLVD
-            </text>
-            <text x="450" y="385" fill="#a8a29e" fontSize="9" fontFamily="sans-serif" fontWeight="600" letterSpacing="0.05em">
-              MARKET AVENUE
-            </text>
-
-            {/* ── ANIMATED LIVE GPS ROUTE TRAIL ── */}
-            {/* 1. Underlying Soft Indigo Glow Trail */}
-            <path
-              d="M 160,330 L 220,330 L 290,270 L 290,190 L 370,190 L 440,140"
-              fill="none"
-              stroke="#6366f1"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0.3"
-            />
-
-            {/* 2. Flowing Dashed Foreground GPS Polyline */}
-            <path
-              d="M 160,330 L 220,330 L 290,270 L 290,190 L 370,190 L 440,140"
-              fill="none"
-              stroke="url(#routeGradient)"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray="8 4"
-              className="animate-gps-flow"
-            />
-
-            {/* Past GPS Waypoint Breadcrumbs with micro-ticks */}
-            <circle cx="160" cy="330" r="3.5" fill="#4f46e5" stroke="#ffffff" strokeWidth="2" />
-            <circle cx="290" cy="270" r="3" fill="#6366f1" stroke="#ffffff" strokeWidth="1.5" />
-            <circle cx="290" cy="190" r="3" fill="#6366f1" stroke="#ffffff" strokeWidth="1.5" />
-            <circle cx="370" cy="190" r="3" fill="#6366f1" stroke="#ffffff" strokeWidth="1.5" />
-          </svg>
-
-          {/* ── CONCENTRIC SONAR RANGE RINGS & 360° RADAR SWEEP ── */}
-          <div
-            className="absolute left-[36%] sm:left-[43%] top-[30%] sm:top-[28%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-            style={{ width: "320px", height: "320px" }}
-          >
-            {/* Range Ring 1: 100m */}
-            <div className="absolute inset-[30%] rounded-full border border-indigo-400/25 border-dashed" />
-            <span className="absolute top-[31%] left-1/2 -translate-x-1/2 text-[8px] font-mono text-indigo-400 font-semibold bg-[#fbf9f4]/80 px-1 rounded">
-              100m
-            </span>
-
-            {/* Range Ring 2: 250m */}
-            <div className="absolute inset-[15%] rounded-full border border-indigo-300/30" />
-            <span className="absolute top-[16%] left-1/2 -translate-x-1/2 text-[8px] font-mono text-indigo-400 font-semibold bg-[#fbf9f4]/80 px-1 rounded">
-              250m
-            </span>
-
-            {/* Range Ring 3: 500m */}
-            <div className="absolute inset-0 rounded-full border border-indigo-200/40" />
-            <span className="absolute top-[2%] left-1/2 -translate-x-1/2 text-[8px] font-mono text-indigo-400 font-semibold bg-[#fbf9f4]/80 px-1 rounded">
-              500m
-            </span>
-
-            {/* Continuous 360° Conical Radar Sweep Line */}
-            <div
-              className="absolute inset-0 rounded-full animate-radar-sweep pointer-events-none"
-              style={{
-                willChange: "transform",
-                transform: "translate3d(0, 0, 0)",
-                background:
-                  "conic-gradient(from 0deg, transparent 0deg, transparent 310deg, rgba(99, 102, 241, 0.08) 330deg, rgba(99, 102, 241, 0.32) 360deg)",
-              }}
-            />
-
-            {/* Smooth Expanding Sonar Ping Wave */}
-            <div className="absolute inset-[38%] rounded-full border-2 border-indigo-500/50 bg-indigo-500/10 animate-sonar-pulse" />
-          </div>
+          {/* Memoized sonar range rings & 360° radar sweep */}
+          <SonarRadarSweep />
 
           {/* ── ACTIVE GPS TARGET BEACON & CALLOUT ── */}
           <div
@@ -600,53 +694,7 @@ const HeroProductVisual = () => {
         </div>
 
         {/* ── 3-STEP JOURNEY WITH FLOWING LIGHT BEAM ── */}
-        <div className="relative grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-stone-200 bg-stone-50/90 border-t border-stone-200 text-center text-xs overflow-hidden">
-          {/* Animated Light Beam Traveling through the 3 steps */}
-          <div
-            className="absolute top-0 bottom-0 w-32 bg-gradient-to-r from-transparent via-indigo-500/15 to-transparent pointer-events-none animate-beam-travel"
-            aria-hidden="true"
-          />
-
-          <div
-            className={`p-3 sm:p-3.5 flex items-center justify-center gap-2 transition-colors ${
-              activeStep === 1 ? "bg-indigo-50/50" : ""
-            }`}
-          >
-            <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[10px]">
-              1
-            </span>
-            <span className="text-stone-700">
-              Generate encrypted tracking link
-            </span>
-          </div>
-
-          <div
-            className={`p-3 sm:p-3.5 flex items-center justify-center gap-2 transition-colors ${
-              activeStep === 2 ? "bg-indigo-50/50 font-medium" : ""
-            }`}
-          >
-            <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[10px]">
-              2
-            </span>
-            <span className="text-stone-700">
-              Recipient taps "Allow" in browser
-            </span>
-          </div>
-
-          <div
-            className={`p-3 sm:p-3.5 flex items-center justify-center gap-2 transition-colors ${
-              activeStep === 3 ? "bg-emerald-50/60 font-semibold" : ""
-            }`}
-          >
-            <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-[10px]">
-              3
-            </span>
-            <span className="text-stone-800 flex items-center gap-1">
-              <span>Live GPS streams to map in &lt;1s</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            </span>
-          </div>
-        </div>
+        <JourneyStepBar activeStep={activeStep} />
       </div>
 
       {/* Caption */}
@@ -660,4 +708,4 @@ const HeroProductVisual = () => {
   );
 };
 
-export default HeroProductVisual;
+export default memo(HeroProductVisual);

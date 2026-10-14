@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 /**
  * useGeolocation — captures GPS coordinates using the browser Geolocation API.
@@ -74,7 +74,10 @@ const useGeolocation = (options = {}) => {
   }, []);
 
   // ── Geolocation options object ──────────────────────────────
-  const geoOptions = { enableHighAccuracy, timeout, maximumAge };
+  const geoOptions = useMemo(
+    () => ({ enableHighAccuracy, timeout, maximumAge }),
+    [enableHighAccuracy, timeout, maximumAge]
+  );
 
   // ── Request location (one-time) ─────────────────────────────
   const getLocation = useCallback(() => {
@@ -89,7 +92,7 @@ const useGeolocation = (options = {}) => {
 
     setState((prev) => ({ ...prev, loading: true, error: null, permissionStatus: 'requesting' }));
     navigator.geolocation.getCurrentPosition(onSuccess, onError, geoOptions);
-  }, [isSupported, onSuccess, onError]);
+  }, [isSupported, onSuccess, onError, geoOptions]);
 
   // ── Start watching location (continuous) ────────────────────
   const startWatch = useCallback(() => {
@@ -99,7 +102,7 @@ const useGeolocation = (options = {}) => {
     setState((prev) => ({ ...prev, loading: true, error: null, permissionStatus: 'requesting' }));
     const id = navigator.geolocation.watchPosition(onSuccess, onError, geoOptions);
     setWatchId(id);
-  }, [isSupported, watchId, onSuccess, onError]);
+  }, [isSupported, watchId, onSuccess, onError, geoOptions]);
 
   // ── Stop watching location ──────────────────────────────────
   const stopWatch = useCallback(() => {
@@ -118,7 +121,7 @@ const useGeolocation = (options = {}) => {
     return () => {
       if (watchMode) stopWatch();
     };
-  }, [watchMode]);
+  }, [watchMode, startWatch, stopWatch]);
 
   return {
     ...state,

@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef, memo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getUserTrackings, deleteTracking } from "../../services/api";
 import toast from "react-hot-toast";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
 const statusBadge = (status) => {
   const map = {
@@ -41,33 +40,127 @@ const statusBadge = (status) => {
   );
 };
 
-const Dashboard = () => {
+const TrackingRow = memo(({ tracking: t, onCopy, onDelete }) => (
+  <tr className="hover:bg-stone-50/60 transition-colors group">
+    {/* Recipient */}
+    <td className="px-6 py-4 whitespace-nowrap">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+          {t.label ? t.label.charAt(0).toUpperCase() : "#"}
+        </div>
+        <div>
+          <div className="text-stone-900 font-semibold text-sm">
+            {t.label || "Direct Tracking Link"}
+          </div>
+          {t.phoneNumber && (
+            <div className="text-stone-500 text-xs font-mono mt-0.5">
+              {t.phoneNumber}
+            </div>
+          )}
+        </div>
+      </div>
+    </td>
+
+    {/* Status */}
+    <td className="px-6 py-4 whitespace-nowrap">
+      {statusBadge(t.status)}
+    </td>
+
+    {/* Expiration */}
+    <td className="px-6 py-4 whitespace-nowrap text-stone-500 hidden sm:table-cell text-xs">
+      {new Date(t.expiresAt).toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </td>
+
+    {/* Actions */}
+    <td className="px-6 py-4 whitespace-nowrap text-right">
+      <div className="flex items-center justify-end gap-2">
+        {/* Copy Link Utility */}
+        {t.status !== "expired" && (
+          <button
+            onClick={() => onCopy(t.token)}
+            className="px-2.5 py-1.5 rounded-lg border border-stone-200 hover:border-stone-300 text-xs font-medium text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 shadow-2xs transition-colors"
+            title="Copy link"
+          >
+            Copy
+          </button>
+        )}
+
+        {/* Primary Action: View Map */}
+        {t.status === "active" ? (
+          <Link
+            to={`/tracking/map/${t.token}`}
+            className="btn-cta-primary px-3 py-1.5 text-xs font-semibold shadow-xs"
+          >
+            Live Map →
+          </Link>
+        ) : t.status === "pending" ? (
+          <Link
+            to={`/tracking/map/${t.token}`}
+            className="px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 text-xs font-medium transition-colors"
+          >
+            Open Map
+          </Link>
+        ) : null}
+
+        {/* Destructive Action */}
+        <button
+          onClick={() => onDelete(t.id)}
+          className="px-2 py-1.5 text-xs text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+          title="Delete session"
+        >
+          ✕
+        </button>
+      </div>
+    </td>
+  </tr>
+));
+
+const Dashboard = memo(() => {
   const { user } = useAuth();
   const [trackings, setTrackings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const isMountedRef = useRef(true);
 
-  const load = async (isRefresh = false) => {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const load = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     try {
       const [tRes] = await Promise.all([getUserTrackings({ limit: 50 })]);
-      setTrackings(
-        Array.isArray(tRes?.data?.trackings) ? tRes.data.trackings : [],
-      );
+      if (isMountedRef.current) {
+        setTrackings(
+          Array.isArray(tRes?.data?.trackings) ? tRes.data.trackings : [],
+        );
+      }
     } catch {
-      toast.error("Failed to load dashboard data.");
-      setTrackings([]);
+      if (isMountedRef.current) {
+        toast.error("Failed to load dashboard data.");
+        setTrackings([]);
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     if (!confirm("Are you sure you want to delete this tracking link?")) return;
     try {
       await deleteTracking(id);
@@ -76,34 +169,39 @@ const Dashboard = () => {
     } catch {
       toast.error("Failed to delete tracking.");
     }
-  };
+  }, [load]);
 
-  const copyShareLink = (token) => {
+  const copyShareLink = useCallback((token) => {
     const fullUrl = `${window.location.origin}/track/${token}`;
     navigator.clipboard.writeText(fullUrl);
     toast.success("Tracking link copied to clipboard!");
-  };
+  }, []);
 
-  const safeTrackings = Array.isArray(trackings) ? trackings : [];
-  const activeCount = safeTrackings.filter((t) => t.status === "active").length;
-  const pendingCount = safeTrackings.filter(
-    (t) => t.status === "pending",
-  ).length;
-  const expiredCount = safeTrackings.filter(
-    (t) => t.status === "expired",
-  ).length;
+  const safeTrackings = useMemo(
+    () => (Array.isArray(trackings) ? trackings : []),
+    [trackings]
+  );
+  const { activeCount, pendingCount, expiredCount } = useMemo(() => {
+    let active = 0;
+    let pending = 0;
+    let expired = 0;
+    for (const t of safeTrackings) {
+      if (t.status === "active") active++;
+      else if (t.status === "pending") pending++;
+      else if (t.status === "expired") expired++;
+    }
+    return { activeCount: active, pendingCount: pending, expiredCount: expired };
+  }, [safeTrackings]);
 
   if (loading)
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <AmbientBackground />
         <div className="w-10 h-10 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
       </div>
     );
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <AmbientBackground />
 
       {/* ── HEADER & PRIMARY ACTIONS ── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8 pb-6 border-b border-stone-200/80">
@@ -298,86 +396,12 @@ const Dashboard = () => {
               </thead>
               <tbody className="divide-y divide-stone-100">
                 {safeTrackings.map((t) => (
-                  <tr
+                  <TrackingRow
                     key={t.id}
-                    className="hover:bg-stone-50/60 transition-colors group"
-                  >
-                    {/* Recipient */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
-                          {t.label ? t.label.charAt(0).toUpperCase() : "#"}
-                        </div>
-                        <div>
-                          <div className="text-stone-900 font-semibold text-sm">
-                            {t.label || "Direct Tracking Link"}
-                          </div>
-                          {t.phoneNumber && (
-                            <div className="text-stone-500 text-xs font-mono mt-0.5">
-                              {t.phoneNumber}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {statusBadge(t.status)}
-                    </td>
-
-                    {/* Expiration */}
-                    <td className="px-6 py-4 whitespace-nowrap text-stone-500 hidden sm:table-cell text-xs">
-                      {new Date(t.expiresAt).toLocaleString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {/* Copy Link Utility */}
-                        {t.status !== "expired" && (
-                          <button
-                            onClick={() => copyShareLink(t.token)}
-                            className="px-2.5 py-1.5 rounded-lg border border-stone-200 hover:border-stone-300 text-xs font-medium text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 shadow-2xs transition-colors"
-                            title="Copy link"
-                          >
-                            Copy
-                          </button>
-                        )}
-
-                        {/* Primary Action: View Map */}
-                        {t.status === "active" ? (
-                          <Link
-                            to={`/tracking/map/${t.token}`}
-                            className="btn-cta-primary px-3 py-1.5 text-xs font-semibold shadow-xs"
-                          >
-                            Live Map →
-                          </Link>
-                        ) : t.status === "pending" ? (
-                          <Link
-                            to={`/tracking/map/${t.token}`}
-                            className="px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 text-xs font-medium transition-colors"
-                          >
-                            Open Map
-                          </Link>
-                        ) : null}
-
-                        {/* Destructive Action */}
-                        <button
-                          onClick={() => handleDelete(t.id)}
-                          className="px-2 py-1.5 text-xs text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                          title="Delete session"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                    tracking={t}
+                    onCopy={copyShareLink}
+                    onDelete={handleDelete}
+                  />
                 ))}
               </tbody>
             </table>
@@ -386,6 +410,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Dashboard;

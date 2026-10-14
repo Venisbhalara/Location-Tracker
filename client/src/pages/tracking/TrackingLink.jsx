@@ -1,11 +1,10 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, memo } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { getTrackingByToken } from "../../services/api";
 import locationService from "../../services/locationService";
 import toast from "react-hot-toast";
 import io from "socket.io-client";
-import AmbientBackground from "../../components/common/AmbientBackground";
 
 const SOCKET_URL =
   import.meta.env.VITE_SOCKET_URL ||
@@ -13,18 +12,14 @@ const SOCKET_URL =
     ? window.location.origin
     : "http://localhost:3000");
 
-const REFRESH_INTERVAL_SEC = 10 * 60;
-
-const TrackingLink = () => {
+const TrackingLink = memo(() => {
   const { token } = useParams();
   const [tracking, setTracking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [consent, setConsent] = useState("idle");
   const [position, setPosition] = useState(null);
   const [error, setError] = useState(null);
-  const [countdown, setCountdown] = useState(REFRESH_INTERVAL_SEC);
   const started = useRef(false);
-  const countdownRef = useRef(null);
   const handleAllowRef = useRef(null);
 
   /* ── Load tracking data ── */
@@ -46,7 +41,6 @@ const TrackingLink = () => {
   useEffect(() => {
     return () => {
       if (started.current) locationService.stop();
-      if (countdownRef.current) clearInterval(countdownRef.current);
     };
   }, []);
 
@@ -59,20 +53,8 @@ const TrackingLink = () => {
     });
   }, [token]);
 
-  /* ── Countdown timer ── */
-  const startCountdown = useCallback(() => {
-    setCountdown(REFRESH_INTERVAL_SEC);
-    if (countdownRef.current) clearInterval(countdownRef.current);
-    countdownRef.current = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) return REFRESH_INTERVAL_SEC;
-        return prev - 1;
-      });
-    }, 1000);
-  }, []);
-
   /* ── Allow location ── */
-  const handleAllow = async () => {
+  const handleAllow = useCallback(async () => {
     if (
       "Notification" in window &&
       "serviceWorker" in navigator &&
@@ -84,7 +66,9 @@ const TrackingLink = () => {
       ) {
         try {
           await Notification.requestPermission();
-        } catch {}
+        } catch {
+          // Notification permission prompt dismissed or rejected
+        }
       }
     }
 
@@ -96,7 +80,6 @@ const TrackingLink = () => {
       onPosition: (pos) => {
         setPosition(pos);
         setConsent("tracking");
-        startCountdown();
       },
       onError: (msg) => {
         setError(msg);
@@ -109,18 +92,15 @@ const TrackingLink = () => {
       },
       onStopped: () => {
         setConsent("stopped");
-        if (countdownRef.current) clearInterval(countdownRef.current);
         toast("The requester ended this tracking session.", { icon: "🛑" });
       },
     });
-
-    startCountdown();
-  };
+  }, [token, emitDenial]);
 
   /* ── Auto-resume handler ── */
   useEffect(() => {
     handleAllowRef.current = handleAllow;
-  });
+  }, [handleAllow]);
 
   useEffect(() => {
     if (!tracking) return;
@@ -151,16 +131,15 @@ const TrackingLink = () => {
     attemptAutoResume();
   }, [tracking, consent]);
 
-  const handleDeny = () => {
+  const handleDeny = useCallback(() => {
     setConsent("denied");
     emitDenial();
-  };
+  }, [emitDenial]);
 
-  const handleStopSharing = () => {
+  const handleStopSharing = useCallback(() => {
     locationService.stop();
     setConsent("stopped");
-    if (countdownRef.current) clearInterval(countdownRef.current);
-  };
+  }, []);
 
   /* ══ 1. LOADING STATE ══════════════════════════════════════════════ */
   if (loading)
@@ -170,7 +149,6 @@ const TrackingLink = () => {
           <title>Loading Tracking Link | NexTrack</title>
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
-        <AmbientBackground />
         <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center bg-white border-stone-200">
           <div className="w-10 h-10 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
@@ -188,7 +166,6 @@ const TrackingLink = () => {
           <title>Link Expired | NexTrack</title>
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
-        <AmbientBackground />
         <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
           <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-2xl mx-auto mb-4">
             ⚠️
@@ -209,13 +186,19 @@ const TrackingLink = () => {
           <title>Location Permission Request | NexTrack</title>
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
-        <AmbientBackground />
 
         <div className="relative z-10 surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-stone-200/90 shadow-md text-center bg-white">
           
           {/* Identity Icon */}
           <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-5 shadow-2xs">
-            <img src="/location.png" alt="NexTrack" className="w-8 h-8 object-contain" />
+            <img
+              src="/location.png"
+              alt="NexTrack"
+              width="32"
+              height="32"
+              decoding="async"
+              className="w-8 h-8 object-contain"
+            />
           </div>
 
           {/* Heading */}
@@ -272,7 +255,6 @@ const TrackingLink = () => {
           <title>Sharing Location Live | NexTrack</title>
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
-        <AmbientBackground />
 
         <div className="surface-elevated max-w-md w-full p-8 sm:p-10 rounded-3xl border-stone-200 shadow-md text-center bg-white">
           {!position ? (
@@ -329,7 +311,6 @@ const TrackingLink = () => {
   if (consent === "stopped")
     return (
       <div className="relative min-h-screen flex items-center justify-center p-4">
-        <AmbientBackground />
         <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
           <div className="w-14 h-14 rounded-2xl bg-stone-100 border border-stone-200 text-stone-500 flex items-center justify-center text-2xl mx-auto mb-4">
             🛑
@@ -346,7 +327,6 @@ const TrackingLink = () => {
   if (consent === "denied")
     return (
       <div className="relative min-h-screen flex items-center justify-center p-4">
-        <AmbientBackground />
         <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
           <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-2xl mx-auto mb-4">
             🚫
@@ -369,7 +349,6 @@ const TrackingLink = () => {
   if (consent === "error")
     return (
       <div className="relative min-h-screen flex items-center justify-center p-4">
-        <AmbientBackground />
         <div className="surface-elevated max-w-sm w-full p-8 rounded-3xl text-center border-stone-200 bg-white">
           <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-4">
             ⚠️
@@ -389,6 +368,6 @@ const TrackingLink = () => {
     );
 
   return null;
-};
+});
 
 export default TrackingLink;

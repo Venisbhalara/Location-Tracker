@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, memo } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   MapContainer,
@@ -10,19 +10,21 @@ import {
   Circle,
 } from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { getTrackingByToken } from "../../services/api";
 import geocodingService from "../../services/geocodingService";
 import useSocket from "../../hooks/useSocket";
-import AmbientBackground from "../../components/common/AmbientBackground";
 import toast from "react-hot-toast";
 
-// Fix Leaflet default icon
+// Fix Leaflet default icon using bundled local assets
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 });
 
 // Precise GPS live marker (green pulse)
@@ -61,19 +63,12 @@ const MapUpdater = ({ position }) => {
 };
 
 // ── NEURAL PING STATUS BAR ─────────────────────────────────────────────────────
-const NeuralPingStatusBar = ({
+const NeuralPingStatusBar = memo(({
   locationMode,
   sharerOnline,
   offlineEvent,
   ipLocation,
 }) => {
-  const [dot, setDot] = useState(true);
-
-  useEffect(() => {
-    const t = setInterval(() => setDot((d) => !d), 800);
-    return () => clearInterval(t);
-  }, []);
-
   if (locationMode === "gps" && sharerOnline) {
     return (
       <div
@@ -94,10 +89,7 @@ const NeuralPingStatusBar = ({
             height: 10,
             borderRadius: "50%",
             background: "#16a34a",
-            boxShadow: dot
-              ? "0 0 0 4px rgba(22,163,74,0.25)"
-              : "0 0 0 0px rgba(22,163,74,0)",
-            transition: "box-shadow 0.8s",
+            animation: "gps-pulse 1.5s ease-in-out infinite",
             flexShrink: 0,
           }}
         />
@@ -159,10 +151,7 @@ const NeuralPingStatusBar = ({
               height: 10,
               borderRadius: "50%",
               background: "#ea580c",
-              boxShadow: dot
-                ? "0 0 0 4px rgba(234,88,12,0.25)"
-                : "0 0 0 0px rgba(234,88,12,0)",
-              transition: "box-shadow 0.8s",
+              animation: "ip-pulse 2s ease-in-out infinite",
               flexShrink: 0,
             }}
           />
@@ -287,10 +276,10 @@ const NeuralPingStatusBar = ({
   }
 
   return null;
-};
+});
 
 // ── GPS RESTORE NOTIFICATION ──────────────────────────────────────────────────
-const GpsRestoredToast = ({ locationMode }) => {
+const GpsRestoredToast = memo(({ locationMode }) => {
   const prevMode = useRef(null);
 
   useEffect(() => {
@@ -310,9 +299,9 @@ const GpsRestoredToast = ({ locationMode }) => {
   }, [locationMode]);
 
   return null;
-};
+});
 
-const LiveMap = () => {
+const LiveMap = memo(() => {
   const { token } = useParams();
   const [tracking, setTracking] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -359,9 +348,20 @@ const LiveMap = () => {
     }
   }, []);
 
+  const lastGeocodedRef = useRef({ lat: 0, lon: 0, time: 0 });
+
   useEffect(() => {
     if (location?.latitude && location?.longitude) {
-      fetchAddress(location.latitude, location.longitude);
+      const now = Date.now();
+      const latDiff = Math.abs(location.latitude - lastGeocodedRef.current.lat);
+      const lonDiff = Math.abs(location.longitude - lastGeocodedRef.current.lon);
+      const timeDiff = now - lastGeocodedRef.current.time;
+
+      // Throttle Nominatim: require > 50m change or > 15s elapsed
+      if (latDiff > 0.0005 || lonDiff > 0.0005 || timeDiff > 15000 || !lastGeocodedRef.current.time) {
+        lastGeocodedRef.current = { lat: location.latitude, lon: location.longitude, time: now };
+        fetchAddress(location.latitude, location.longitude);
+      }
     }
   }, [location, fetchAddress]);
 
@@ -395,12 +395,12 @@ const LiveMap = () => {
 
   const trackingLink = `${window.location.origin}/track/${token}`;
 
-  const copyLink = () => {
+  const copyLink = useCallback(() => {
     navigator.clipboard.writeText(trackingLink);
     toast.success("Link copied!");
-  };
+  }, [trackingLink]);
 
-  const handlePing = async () => {
+  const handlePing = useCallback(async () => {
     const toastId = toast.loading("Sending manual ping...");
     try {
       const API_BASE = import.meta.env.VITE_API_URL || "/api";
@@ -421,19 +421,17 @@ const LiveMap = () => {
     } catch {
       toast.error("Error sending ping.", { id: toastId });
     }
-  };
+  }, [token]);
 
   if (loading)
     return (
       <div className="flex items-center justify-center py-24 min-h-[calc(100vh-4rem)]">
-        <AmbientBackground />
         <div className="w-10 h-10 border-4 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
       </div>
     );
 
   return (
     <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
-      <AmbientBackground />
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes gps-pulse {
           0%, 100% { box-shadow: 0 0 0 4px rgba(22,163,74,0.35); }
@@ -892,6 +890,6 @@ const LiveMap = () => {
       </div>
     </div>
   );
-};
+});
 
 export default LiveMap;

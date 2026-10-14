@@ -38,7 +38,7 @@ const createGroup = async (req, res) => {
   const { name, description, expiryHours = 24 } = req.body;
 
   try {
-    const user = await User.findByPk(req.user.id);
+    const user = req.user;
     if (!user) return res.status(404).json({ message: "User not found." });
 
     // User must have approved tracking access
@@ -113,7 +113,7 @@ const addGroupMember = async (req, res) => {
     }
 
     // Check user's balance
-    const user = await User.findByPk(req.user.id);
+    const user = req.user;
     if (!user) return res.status(404).json({ message: "User not found." });
 
     if (user.trackingBalance <= 0) {
@@ -357,16 +357,18 @@ const deleteGroup = async (req, res) => {
 
     const io = req.app.get("io");
 
-    // Stop all individual tracking sessions
-    for (const member of group.members) {
-      if (member.trackingRequest) {
-        const token = member.trackingRequest.token;
-        await member.trackingRequest.destroy();
-        if (io && token) {
-          io.to(token).emit("tracking-stopped", { token, reason: "group_deleted" });
+    // Stop all individual tracking sessions concurrently
+    await Promise.all(
+      group.members.map(async (member) => {
+        if (member.trackingRequest) {
+          const token = member.trackingRequest.token;
+          await member.trackingRequest.destroy();
+          if (io && token) {
+            io.to(token).emit("tracking-stopped", { token, reason: "group_deleted" });
+          }
         }
-      }
-    }
+      })
+    );
 
     // Notify the group map room
     if (io) {
