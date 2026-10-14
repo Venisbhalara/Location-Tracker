@@ -28,16 +28,8 @@ export function resetLenisScroll(options = { immediate: true }) {
 
 export function useLenis() {
   useEffect(() => {
-    // 1. Accessibility: Respect prefers-reduced-motion
-    if (typeof window !== 'undefined') {
-      const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-      if (prefersReduced) {
-        return;
-      }
-
-      if ('scrollRestoration' in window.history) {
-        window.history.scrollRestoration = 'manual';
-      }
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
     }
 
     // 2. High-performance, single-instance Lenis controller
@@ -55,10 +47,15 @@ export function useLenis() {
 
     lenisInstance = lenis;
 
-    // Synchronize initial scroll position
-    if (typeof window !== 'undefined') {
+    // Synchronize initial scroll position cleanly only if restored
+    if (typeof window !== 'undefined' && window.scrollY > 0) {
       lenis.scrollTo(window.scrollY, { immediate: true });
     }
+
+    const handleLoad = () => {
+      lenis.resize();
+    };
+    window.addEventListener('load', handleLoad, { once: true });
 
     // 3. Single centralized scroll event dispatcher for all registered subscribers
     const unsubLenis = lenis.on('scroll', (e) => {
@@ -72,6 +69,7 @@ export function useLenis() {
     });
 
     return () => {
+      window.removeEventListener('load', handleLoad);
       unsubLenis();
       lenis.destroy();
       lenisInstance = null;

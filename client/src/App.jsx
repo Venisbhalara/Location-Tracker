@@ -1,6 +1,7 @@
 import { Suspense, lazy, memo, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useLenis } from "./hooks/useLenis";
+import { useOffscreenAnimationPause } from "./hooks/useOffscreenAnimationPause";
 import { scheduleIdlePrefetch } from "./utils/routePrefetch";
 
 // ── Lazy-loaded pages ────────────────────────────────────────────────────────
@@ -43,7 +44,7 @@ const PageLoader = () => (
 
 // ── Main layout with navbar and footer ────────────────────────────────────────
 const MainLayout = memo(({ children, hideFooter }) => (
-  <div className="min-h-screen flex flex-col relative">
+  <div className="min-h-screen flex flex-col relative z-10">
     <ScrollProgressBar />
     <Navbar />
     <main className="flex-1">{children}</main>
@@ -54,7 +55,7 @@ const MainLayout = memo(({ children, hideFooter }) => (
 
 // ── Minimal layout for tracking links (no navbar/footer) ───────────────────────
 const MinimalLayout = memo(({ children }) => (
-  <div className="min-h-screen relative">{children}</div>
+  <div className="min-h-screen relative z-10">{children}</div>
 ));
 
 function App() {
@@ -64,6 +65,9 @@ function App() {
   const isAuthRoute =
     location.pathname === "/login" || location.pathname === "/register";
   const isGhostRoute = location.pathname === "/ghost";
+
+  // Pause infinite CSS animations inside off-screen sections (resume when visible)
+  useOffscreenAnimationPause(location.pathname);
 
   // Warm up primary public routes during browser idle time
   useEffect(() => {

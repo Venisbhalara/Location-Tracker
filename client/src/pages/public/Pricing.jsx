@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { motion, AnimatePresence } from "framer-motion";
 import { createPaymentOrder, verifyPayment } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import SlotLifecycleVisual from "../../components/pricing/SlotLifecycleVisual";
+import OdometerCounter from "../../components/common/OdometerCounter";
+import SpecularCard from "../../components/common/SpecularCard";
+import {
+  OpticalReveal,
+  OpticalStaggerContainer,
+  OpticalStaggerItem,
+} from "../../components/common/OpticalReveal";
 import toast from "react-hot-toast";
 
 const plans = [
@@ -78,25 +87,42 @@ const faqs = [
 ];
 
 const FAQItem = React.memo(({ faq, index, isOpen, onToggle }) => (
-  <div className="surface-card rounded-xl border border-[#e7e0d3] overflow-hidden">
+  <div className="surface-card rounded-xl border border-[#e7e0d3] overflow-hidden hover:border-stone-300 transition-colors">
     <button
+      type="button"
       onClick={() => onToggle(index)}
-      className="w-full px-6 py-4.5 text-left flex items-center justify-between text-stone-900 font-medium text-sm sm:text-base hover:text-stone-700 transition-colors"
+      aria-expanded={isOpen}
+      className="w-full px-6 py-4.5 text-left flex items-center justify-between text-stone-900 font-medium text-sm sm:text-base hover:text-indigo-700 transition-colors cursor-pointer"
     >
       <span>{faq.q}</span>
       <span
-        className={`text-xl transition-transform duration-200 ${isOpen ? "rotate-45 text-stone-900" : "text-stone-400"}`}
+        className={`text-xl transition-transform duration-250 shrink-0 ml-4 ${
+          isOpen ? "rotate-45 text-indigo-600" : "text-stone-400"
+        }`}
+        aria-hidden="true"
       >
         +
       </span>
     </button>
-    {isOpen && (
-      <div className="px-6 pb-5 text-sm text-stone-600 leading-relaxed border-t border-[#f0ece1] pt-3">
-        {faq.a}
-      </div>
-    )}
+    <AnimatePresence initial={false}>
+      {isOpen && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+          className="overflow-hidden"
+        >
+          <div className="px-6 pb-5 text-sm text-stone-600 leading-relaxed border-t border-[#f0ece1] pt-3">
+            {faq.a}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   </div>
 ));
+
+FAQItem.displayName = "FAQItem";
 
 const schemaPricing = {
   "@context": "https://schema.org",
@@ -132,7 +158,7 @@ const Pricing = React.memo(() => {
   const [loading, setLoading] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [activeFAQ, setActiveFAQ] = useState(null);
+  const [activeFAQ, setActiveFAQ] = useState(0);
 
   React.useEffect(() => {
     if (!showModal) return;
@@ -153,15 +179,18 @@ const Pricing = React.memo(() => {
     });
   };
 
-  const handlePaymentInitiate = React.useCallback((planId) => {
-    if (!isAuthenticated) {
-      toast.error("Please sign in or create an account to recharge slots.");
-      return;
-    }
-    const plan = plans.find((p) => p.id === planId);
-    setSelectedPlan(plan);
-    setShowModal(true);
-  }, [isAuthenticated]);
+  const handlePaymentInitiate = React.useCallback(
+    (planId) => {
+      if (!isAuthenticated) {
+        toast.error("Please sign in or create an account to recharge slots.");
+        return;
+      }
+      const plan = plans.find((p) => p.id === planId);
+      setSelectedPlan(plan);
+      setShowModal(true);
+    },
+    [isAuthenticated]
+  );
 
   const processCheckout = React.useCallback(async () => {
     if (!selectedPlan) return;
@@ -174,7 +203,7 @@ const Pricing = React.memo(() => {
       const res = await loadRazorpay();
       if (!res) {
         toast.error(
-          "Payment SDK failed to load. Please verify your connection.",
+          "Payment SDK failed to load. Please verify your connection."
         );
         setLoading(null);
         return;
@@ -202,14 +231,14 @@ const Pricing = React.memo(() => {
             const verifyRes = await verifyPayment(response);
             if (verifyRes.data.success) {
               toast.success(
-                "Payment verified! Slots added to your account balance.",
+                "Payment verified! Slots added to your account balance."
               );
               window.location.href = "/dashboard";
             }
           } catch (err) {
             console.error("Verification error:", err);
             toast.error(
-              err.response?.data?.message || "Payment verification failed.",
+              err.response?.data?.message || "Payment verification failed."
             );
           }
         },
@@ -257,272 +286,312 @@ const Pricing = React.memo(() => {
       </Helmet>
 
       <div className="relative min-h-screen pt-10 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-
         {/* Breadcrumb Hierarchy */}
-        <nav aria-label="Breadcrumb" className="mb-6">
-          <ol className="flex items-center gap-2 text-xs text-stone-500">
-            <li>
-              <Link to="/" className="hover:text-stone-900 transition-colors">
-                Home
-              </Link>
-            </li>
-            <li className="text-stone-300">/</li>
-            <li className="text-stone-800 font-medium">Pricing</li>
-          </ol>
-        </nav>
+        <OpticalReveal distance={10}>
+          <nav aria-label="Breadcrumb" className="mb-6">
+            <ol className="flex items-center gap-2 text-xs text-stone-500">
+              <li>
+                <Link to="/" className="hover:text-stone-900 transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li className="text-stone-300">/</li>
+              <li className="text-stone-800 font-medium">Pricing</li>
+            </ol>
+          </nav>
+        </OpticalReveal>
 
-        {/* Page Header (PRIMARY MESSAGE) */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 eyebrow-pill mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
-            <span>Pay Once — Use When Needed</span>
+        {/* Page Header */}
+        <OpticalReveal delay={0.05} distance={18}>
+          <div className="glass-content-container rounded-3xl px-6 py-8 sm:px-10 sm:py-10 text-center w-full max-w-4xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 eyebrow-pill mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              <span>Pay Once — Use When Needed</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-stone-900 mb-4 font-serif">
+              Transparent Pricing,{" "}
+              <span className="italic font-normal text-stone-600">
+                Zero Subscriptions
+              </span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-stone-700 max-w-xl mx-auto leading-relaxed">
+              Recharge your account with tracking slots. Each slot generates a
+              secure tracking link that can be reused once expired or deleted.
+            </p>
           </div>
+        </OpticalReveal>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-stone-900 mb-4 font-serif">
-            Transparent Pricing,{" "}
-            <span className="italic font-normal text-stone-600">
-              Zero Subscriptions
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-stone-600 max-w-xl mx-auto leading-relaxed">
-            Recharge your account with tracking slots. Each slot generates a
-            secure tracking link that can be reused once expired or deleted.
-          </p>
-        </div>
+        {/* ── CLOSED-LOOP SLOT RECYCLING GRAPHIC ── */}
+        <OpticalReveal delay={0.1} distance={20}>
+          <SlotLifecycleVisual />
+        </OpticalReveal>
 
         {/* ── PRICING CARDS HIERARCHY ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto mb-20">
+        <OpticalStaggerContainer
+          stagger={0.1}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto mb-20"
+        >
           {plans.map((plan) => {
             const isFeatured = plan.isPopular;
 
             return (
-              <div
+              <OpticalStaggerItem
                 key={plan.id}
-                className={`flex flex-col justify-between p-8 rounded-2xl transition-all duration-300 relative ${
-                  isFeatured
-                    ? "bg-[#f7f4ed] border-2 border-stone-800 shadow-lg lg:-translate-y-2"
-                    : "surface-card hover:border-stone-300 hover:shadow-md"
-                }`}
+                distance={20}
+                className="h-full"
               >
-                {/* Visual Badge for Primary Choice */}
-                {isFeatured && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-stone-900 text-white shadow-sm">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-
-                <div>
-                  {/* Tier Title & Tagline */}
-                  <div className="mb-6">
-                    <h3 className="text-xl font-bold text-stone-900 mb-2 font-serif">
-                      {plan.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-stone-600 leading-relaxed min-h-[40px]">
-                      {plan.tagline}
-                    </p>
-                  </div>
-
-                  {/* Price Block */}
-                  <div className="mb-8 pb-6 border-b border-[#e7e0d3]">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-4xl sm:text-5xl font-extrabold text-stone-900 tracking-tight">
-                        ₹{plan.price}
-                      </span>
-                      <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">
-                        One-Time
+                <div className="relative h-full">
+                  {isFeatured && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
+                      <span className="px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-stone-900 text-white shadow-sm">
+                        Most Popular
                       </span>
                     </div>
+                  )}
 
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ece6da] border border-[#ded7ca] text-stone-800 text-xs font-semibold mt-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                      {plan.slots} High-Precision Slots
-                    </div>
-                  </div>
-
-                  {/* Features List */}
-                  <div className="space-y-3.5 mb-8">
-                    <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block mb-3">
-                      Included with plan:
-                    </span>
-                    {plan.features.map((feat, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3 text-xs sm:text-sm text-stone-700"
-                      >
-                        <span className="w-4 h-4 rounded-full bg-stone-100 border border-stone-300 text-stone-700 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
-                          ✓
-                        </span>
-                        <span className="leading-snug">{feat}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Card CTA */}
-                <div className="pt-4 border-t border-[#e7e0d3]">
-                  <button
-                    onClick={() => handlePaymentInitiate(plan.id)}
-                    disabled={loading !== null}
-                    className={`w-full py-3.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  <SpecularCard
+                    className={`p-8 rounded-3xl h-full ${
                       isFeatured
-                        ? "btn-cta-primary shadow-sm"
-                        : "btn-cta-secondary"
+                        ? "surface-elevated shadow-lg lg:-translate-y-2"
+                        : "surface-card"
                     }`}
                   >
-                    {loading === plan.id ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Processing...
-                      </span>
-                    ) : (
-                      <span>Recharge {plan.name}</span>
-                    )}
-                  </button>
+                    <div>
+                      <div className="mb-6">
+                        <h3 className="text-xl font-bold text-stone-900 mb-2 font-serif">
+                          {plan.name}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-stone-700 leading-relaxed min-h-[40px]">
+                          {plan.tagline}
+                        </p>
+                      </div>
+
+                      {/* Price Block with Odometer Counter */}
+                      <div className="mb-8 pb-6 border-b border-white/60">
+                        <div className="flex items-baseline gap-2 mb-1">
+                          <span className="text-4xl sm:text-5xl font-extrabold text-stone-900 tracking-tight">
+                            <OdometerCounter value={plan.price} prefix="₹" />
+                          </span>
+                          <span className="text-xs font-semibold text-stone-600 uppercase tracking-wider">
+                            One-Time
+                          </span>
+                        </div>
+
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/45 border border-white/80 text-stone-800 text-xs font-semibold mt-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                          <span>
+                            <OdometerCounter
+                              value={plan.slots}
+                              suffix=" High-Precision Slots"
+                            />
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Features List */}
+                      <div className="space-y-3.5 mb-8">
+                        <span className="text-xs font-bold uppercase tracking-wider text-stone-600 block mb-3">
+                          Included with plan:
+                        </span>
+                        {plan.features.map((feat, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-start gap-3 text-xs sm:text-sm text-stone-800"
+                          >
+                            <span className="w-4 h-4 rounded-full bg-white/55 border border-white/85 text-stone-800 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
+                              ✓
+                            </span>
+                            <span className="leading-snug">{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Card CTA */}
+                    <div className="pt-4 border-t border-white/60">
+                      <button
+                        onClick={() => handlePaymentInitiate(plan.id)}
+                        disabled={loading !== null}
+                        className={`w-full py-3.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                          isFeatured
+                            ? "btn-cta-primary shadow-sm"
+                            : "btn-cta-secondary"
+                        }`}
+                      >
+                        {loading === plan.id ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            Processing...
+                          </span>
+                        ) : (
+                          <span>Recharge {plan.name}</span>
+                        )}
+                      </button>
+                    </div>
+                  </SpecularCard>
                 </div>
-              </div>
+              </OpticalStaggerItem>
             );
           })}
-        </div>
+        </OpticalStaggerContainer>
 
         {/* ── TRUST & INTEGRITY METRICS ── */}
-        <div className="max-w-5xl mx-auto mb-20 pt-8 border-t border-[#e7e0d3]">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-[#e7e0d3]">
-            <div className="p-3">
-              <div className="text-2xl mb-1">🔒</div>
-              <h4 className="text-sm font-semibold text-stone-900 mb-1">
-                Bank-Grade Security
-              </h4>
-              <p className="text-xs text-stone-500">
-                256-bit TLS encrypted data streams
-              </p>
-            </div>
-            <div className="p-3 pt-6 md:pt-3">
-              <div className="text-2xl mb-1">🌐</div>
-              <h4 className="text-sm font-semibold text-stone-900 mb-1">
-                Global Coverage
-              </h4>
-              <p className="text-xs text-stone-500">
-                Works anywhere with mobile browser
-              </p>
-            </div>
-            <div className="p-3 pt-6 md:pt-3">
-              <div className="text-2xl mb-1">⚡</div>
-              <h4 className="text-sm font-semibold text-stone-900 mb-1">
-                Instant Activation
-              </h4>
-              <p className="text-xs text-stone-500">
-                Slots credited immediately upon pay
-              </p>
-            </div>
-            <div className="p-3 pt-6 md:pt-3">
-              <div className="text-2xl mb-1">🛡️</div>
-              <h4 className="text-sm font-semibold text-stone-900 mb-1">
-                Zero Lock-In
-              </h4>
-              <p className="text-xs text-stone-500">
-                No recurring auto-debit cards
-              </p>
+        <OpticalReveal distance={16}>
+          <div className="glass-content-container rounded-3xl w-full max-w-6xl mx-auto mb-20 p-6 sm:p-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-white/60">
+              <div className="p-3">
+                <div className="text-2xl mb-1">🔒</div>
+                <h4 className="mx-auto text-sm font-semibold text-stone-900 mb-1">
+                  Bank-Grade Security
+                </h4>
+                <p className="text-xs text-stone-600">
+                  256-bit TLS encrypted data streams
+                </p>
+              </div>
+              <div className="p-3 pt-6 md:pt-3">
+                <div className="text-2xl mb-1">🌐</div>
+                <h4 className="mx-auto text-sm font-semibold text-stone-900 mb-1">
+                  Global Coverage
+                </h4>
+                <p className="text-xs text-stone-600">
+                  Works anywhere with mobile browser
+                </p>
+              </div>
+              <div className="p-3 pt-6 md:pt-3">
+                <div className="text-2xl mb-1">⚡</div>
+                <h4 className="mx-auto text-sm font-semibold text-stone-900 mb-1">
+                  Instant Activation
+                </h4>
+                <p className="text-xs text-stone-600">
+                  Slots credited immediately upon pay
+                </p>
+              </div>
+              <div className="p-3 pt-6 md:pt-3">
+                <div className="text-2xl mb-1">🛡️</div>
+                <h4 className="mx-auto text-sm font-semibold text-stone-900 mb-1">
+                  Zero Lock-In
+                </h4>
+                <p className="text-xs text-stone-600">
+                  No recurring auto-debit cards
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </OpticalReveal>
 
         {/* ── FAQ SECTION ── */}
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 font-serif">
-              Pricing Questions Answered
-            </h2>
-            <p className="text-stone-600 text-sm mt-1">
-              Everything you need to know about slot purchases and billing.
-            </p>
-          </div>
+          <OpticalReveal distance={18}>
+            <div className="glass-content-container rounded-3xl px-6 py-6 sm:px-10 sm:py-7 text-center w-full max-w-3xl mx-auto mb-10">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 font-serif">
+                Pricing Questions Answered
+              </h2>
+              <p className="text-stone-700 text-sm mt-1">
+                Everything you need to know about slot purchases and billing.
+              </p>
+            </div>
+          </OpticalReveal>
 
-          <div className="space-y-3">
+          <OpticalStaggerContainer stagger={0.06} className="space-y-3">
             {faqs.map((faq, i) => (
-              <FAQItem
-                key={i}
-                faq={faq}
-                index={i}
-                isOpen={activeFAQ === i}
-                onToggle={(idx) => setActiveFAQ(activeFAQ === idx ? null : idx)}
-              />
+              <OpticalStaggerItem key={i} distance={14}>
+                <FAQItem
+                  faq={faq}
+                  index={i}
+                  isOpen={activeFAQ === i}
+                  onToggle={(idx) =>
+                    setActiveFAQ(activeFAQ === idx ? null : idx)
+                  }
+                />
+              </OpticalStaggerItem>
             ))}
-          </div>
+          </OpticalStaggerContainer>
         </div>
 
         {/* ── CONFIRMATION MODAL ── */}
-        {showModal && selectedPlan && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs"
-              onClick={() => setShowModal(false)}
-            />
+        <AnimatePresence>
+          {showModal && selectedPlan && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs"
+                onClick={() => setShowModal(false)}
+              />
 
-            <div className="relative bg-[#fcfaf6] w-full max-w-md p-8 sm:p-10 rounded-2xl border border-[#ded7ca] shadow-2xl z-10">
-              <div className="text-center mb-6">
-                <div className="w-12 h-12 rounded-xl bg-[#ece6da] border border-[#ded7ca] text-stone-800 flex items-center justify-center text-xl mx-auto mb-3">
-                  💳
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="relative bg-[#fcfaf6] w-full max-w-md p-8 sm:p-10 rounded-2xl border border-[#ded7ca] shadow-2xl z-10"
+              >
+                <div className="text-center mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-[#ece6da] border border-[#ded7ca] text-stone-800 flex items-center justify-center text-xl mx-auto mb-3">
+                    💳
+                  </div>
+                  <h3 className="text-2xl font-bold text-stone-900 tracking-tight font-serif">
+                    Order Confirmation
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-1">
+                    Review your order before proceeding
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-stone-900 tracking-tight font-serif">
-                  Order Confirmation
-                </h3>
-                <p className="text-xs text-stone-500 mt-1">
-                  Review your order before proceeding
-                </p>
-              </div>
 
-              {/* Order summary box */}
-              <div className="surface-card p-5 rounded-xl border border-[#e7e0d3] mb-6 space-y-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-stone-600">Plan</span>
-                  <span className="text-stone-900 font-bold">
-                    {selectedPlan.name} Tier
+                {/* Order summary box */}
+                <div className="surface-card p-5 rounded-xl border border-[#e7e0d3] mb-6 space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-stone-600">Plan</span>
+                    <span className="text-stone-900 font-bold">
+                      {selectedPlan.name} Tier
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-stone-600">Credits Added</span>
+                    <span className="text-emerald-700 font-bold">
+                      +{selectedPlan.slots} Slots
+                    </span>
+                  </div>
+                  <div className="h-px bg-[#e7e0d3] my-2" />
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-stone-700 font-medium text-sm">
+                      Total Due
+                    </span>
+                    <span className="text-2xl font-extrabold text-stone-900">
+                      ₹{selectedPlan.price}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={processCheckout}
+                    className="btn-cta-primary w-full py-3.5 text-sm font-semibold justify-center"
+                  >
+                    Proceed to Secure Checkout →
+                  </button>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="btn-cta-secondary w-full py-3 text-xs font-medium justify-center text-stone-600"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <span className="text-[11px] text-stone-500">
+                    🔒 Bank-grade 256-bit encrypted checkout via Razorpay
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-stone-600">Credits Added</span>
-                  <span className="text-emerald-700 font-bold">
-                    +{selectedPlan.slots} Slots
-                  </span>
-                </div>
-                <div className="h-px bg-[#e7e0d3] my-2" />
-                <div className="flex justify-between items-baseline">
-                  <span className="text-stone-700 font-medium text-sm">
-                    Total Due
-                  </span>
-                  <span className="text-2xl font-extrabold text-stone-900">
-                    ₹{selectedPlan.price}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={processCheckout}
-                  className="btn-cta-primary w-full py-3.5 text-sm font-semibold justify-center"
-                >
-                  Proceed to Secure Checkout →
-                </button>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="btn-cta-secondary w-full py-3 text-xs font-medium justify-center text-stone-600"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              <div className="mt-6 text-center">
-                <span className="text-[11px] text-stone-500">
-                  🔒 Bank-grade 256-bit encrypted checkout via Razorpay
-                </span>
-              </div>
+              </motion.div>
             </div>
-          </div>
-        )}
+          )}
+        </AnimatePresence>
       </div>
     </>
   );

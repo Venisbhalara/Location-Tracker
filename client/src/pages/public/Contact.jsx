@@ -79,7 +79,7 @@ const Contact = memo(() => {
         </nav>
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="glass-content-container rounded-3xl px-6 py-8 sm:px-10 sm:py-10 text-center w-full max-w-4xl mx-auto mb-16">
           <span className="eyebrow-pill mb-4">Customer Support &amp; Technical Desk</span>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-stone-900 mb-4 font-serif">
             We're Here to{" "}
@@ -87,7 +87,7 @@ const Contact = memo(() => {
               Assist You
             </span>
           </h1>
-          <p className="text-base sm:text-lg text-stone-600 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-stone-700 max-w-xl mx-auto leading-relaxed">
             Have a question, feedback, or need assistance with tracking links? Send us a message and our engineering team will respond promptly.
           </p>
         </div>

@@ -1,13 +1,43 @@
-import { memo } from "react";
-import { motion, useScroll } from "framer-motion";
+import { memo, useEffect } from "react";
+import { motion, useMotionValue } from "framer-motion";
+import { lenisInstance, subscribeLenisScroll } from "../../hooks/useLenis";
 
 /**
  * ScrollProgressBar Component
  * Minimalist 2px hairline scroll progress indicator.
- * Directly mapped to scrollYProgress without heavy useSpring physics solver for 120 FPS performance.
+ *
+ * Driven directly by Lenis' precomputed `progress` (scroll / limit) on every
+ * Lenis frame — no DOM reads, so it never forces a synchronous layout.
+ * (framer-motion's useScroll re-reads scrollHeight/clientHeight on every scroll
+ * event, which forced a layout flush per frame while Lenis was scrolling.)
+ * Rendered with a GPU-composited scaleX transform.
  */
 export const ScrollProgressBar = memo(() => {
-  const { scrollYProgress } = useScroll();
+  const scrollYProgress = useMotionValue(0);
+
+  useEffect(() => {
+    const unsubLenis = subscribeLenisScroll((e) => {
+      if (typeof e?.progress === "number" && Number.isFinite(e.progress)) {
+        scrollYProgress.set(Math.min(Math.max(e.progress, 0), 1));
+      }
+    });
+
+    // Native fallback (only when Lenis isn't running, e.g. reduced environments)
+    const handleNativeScroll = () => {
+      if (lenisInstance) return;
+      const max =
+        document.documentElement.scrollHeight - window.innerHeight;
+      scrollYProgress.set(max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0);
+    };
+
+    window.addEventListener("scroll", handleNativeScroll, { passive: true });
+    handleNativeScroll();
+
+    return () => {
+      unsubLenis();
+      window.removeEventListener("scroll", handleNativeScroll);
+    };
+  }, [scrollYProgress]);
 
   return (
     <motion.div

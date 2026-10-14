@@ -109,7 +109,7 @@ function MorphingHeadline() {
       aria-label="Track Any Phone's Live GPS. Just Send a Link. No App Needed."
     >
       {/* Primary Headline: Fixed height line ensuring ZERO vertical jump */}
-      <div className="flex items-center justify-center whitespace-nowrap text-[24px] xs:text-2xl sm:text-3xl md:text-4xl lg:text-[44px] font-bold text-stone-900 tracking-tight leading-normal">
+      <div className="mx-auto flex items-center justify-center whitespace-nowrap text-[24px] xs:text-2xl sm:text-3xl md:text-4xl lg:text-[44px] font-bold text-stone-900 tracking-tight leading-normal">
         <span className="shrink-0 text-stone-900">Track Any</span>
 
         {/* Stable Morph Slot */}
@@ -131,7 +131,7 @@ function MorphingHeadline() {
       </div>
 
       {/* Sub-tagline */}
-      <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-stone-600 mt-2 sm:mt-3 tracking-normal">
+      <div className="mx-auto text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-stone-600 mt-2 sm:mt-3 tracking-normal">
         Just Send a Link. No App Needed.
       </div>
     </h1>

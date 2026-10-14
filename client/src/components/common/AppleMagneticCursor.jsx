@@ -198,7 +198,7 @@ export const AppleMagneticCursor = memo(() => {
       }
     };
 
-    // Scroll & Wheel handler: throttled to avoid any React re-render spikes during scroll
+    // Scroll & Wheel handler: completely dormant during scroll to guarantee 0 forced layout flushes
     const handleScrollOrWheel = () => {
       const { x, y } = lastPosRef.current;
       if (x < 0 || y < 0) return;
@@ -213,14 +213,18 @@ export const AppleMagneticCursor = memo(() => {
         applyCursorMode("default");
       }
 
-      // When scroll settles (after 60ms), re-evaluate what is currently under the pointer
+      // Re-evaluate target ONLY after scrolling has completely ceased (140ms)
       if (scrollDebounceTimerRef.current) {
         clearTimeout(scrollDebounceTimerRef.current);
       }
       scrollDebounceTimerRef.current = setTimeout(() => {
         isScrollingRef.current = false;
-        evaluateTargetAtPoint(x, y);
-      }, 60);
+        requestAnimationFrame(() => {
+          if (!isScrollingRef.current) {
+            evaluateTargetAtPoint(lastPosRef.current.x, lastPosRef.current.y);
+          }
+        });
+      }, 140);
     };
 
     const handleMouseDown = () => setIsClicking(true);
